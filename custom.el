@@ -6,7 +6,7 @@
  '(compilation-message-face (quote default))
  '(custom-safe-themes
    (quote
-    ("628278136f88aa1a151bb2d6c8a86bf2b7631fbea5f0f76cba2a0079cd910f7d" "7b4d9b8a6ada8e24ac9eecd057093b0572d7008dbd912328231d0cada776065a" default)))
+    ("c74e83f8aa4c78a121b52146eadb792c9facc5b1f02c917e3dbb454fca931223" "3c83b3676d796422704082049fc38b6966bcad960f896669dfc21a7a37a748fa" "628278136f88aa1a151bb2d6c8a86bf2b7631fbea5f0f76cba2a0079cd910f7d" "7b4d9b8a6ada8e24ac9eecd057093b0572d7008dbd912328231d0cada776065a" default)))
  '(fci-rule-color "#515151")
  '(flycheck-color-mode-line-face-to-color (quote mode-line-buffer-id))
  '(highlight-changes-colors (quote ("#FD5FF0" "#AE81FF")))
@@ -20,6 +20,8 @@
      ("#A75B00" . 70)
      ("#F309DF" . 85)
      ("#3C3D37" . 100))))
+ '(hl-paren-background-colors (quote ("#e8fce8" "#c1e7f8" "#f8e8e8")))
+ '(hl-paren-colors (quote ("#40883f" "#0287c8" "#b85c57")))
  '(magit-diff-use-overlays nil)
  '(org-agenda-custom-commands
    (quote
@@ -40,7 +42,7 @@
       ((org-agenda-overriding-header ""))))))
  '(org-agenda-files
    (quote
-    ("~/Dropbox/org/life.org_archive" "~/research/destress/inquire.org" "~/cs/projects/blog/blog.org" "~/research/neuroecon/matrix/matrix.org" "~/Dropbox/org/daily.org" "~/research/neuroecon/general/neuroecon.org" "~/research/neuroecon/rtfMRI/rtfMRI.org" "~/Dropbox/org/ideas.org" "~/research/gazzaley/meditation/meditation.org" "~/Dropbox/org/life.org" "~/Dropbox/org/projects.org" "~/Dropbox/org/books.org")))
+    ("~/Dropbox/org/notes.org" "~/Dropbox/org/life.org_archive" "~/research/destress/inquire.org" "~/cs/projects/blog/blog.org" "~/research/neuroecon/matrix/matrix.org" "~/Dropbox/org/daily.org" "~/research/neuroecon/general/neuroecon.org" "~/research/neuroecon/rtfMRI/rtfMRI.org" "~/Dropbox/org/ideas.org" "~/research/gazzaley/meditation/meditation.org" "~/Dropbox/org/life.org" "~/Dropbox/org/projects.org" "~/Dropbox/org/books.org")))
  '(org-capture-templates
    (quote
     (("j" "Journal entry" entry
@@ -60,9 +62,13 @@
  '(org-refile-targets (quote ((nil :tag . "") (org-agenda-files :level . 2))))
  '(package-selected-packages
    (quote
-    (multi-term flx-ido org-bullets zotxt ess expand-region org-edit-latex auctex latex-extra bind-key page-break-lines use-package undo-tree org)))
+    (ag flyspell-correct neotree nyan-mode smart-mode-line multi-term flx-ido org-bullets zotxt ess expand-region org-edit-latex auctex latex-extra bind-key page-break-lines use-package undo-tree org)))
  '(pos-tip-background-color "#A6E22E")
  '(pos-tip-foreground-color "#272822")
+ '(sml/active-background-color "#98ece8")
+ '(sml/active-foreground-color "#424242")
+ '(sml/inactive-background-color "#4fa8a8")
+ '(sml/inactive-foreground-color "#424242")
  '(vc-annotate-background nil)
  '(vc-annotate-color-map
    (quote

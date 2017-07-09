@@ -1,7 +1,8 @@
 #+PROPERTY: header-args :tangle yes
+#+PROPERTY: noweb yes
 
 * personal
-  Who am i?
+  Who am I?
   #+begin_src emacs-lisp
     (setq user-full-name "Pierre Karashchuk"
           user-mail-address "krchtchk@gmail.com")
@@ -9,13 +10,37 @@
 
 * customize file
   Set up the customize file to its own separate file, instead of saving
-  customize settings in [[file:init.el][init.el]].
 
   #+begin_src emacs-lisp
     (setq custom-file (expand-file-name "custom.el" user-emacs-directory))
     (load custom-file)
   #+end_src
+* appearance
+** theme functions
+   From [[https://github.com/danielmai/.emacs.d/blob/master/config.org][Daniel Mai]]
+   #+begin_src emacs-lisp
+     (defun switch-theme (theme)
+       "Disables any currently active themes and loads THEME."
+       ;; This interactive call is taken from `load-theme'
+       (interactive
+        (list
+         (intern (completing-read "Load custom theme: "
+                                  (mapc 'symbol-name
+                                        (custom-available-themes))))))
+       (let ((enabled-themes custom-enabled-themes))
+         (mapc #'disable-theme custom-enabled-themes)
+         (load-theme theme t)))
 
+     (defun disable-active-themes ()
+       "Disables any currently active themes listed in `custom-enabled-themes'."
+       (interactive)
+       (mapc #'disable-theme custom-enabled-themes))
+   #+end_src
+** current theme
+   #+begin_src emacs-lisp
+     (use-package color-theme-sanityinc-tomorrow
+       :config (load-theme 'sanityinc-tomorrow-eighties t))
+   #+end_src
 * package config
   #+begin_src emacs-lisp
     (require 'package)
@@ -26,15 +51,25 @@
       (add-to-list 'package-archives '("org" . "http://orgmode.org/elpa/") t))
   #+end_src
 * ido
-  #+begin_src emacs-lisp
-    (setq ido-enable-flex-matching t)
-    (setq ido-everywhere t)
-    (ido-mode 1)
-    (setq ido-use-filename-at-point 'guess)
-    (setq ido-use-url-at-point nil)
-    (setq ido-file-extensions-order '(".org" ".txt" ".md" ".py" ".r" ".R" ".el"))
-  #+end_src
+** enable ido + basic settings
+   #+begin_src emacs-lisp
+     (setq ido-enable-flex-matching t)
+     (setq ido-everywhere t)
+     (ido-mode 1)
+     (setq ido-use-filename-at-point 'guess)
+     (setq ido-use-url-at-point nil)
+     (setq ido-file-extensions-order '(".org" ".txt" ".md" ".py" ".r" ".R" ".el"))
+     (setq ido-default-buffer-method 'selected-window)
+   #+end_src
+** bookmark jump
+   #+begin_src emacs-lisp
+     (defun ido-bookmark-jump (bname)
+       "*Switch to bookmark interactively using `ido'."
+       (interactive (list (ido-completing-read "Bookmark: " (bookmark-all-names) nil t)))
+       (bookmark-jump bname))
 
+     (define-key global-map [remap bookmark-jump] 'ido-bookmark-jump)
+   #+end_src
 * misc packages
 ** smex
    #+begin_src emacs-lisp
@@ -46,21 +81,39 @@
      (use-package magit 
        :bind ("C-x g" . magit-status))
    #+end_src
-* ergonomic keys
-  Based on ergoemacs key bindings, but adjusted for me
-  I want to have movement using Ctrl+something
+** pdf-tools
+   #+begin_src emacs-lisp
+     (use-package pdf-tools
+       :config (pdf-tools-install))
+   #+end_src
+* keybindings
+** ergonomic keys
+   Based on ergoemacs key bindings, but adjusted for me
+   I want to have movement using Ctrl+something
 
-  #+begin_src emacs-lisp
-    (define-key global-map [(control u)] ctl-x-map)
-    (bind-keys*
-     ("C-o" . other-window)
-     ("C-t" . previous-line)
-     ("C-p" . (lambda () (interactive) (message "C-p is disabled. Use C-t to go up.")))
-     ("M-u" . universal-argument)
-     ("M-h" . save-buffer)
-     ("C-." . set-mark-command))
-  #+end_src
+   #+begin_src emacs-lisp
+     (define-key global-map [(control u)] ctl-x-map)
+     (bind-keys
+      ("C-o" . other-window)
+      ("C-t" . previous-line)
+      ("C-p" . (lambda () (interactive) (message "C-p is disabled. Use C-t to go up.")))
+      ("M-u" . universal-argument)
+      ("C-." . set-mark-command)
+      ("M-." . expand-region))
 
+     (bind-keys* 
+      ("M-h" . save-buffer))
+
+   #+end_src
+** misc keys
+   #+begin_src emacs-lisp
+     (bind-key "M-/" 'hippie-expand)
+
+     (defun revert-buffer-no-confirm ()
+       "Revert buffer without confirmation."
+       (interactive) (revert-buffer t t))
+     (bind-key "C-x C-r" 'revert-buffer-no-confirm)
+   #+end_src
 * sane defaults
   (Copied from [[https://github.com/danielmai/.emacs.d][Daniel Mai]])
   Let's start with some sane defaults, shall we?
@@ -124,7 +177,6 @@
      (use-package page-break-lines
        :ensure t)
    #+end_src
-
 * org mode
 ** org options
    #+begin_src emacs-lisp
@@ -134,4 +186,25 @@
    #+begin_src emacs-lisp
      (bind-keys :map org-mode-map
                 ("M-." . org-mark-element))
+   #+end_src
+** todo
+   #+begin_src emacs-lisp
+     (setq org-todo-keywords
+           '((sequence "NEXT(n!)" "TODO(t!)" "IN-PROGRESS(i!)" "WAITING(w@/!)"
+                       "SOMEDAY(s)" "PROJECT(p)" "DELEGATED(l@/!)"
+                       "|" "DONE(d)" "CANCELED(c)")
+             (sequence "TO-READ(r@)" "READING(e)" "|" "READ(a)")
+             ))
+   #+end_src
+** misc
+   #+begin_src emacs-lisp
+     (add-to-list 'auto-mode-alist '("\\.org_archive\\'" . org-mode))
+   #+end_src
+** spelling
+   #+begin_src emacs-lisp
+     (add-to-list 'ispell-skip-region-alist '(":\\(PROPERTIES\\|LOGBOOK\\):" . ":END:"))
+     (add-to-list 'ispell-skip-region-alist '("#\\+BEGIN_SRC" . "#\\+END_SRC"))
+     (add-to-list 'ispell-skip-region-alist '("#\\+begin_src" . "#\\+end_src"))
+     (add-to-list 'ispell-skip-region-alist '("#\\+PROPERTY" . "\n"))
+     (add-to-list 'ispell-skip-region-alist '("\\[\\[" . "\\]\\]"))
    #+end_src

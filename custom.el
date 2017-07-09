@@ -29,7 +29,7 @@
  '(magit-diff-use-overlays nil)
  '(package-selected-packages
    (quote
-    (ssh org-plus-contrib image+ pdf-tools color-theme-sanityinc-tomorrow base16-theme waher-theme darkokai-theme monokai-alt-theme monokai-theme plan9-theme markdown-mode markdown-mode+ bind-key page-break-lines use-package undo-tree org)))
+    (expand-region org-edit-latex auctex latex-extra bind-key page-break-lines use-package undo-tree org)))
  '(pos-tip-background-color "#A6E22E")
  '(pos-tip-foreground-color "#272822")
  '(vc-annotate-background nil)
@@ -61,4 +61,4 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- )
+ '(variable-pitch ((t (:height 100 :width normal :family "Noto Sans")))))

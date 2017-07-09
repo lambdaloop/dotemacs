@@ -1,0 +1,141 @@
+#+PROPERTY: header-args :tangle yes
+
+* personal
+Who am i?
+#+begin_src emacs-lisp
+(setq user-full-name "Pierre Karashchuk"
+      user-mail-address "krchtchk@gmail.com")
+#+end_src
+
+* package config
+#+begin_src emacs-lisp
+(require 'package)
+(package-initialize)
+(unless (assoc-default "melpa" package-archives)
+  (add-to-list 'package-archives '("melpa" . "http://melpa.org/packages/") t))
+(unless (assoc-default "org" package-archives)
+  (add-to-list 'package-archives '("org" . "http://orgmode.org/elpa/") t))
+#+end_src
+
+* misc packages
+#+begin_src emacs-lisp
+  (use-package magit 
+  :bind ("C-x g" . magit-status))
+#+end_src
+
+* customize file
+Set up the customize file to its own separate file, instead of saving
+customize settings in [[file:init.el][init.el]].
+
+#+begin_src emacs-lisp
+(setq custom-file (expand-file-name "custom.el" user-emacs-directory))
+(load custom-file)
+#+end_src
+* ergonomic keys
+Based on ergoemacs key bindings, but adjusted for me
+I want to have movement using Ctrl+something
+
+#+begin_src emacs-lisp
+(define-key global-map [(control u)] ctl-x-map)
+
+(bind-keys*
+("C-o" . other-window)
+("C-t" . previous-line)
+("C-p" . other-window)
+("M-u" . universal-argument)
+("M-h" . save-buffer)
+("C-." . set-mark-command))
+#+end_src
+
+* sane defaults
+(Copied from [[https://github.com/danielmai/.emacs.d][Daniel Mai]])
+
+Let's start with some sane defaults, shall we?
+
+Sources for this section include [[https://github.com/magnars/.emacs.d/blob/master/settings/sane-defaults.el][Magnars Sveen]] and [[http://pages.sachachua.com/.emacs.d/Sacha.html][Sacha Chua]].
+
+
+#+begin_src emacs-lisp
+;; These functions are useful. Activate them.
+(put 'downcase-region 'disabled nil)
+(put 'upcase-region 'disabled nil)
+(put 'narrow-to-region 'disabled nil)
+(put 'dired-find-alternate-file 'disabled nil)
+
+;; Answering just 'y' or 'n' will do
+(defalias 'yes-or-no-p 'y-or-n-p)
+
+;; Keep all backup and auto-save files in one directory
+(setq backup-directory-alist '(("." . "~/tmp/emacs-backups")))
+(setq auto-save-file-name-transforms '((".*" "~/tmp/auto-save-list/" t)))
+
+;; UTF-8 please
+(setq locale-coding-system 'utf-8) ; pretty
+(set-terminal-coding-system 'utf-8) ; pretty
+(set-keyboard-coding-system 'utf-8) ; pretty
+(set-selection-coding-system 'utf-8) ; please
+(prefer-coding-system 'utf-8) ; with sugar on top
+(setq-default indent-tabs-mode nil)
+
+;; Turn off the blinking cursor
+(blink-cursor-mode -1)
+
+(setq-default indent-tabs-mode nil)
+(setq-default indicate-empty-lines t)
+
+;; Don't count two spaces after a period as the end of a sentence.
+;; Just one space is needed.
+(setq sentence-end-double-space nil)
+
+;; delete the region when typing, just like as we expect nowadays.
+(delete-selection-mode t)
+
+(show-paren-mode t)
+
+(column-number-mode t)
+
+(global-visual-line-mode)
+(diminish 'visual-line-mode)
+
+(setq uniquify-buffer-name-style 'forward)
+
+
+;; Don't beep at me
+(setq visible-bell nil)
+
+#+end_src
+
+The following function for ~occur-dwim~ is taken from [[https://github.com/abo-abo][Oleh Krehel]] from
+[[http://oremacs.com/2015/01/26/occur-dwim/][his blog post at (or emacs]]. It takes the current region or the symbol
+at point as the default value for occur.
+
+#+begin_src emacs-lisp
+(defun occur-dwim ()
+  "Call `occur' with a sane default."
+  (interactive)
+  (push (if (region-active-p)
+            (buffer-substring-no-properties
+             (region-beginning)
+             (region-end))
+          (thing-at-point 'symbol))
+        regexp-history)
+  (call-interactively 'occur))
+
+(bind-key "M-s o" 'occur-dwim)
+#+end_src
+
+Here we make page-break characters look pretty, instead of appearing
+as =^L= in Emacs. [[http://ericjmritz.name/2015/08/29/using-page-breaks-in-gnu-emacs/][Here's an informative article called "Using
+Page-Breaks in GNU Emacs" by Eric J. M. Ritz.]]
+
+#+begin_src emacs-lisp
+(use-package page-break-lines
+  :ensure t)
+#+end_src
+
+* org mode
+** org specific keybindings
+#+begin_src emacs-lisp
+(bind-keys :map org-mode-map
+("M-." . org-mark-element))
+#+end_src

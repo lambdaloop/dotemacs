@@ -3,12 +3,6 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(ansi-color-faces-vector
-   [default bold shadow italic underline bold bold-italic bold])
- '(ansi-color-names-vector
-   (vector "#cccccc" "#f2777a" "#99cc99" "#ffcc66" "#6699cc" "#cc99cc" "#66cccc" "#515151"))
- '(ansi-term-color-vector
-   [unspecified "#2c3e50" "#e74c3c" "#2ecc71" "#f1c40f" "#3498db" "#9b59b6" "#3498db" "#e0e0e0"] t)
  '(compilation-message-face (quote default))
  '(custom-safe-themes
    (quote
@@ -27,9 +21,46 @@
      ("#F309DF" . 85)
      ("#3C3D37" . 100))))
  '(magit-diff-use-overlays nil)
+ '(org-agenda-custom-commands
+   (quote
+    (("d" "Agenda with only one deadline warning day" agenda ""
+      ((org-agenda-start-day "+0")
+       (org-agenda-span 1)
+       (org-deadline-warning-days 7)))
+     ("N" "Agenda and all NEXTs"
+      ((agenda "" nil)
+       (todo "NEXT"
+             ((org-agenda-skip-function
+               (quote
+                (org-agenda-skip-entry-if
+                 (quote scheduled)))))))
+      nil)
+     ("p" "List all Projects" todo "PROJECT" nil)
+     ("n" "List all next actions" todo "NEXT|TODO"
+      ((org-agenda-overriding-header ""))))))
+ '(org-agenda-files
+   (quote
+    ("~/Dropbox/org/life.org_archive" "~/research/destress/inquire.org" "~/cs/projects/blog/blog.org" "~/research/neuroecon/matrix/matrix.org" "~/Dropbox/org/daily.org" "~/research/neuroecon/general/neuroecon.org" "~/research/neuroecon/rtfMRI/rtfMRI.org" "~/Dropbox/org/ideas.org" "~/research/gazzaley/meditation/meditation.org" "~/Dropbox/org/life.org" "~/Dropbox/org/projects.org" "~/Dropbox/org/books.org")))
+ '(org-capture-templates
+   (quote
+    (("j" "Journal entry" entry
+      (file+datetree+prompt "~/Dropbox/org/daily.org")
+      (file "~/Dropbox/org/templates/tpl-journal.txt"))
+     ("t" "Task" entry
+      (file+headline "~/Dropbox/org/life.org" "Capture")
+      (file "~/Dropbox/org/templates/tpl-task.txt")
+      :empty-lines-after 1)
+     ("b" "Capture a bookmark" entry
+      (file+headline "~/Dropbox/org/notes.org" "Bookmarks")
+      (file "~/Dropbox/org/templates/tpl-bookmark.txt")
+      :empty-lines-after 1)
+     ("w" "Weekly review" entry
+      (file+datetree+prompt "~/Dropbox/org/daily.org")
+      (file "~/Dropbox/org/templates/tpl-review.txt")))))
+ '(org-refile-targets (quote ((nil :tag . "") (org-agenda-files :level . 2))))
  '(package-selected-packages
    (quote
-    (expand-region org-edit-latex auctex latex-extra bind-key page-break-lines use-package undo-tree org)))
+    (multi-term flx-ido org-bullets zotxt ess expand-region org-edit-latex auctex latex-extra bind-key page-break-lines use-package undo-tree org)))
  '(pos-tip-background-color "#A6E22E")
  '(pos-tip-foreground-color "#272822")
  '(vc-annotate-background nil)

@@ -1,5 +1,4 @@
 #+PROPERTY: header-args :tangle yes
-#+PROPERTY: noweb yes
 
 * personal
   Who am I?

@@ -1,3 +1,4 @@
+#+TITLE: Emacs Config
 #+PROPERTY: header-args :tangle yes
 
 * personal
@@ -84,6 +85,7 @@
                  ("^/sudo:.*:" ":SU:")
                  ("^~/Dropbox/" ":DBox:")
                  ("^:\\([^:]*\\):Documento?s/" ":\\1/Doc:")
+                 ("^~/research/neuroecon" ":NEcon:")
                  ("^~/research/" ":RS:")
                  ("^~/cs/projects/" ":CS-PROJ:")
                  ("^~/data_analysis/" ":DA:")
@@ -205,7 +207,8 @@
      (bind-keys
       ("C-o" . other-window)
       ("C-t" . previous-line)
-      ("C-p" . (lambda () (interactive) (message "C-p is disabled. Use C-t to go up.")))
+      ;; ("C-p" . (lambda () (interactive) (message "C-p is disabled. Use C-t to go up.")))
+      ("C-p" . transpose-chars)
       ("M-u" . universal-argument)
       ("M-p" . (lambda () (interactive) (execute-kbd-macro (kbd "M-{"))))
       ("M-g" . (lambda () (interactive) (execute-kbd-macro (kbd "M-}"))))
@@ -220,14 +223,20 @@
    #+end_src
 
 ** misc keys
-   #+begin_src emacs-lisp
-     (bind-key "M-/" 'hippie-expand)
-     (bind-key "C-x k" 'kill-this-buffer)
+#+begin_src emacs-lisp
+  (bind-key "M-/" 'hippie-expand)
 
-     (defun revert-buffer-no-confirm ()
-       "Revert buffer without confirmation."
-       (interactive) (revert-buffer t t))
-     (bind-key "C-x C-r" 'revert-buffer-no-confirm)
+  (defun really-kill-this-buffer ()
+    "Kill this current buffer."
+    (interactive)
+    (kill-buffer (current-buffer)))
+
+  (bind-key "C-x k" 'really-kill-this-buffer)
+
+  (defun revert-buffer-no-confirm ()
+    "Revert buffer without confirmation."
+    (interactive) (revert-buffer t t))
+  (bind-key "C-x C-r" 'revert-buffer-no-confirm)
    #+end_src
 * misc packages
   Here's a bunch of one-liners for package requires
@@ -287,7 +296,6 @@
                   ("C-;" . flyspell-correct-previous-word-generic)))
   #+end_src
 
-
 * latex
   #+begin_src emacs-lisp
     (add-hook 'LaTeX-mode-hook 'visual-line-mode)
@@ -323,6 +331,7 @@
    This includes options for source blocks and agenda.
    #+begin_src emacs-lisp
      (setq org-src-tab-acts-natively t)
+     (setq org-startup-indented t)
 
      (setq org-agenda-start-on-weekday 6) ;; start week on Saturdays
      (setq org-agenda-span 2)
@@ -346,6 +355,8 @@
      (setq org-completion-use-ido t)
      (setq org-outline-path-complete-in-steps nil)
    #+end_src
+
+   #+RESULTS:
 
 ** todo
    #+begin_src emacs-lisp
@@ -521,6 +532,13 @@
 
    #+RESULTS:
    : org-archive-subtree
+
+** org latex
+#+begin_src emacs-lisp
+(fset 'org-latex-subtree-to-pdf
+      "\C-c\C-e\C-slp")
+(bind-key "C-c e" 'org-latex-subtree-to-pdf org-mode-map)
+#+end_src
 
 * python
 ** ipython shell

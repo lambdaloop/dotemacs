@@ -29,20 +29,24 @@
       ((org-agenda-start-day "+0")
        (org-agenda-span 1)
        (org-deadline-warning-days 7)))
-     ("N" "Agenda and all NEXTs"
-      ((agenda "" nil)
-       (todo "NEXT"
+     ("N" "Agenda and all TODOs"
+      ((agenda ""
+               ((org-agenda-span 7)))
+       (todo "TODO"
              ((org-agenda-skip-function
                (quote
                 (org-agenda-skip-entry-if
                  (quote scheduled)))))))
       nil)
      ("p" "List all Projects" todo "PROJECT" nil)
-     ("n" "List all next actions" todo "NEXT|TODO"
-      ((org-agenda-overriding-header ""))))))
+     ("n" "List all next actions" todo "TODO"
+      ((org-agenda-skip-function
+        (quote
+         (org-agenda-skip-entry-if
+          (quote scheduled)))))))))
  '(org-agenda-files
    (quote
-    ("~/Dropbox/org/notes.org" "~/research/destress/inquire.org" "~/cs/projects/blog/blog.org" "~/research/neuroecon/matrix/matrix.org" "~/Dropbox/org/daily.org" "~/research/neuroecon/general/neuroecon.org" "~/research/neuroecon/rtfMRI/rtfMRI.org" "~/Dropbox/org/ideas.org" "~/research/gazzaley/meditation/meditation.org" "~/Dropbox/org/life.org" "~/Dropbox/org/projects.org" "~/Dropbox/org/books.org")))
+    ("~/research/neuroecon/general/neuroecon_notes.org" "~/Dropbox/org/notes.org" "~/research/destress/inquire.org" "~/cs/projects/blog/blog.org" "~/research/neuroecon/matrix/matrix.org" "~/Dropbox/org/daily.org" "~/research/neuroecon/general/neuroecon.org" "~/research/neuroecon/rtfMRI/rtfMRI.org" "~/Dropbox/org/ideas.org" "~/research/gazzaley/meditation/meditation.org" "~/Dropbox/org/life.org" "~/Dropbox/org/projects.org" "~/Dropbox/org/books.org")))
  '(org-capture-templates
    (quote
     (("j" "Journal entry" entry
@@ -59,10 +63,13 @@
      ("w" "Weekly review" entry
       (file+datetree+prompt "~/Dropbox/org/daily.org")
       (file "~/Dropbox/org/templates/tpl-review.txt")))))
- '(org-refile-targets (quote ((nil :level . 3) (org-agenda-files :level . 2))))
+ '(org-refile-targets
+   (quote
+    ((org-agenda-files :maxlevel . 2)
+     (nil :maxlevel . 2))))
  '(package-selected-packages
    (quote
-    (writeroom-mode ag flyspell-correct neotree nyan-mode smart-mode-line multi-term flx-ido org-bullets zotxt ess expand-region org-edit-latex auctex latex-extra bind-key page-break-lines use-package undo-tree org)))
+    (avy writeroom-mode ag flyspell-correct neotree nyan-mode smart-mode-line multi-term flx-ido org-bullets zotxt ess expand-region org-edit-latex auctex latex-extra bind-key page-break-lines use-package undo-tree org)))
  '(pos-tip-background-color "#A6E22E")
  '(pos-tip-foreground-color "#272822")
  '(sml/active-background-color "#98ece8")

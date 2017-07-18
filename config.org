@@ -2,224 +2,231 @@
 #+PROPERTY: header-args :tangle yes
 
 * personal
-  Who am I?
-  #+begin_src emacs-lisp
-    (setq user-full-name "Pierre Karashchuk"
-          user-mail-address "krchtchk@gmail.com")
-  #+end_src
+Who am I?
+#+begin_src emacs-lisp
+  (setq user-full-name "Pierre Karashchuk"
+        user-mail-address "krchtchk@gmail.com")
+#+end_src
 
 * startup
-  I almost never use the *scratch* buffer. life.org is a good start
-  #+begin_src emacs-lisp
-    (setq initial-buffer-choice "~/Dropbox/org/life.org")
-  #+end_src
+I almost never use the *scratch* buffer. life.org is a good start
+#+begin_src emacs-lisp
+  (setq initial-buffer-choice "~/Dropbox/org/life.org")
+#+end_src
 
 * customize file
-  Set up the customize file to its own separate file, instead of saving
+Set up the customize file to its own separate file, instead of saving
 
-  #+begin_src emacs-lisp
-    (setq custom-file (expand-file-name "custom.el" user-emacs-directory))
-    (load custom-file)
-  #+end_src
+#+begin_src emacs-lisp
+  (setq custom-file (expand-file-name "custom.el" user-emacs-directory))
+  (load custom-file)
+#+end_src
 * package config
-  #+begin_src emacs-lisp
-    (require 'package)
-    (package-initialize)
-    (unless (assoc-default "melpa" package-archives)
-      (add-to-list 'package-archives '("melpa" . "http://melpa.org/packages/") t))
-    (unless (assoc-default "org" package-archives)
-      (add-to-list 'package-archives '("org" . "http://orgmode.org/elpa/") t))
-  #+end_src
+#+begin_src emacs-lisp
+  (require 'package)
+  (package-initialize)
+  (unless (assoc-default "melpa" package-archives)
+    (add-to-list 'package-archives '("melpa" . "http://melpa.org/packages/") t))
+  (unless (assoc-default "org" package-archives)
+    (add-to-list 'package-archives '("org" . "http://orgmode.org/elpa/") t))
+#+end_src
 * appearance
 ** basic appearance
-   #+begin_src emacs-lisp
-     (setq default-frame-alist '((font-backend . "xft")
-                                 (font . "DejaVu Sans Mono-9")
-                                 (vertical-scroll-bars)
-                                 (menu-bar-lines . 0)
-                                 (tool-bar-lines . 0)
-                                 ))
-     (custom-set-faces
-      '(variable-pitch ((t (:height 100 :width normal :family "Noto Sans")))))
+#+begin_src emacs-lisp
+  (setq default-frame-alist '((font-backend . "xft")
+                              (font . "DejaVu Sans Mono-9")
+                              (vertical-scroll-bars)
+                              (menu-bar-lines . 0)
+                              (tool-bar-lines . 0)
+                              ))
+  (custom-set-faces
+   '(variable-pitch ((t (:height 100 :width normal :family "Noto Sans")))))
 
-     (setq-default cursor-type 'box)
-     (blink-cursor-mode 0)
-   #+end_src
+  (setq-default cursor-type 'box)
+  (blink-cursor-mode 0)
+#+end_src
 
 ** theme functions
-   From [[https://github.com/danielmai/.emacs.d/blob/master/config.org][Daniel Mai]]
-   #+begin_src emacs-lisp
-     (defun switch-theme (theme)
-       "Disables any currently active themes and loads THEME."
-       ;; This interactive call is taken from `load-theme'
-       (interactive
-        (list
-         (intern (completing-read "Load custom theme: "
-                                  (mapc 'symbol-name
-                                        (custom-available-themes))))))
-       (let ((enabled-themes custom-enabled-themes))
-         (mapc #'disable-theme custom-enabled-themes)
-         (load-theme theme t)))
+From [[https://github.com/danielmai/.emacs.d/blob/master/config.org][Daniel Mai]]
+#+begin_src emacs-lisp
+  (defun switch-theme (theme)
+    "Disables any currently active themes and loads THEME."
+    ;; This interactive call is taken from `load-theme'
+    (interactive
+     (list
+      (intern (completing-read "Load custom theme: "
+                               (mapc 'symbol-name
+                                     (custom-available-themes))))))
+    (let ((enabled-themes custom-enabled-themes))
+      (mapc #'disable-theme custom-enabled-themes)
+      (load-theme theme t)))
 
-     (defun disable-active-themes ()
-       "Disables any currently active themes listed in `custom-enabled-themes'."
-       (interactive)
-       (mapc #'disable-theme custom-enabled-themes))
-   #+end_src
+  (defun disable-active-themes ()
+    "Disables any currently active themes listed in `custom-enabled-themes'."
+    (interactive)
+    (mapc #'disable-theme custom-enabled-themes))
+#+end_src
 
 ** current theme
-   #+begin_src emacs-lisp
-     (use-package color-theme-sanityinc-tomorrow
-       :config (switch-theme 'sanityinc-tomorrow-eighties))
-   #+end_src
+#+begin_src emacs-lisp
+  (use-package color-theme-sanityinc-tomorrow
+    :config (switch-theme 'sanityinc-tomorrow-eighties))
+#+end_src
 ** smart-mode-line
-   #+begin_src emacs-lisp
-     (use-package smart-mode-line
-       :config 
-       (progn 
-         (setq sml/no-confirm-load-theme t) 
-         (setq sml/replacer-regexp-list
-               '(("^~/Dropbox/org/" ":ORG:")
-                 ("^~/\\.emacs\\.d/elpa/" ":ELPA:")
-                 ("^~/\\.emacs\\.d/" ":ED:")
-                 ("^/sudo:.*:" ":SU:")
-                 ("^~/Dropbox/" ":DBox:")
-                 ("^:\\([^:]*\\):Documento?s/" ":\\1/Doc:")
-                 ("^~/research/neuroecon" ":NEcon:")
-                 ("^~/research/" ":RS:")
-                 ("^~/cs/projects/" ":CS-PROJ:")
-                 ("^~/data_analysis/" ":DA:")
-                 ("^~/desktop_scripts/" ":DSc:")
-                 ))
-         (sml/setup)))
-   #+end_src
+#+begin_src emacs-lisp
+  (use-package smart-mode-line
+    :config 
+    (progn 
+      (setq sml/no-confirm-load-theme t) 
+      (setq sml/replacer-regexp-list
+            '(("^~/Dropbox/org/" ":ORG:")
+              ("^~/\\.emacs\\.d/elpa/" ":ELPA:")
+              ("^~/\\.emacs\\.d/" ":ED:")
+              ("^/sudo:.*:" ":SU:")
+              ("^~/Dropbox/" ":DBox:")
+              ("^:\\([^:]*\\):Documento?s/" ":\\1/Doc:")
+              ("^~/research/neuroecon" ":NEcon:")
+              ("^~/research/" ":RS:")
+              ("^~/cs/projects/" ":CS-PROJ:")
+              ("^~/data_analysis/" ":DA:")
+              ("^~/desktop_scripts/" ":DSc:")
+              ))
+      (sml/setup)))
+#+end_src
 * ido
 ** enable ido + basic settings
-   #+begin_src emacs-lisp
-     (use-package ido 
-       :config
-       (progn
-         (setq ido-enable-flex-matching t)
-         (setq ido-everywhere t)
-         (ido-mode +1)
-         (setq ido-use-filename-at-point 'guess)
-         (setq ido-use-url-at-point nil)
-         (setq ido-file-extensions-order '(".org" ".txt" ".md" ".py" ".r" ".R" ".el"))
-         (setq ido-default-buffer-method 'selected-window)))
+#+begin_src emacs-lisp
+  (use-package ido 
+    :config
+    (progn
+      (setq ido-enable-flex-matching t)
+      (setq ido-everywhere t)
+      (ido-mode +1)
+      (setq ido-use-filename-at-point 'guess)
+      (setq ido-use-url-at-point nil)
+      (setq ido-file-extensions-order '(".org" ".txt" ".md" ".py" ".r" ".R" ".el"))
+      (setq ido-default-buffer-method 'selected-window)))
 
-     (use-package ido-completing-read+
-       :ensure ido
-       :config (ido-ubiquitous-mode +1)
-       )
+  (use-package ido-completing-read+
+    :ensure ido
+    :config (ido-ubiquitous-mode +1)
+    )
 
-     (use-package flx-ido
-       :ensure ido
-       :config (progn 
-                 (flx-ido-mode +1) 
-                 ;; disable ido faces to see flx highlights
-                 (setq ido-use-faces nil) 
-                 )
-       )
-   #+end_src
+  (use-package flx-ido
+    :ensure ido
+    :config (progn 
+              (flx-ido-mode +1) 
+              ;; disable ido faces to see flx highlights
+              (setq ido-use-faces nil) 
+              )
+    )
+#+end_src
 
-   #+RESULTS:
-   : t
+#+RESULTS:
+: t
 
 ** bookmark jump
-   #+begin_src emacs-lisp
-     (defun ido-bookmark-jump (bname)
-       "*Switch to bookmark interactively using `ido'."
-       (interactive (list (ido-completing-read "Bookmark: " (bookmark-all-names) nil t)))
-       (bookmark-jump bname))
+#+begin_src emacs-lisp
+  (defun ido-bookmark-jump (bname)
+    "*Switch to bookmark interactively using `ido'."
+    (interactive (list (ido-completing-read "Bookmark: " (bookmark-all-names) nil t)))
+    (bookmark-jump bname))
 
-     (define-key global-map [remap bookmark-jump] 'ido-bookmark-jump)
-   #+end_src
+  (define-key global-map [remap bookmark-jump] 'ido-bookmark-jump)
+#+end_src
 * sane defaults
-  (Copied from [[https://github.com/danielmai/.emacs.d][Daniel Mai]])
-  Let's start with some sane defaults, shall we?
-  Sources for this section include [[https://github.com/magnars/.emacs.d/blob/master/settings/sane-defaults.el][Magnars Sveen]] and [[http://pages.sachachua.com/.emacs.d/Sacha.html][Sacha Chua]].
+(Copied from [[https://github.com/danielmai/.emacs.d][Daniel Mai]])
+Let's start with some sane defaults, shall we?
+Sources for this section include [[https://github.com/magnars/.emacs.d/blob/master/settings/sane-defaults.el][Magnars Sveen]] and [[http://pages.sachachua.com/.emacs.d/Sacha.html][Sacha Chua]].
 ** misc
-   #+begin_src emacs-lisp
-     ;; These functions are useful. Activate them.
-     (put 'downcase-region 'disabled nil)
-     (put 'upcase-region 'disabled nil)
-     (put 'narrow-to-region 'disabled nil)
-     (put 'dired-find-alternate-file 'disabled nil)
+#+begin_src emacs-lisp
+  ;; These functions are useful. Activate them.
+  (put 'narrow-to-region 'disabled nil)
+  (put 'dired-find-alternate-file 'disabled nil)
 
-     ;; Answering just 'y' or 'n' will do
-     (defalias 'yes-or-no-p 'y-or-n-p)
+  ;; Answering just 'y' or 'n' will do
+  (defalias 'yes-or-no-p 'y-or-n-p)
 
-     ;; Keep all backup and auto-save files in one directory
-     (setq backup-directory-alist '(("." . "~/tmp/emacs-backups")))
-     (setq auto-save-file-name-transforms '((".*" "~/tmp/auto-save-list/" t)))
+  ;; Keep all backup and auto-save files in one directory
+  (setq backup-directory-alist '(("." . "~/tmp/emacs-backups")))
+  (setq auto-save-file-name-transforms '((".*" "~/tmp/auto-save-list/" t)))
 
-     ;; UTF-8 please
-     (setq locale-coding-system 'utf-8) ; pretty
-     (set-terminal-coding-system 'utf-8) ; pretty
-     (set-keyboard-coding-system 'utf-8) ; pretty
-     (set-selection-coding-system 'utf-8) ; please
-     (prefer-coding-system 'utf-8) ; with sugar on top
-     (setq-default indent-tabs-mode nil)
+  ;; UTF-8 please
+  (setq locale-coding-system 'utf-8) ; pretty
+  (set-terminal-coding-system 'utf-8) ; pretty
+  (set-keyboard-coding-system 'utf-8) ; pretty
+  (set-selection-coding-system 'utf-8) ; please
+  (prefer-coding-system 'utf-8) ; with sugar on top
+  (setq-default indent-tabs-mode nil)
 
-     ;; Turn off the blinking cursor
-     (blink-cursor-mode -1)
+  ;; Turn off the blinking cursor
+  (blink-cursor-mode -1)
 
-     (setq-default indent-tabs-mode nil)
-     (setq-default indicate-empty-lines t)
+  (setq-default indent-tabs-mode nil)
+  (setq-default indicate-empty-lines t)
 
-     ;; Don't count two spaces after a period as the end of a sentence.
-     ;; Just one space is needed.
-     (setq sentence-end-double-space nil)
+  ;; Don't count two spaces after a period as the end of a sentence.
+  ;; Just one space is needed.
+  (setq sentence-end-double-space nil)
 
-     ;; delete the region when typing, just like as we expect nowadays.
-     (delete-selection-mode t)
+  ;; delete the region when typing, just like as we expect nowadays.
+  (delete-selection-mode t)
 
-     (show-paren-mode t)
+  (show-paren-mode t)
 
-     (column-number-mode t)
+  (column-number-mode t)
 
-     (global-visual-line-mode)
-     (diminish 'visual-line-mode)
+  (global-visual-line-mode)
+  (diminish 'visual-line-mode)
 
-     (setq uniquify-buffer-name-style 'forward)
+  (setq uniquify-buffer-name-style 'forward)
 
-     ;; Don't beep at me
-     (setq visible-bell nil)
+  ;; Don't beep at me
+  (setq visible-bell nil)
 
-   #+end_src
+  ;; C-n adds newlines
+  (setq-default next-line-add-newlines t)
+
+  ;; Add final newline
+  (setq-default require-final-newline t)
+
+  ;; enable electric pair mode everywhere
+  (electric-pair-mode +1)
+    #+end_src
 
 ** page breaks
-   Here we make page-break characters look pretty, instead of appearing
-   as =^L= in Emacs. [[http://ericjmritz.name/2015/08/29/using-page-breaks-in-gnu-emacs/][Here's an informative article called "Using
-   Page-Breaks in GNU Emacs" by Eric J. M. Ritz.]]
+Here we make page-break characters look pretty, instead of appearing
+as =^L= in Emacs. [[http://ericjmritz.name/2015/08/29/using-page-breaks-in-gnu-emacs/][Here's an informative article called "Using
+Page-Breaks in GNU Emacs" by Eric J. M. Ritz.]]
 
-   #+begin_src emacs-lisp
-     (use-package page-break-lines
-       :ensure t)
-   #+end_src
+#+begin_src emacs-lisp
+  (use-package page-break-lines
+    :ensure t)
+#+end_src
 * keybindings
 ** ergonomic keys
-   Based on ergoemacs key bindings, but adjusted for me
-   I want to have movement using Ctrl+something
+Based on ergoemacs key bindings, but adjusted for me
+I want to have movement using Ctrl+something
 
-   #+begin_src emacs-lisp
-     (define-key global-map [(control u)] ctl-x-map)
-     (bind-keys
-      ("C-o" . other-window)
-      ("C-t" . previous-line)
-      ;; ("C-p" . (lambda () (interactive) (message "C-p is disabled. Use C-t to go up.")))
-      ("C-p" . transpose-chars)
-      ("M-u" . universal-argument)
-      ("M-p" . (lambda () (interactive) (execute-kbd-macro (kbd "M-{"))))
-      ("M-g" . (lambda () (interactive) (execute-kbd-macro (kbd "M-}"))))
-      ("M-[" . (lambda () (interactive) (execute-kbd-macro (kbd "M-{"))))
-      ("M-]" . (lambda () (interactive) (execute-kbd-macro (kbd "M-}"))))
-      )
+#+begin_src emacs-lisp
+  (define-key global-map [(control u)] ctl-x-map)
+  (bind-keys
+   ("C-o" . other-window)
+   ("C-t" . previous-line)
+   ;; ("C-p" . (lambda () (interactive) (message "C-p is disabled. Use C-t to go up.")))
+   ("C-p" . transpose-chars)
+   ("M-i" . universal-argument)
+   ("C-x C-u" . pop-to-mark-command)
+   ("M-p" . (lambda () (interactive) (execute-kbd-macro (kbd "M-{"))))
+   ("M-g" . (lambda () (interactive) (execute-kbd-macro (kbd "M-}"))))
+   ("M-[" . (lambda () (interactive) (execute-kbd-macro (kbd "M-{"))))
+   ("M-]" . (lambda () (interactive) (execute-kbd-macro (kbd "M-}"))))
+   )
 
-     (bind-keys*
-      ("C-." . set-mark-command) 
-      ("M-h" . save-buffer)
-      )
+  (bind-keys*
+   ("C-." . set-mark-command) 
+   ("M-h" . save-buffer)
+   )
    #+end_src
 
 ** misc keys
@@ -255,65 +262,189 @@
       :config (setq ess-use-ido t))
     (use-package nyan-mode
       :config (nyan-mode +1))
-  #+end_src
+    (use-package avy
+      :config (setq avy-timeout-seconds 0.3)
+      :bind* (("M-o" . avy-goto-char-timer)))
+      #+end_src
 * multi term
-  #+begin_src emacs-lisp
-    (use-package multi-term 
-      :config (setq multi-term-program "/usr/bin/zsh")
-      :config
-      (progn
-        (unbind-key "C-u" term-raw-map)
-        (unbind-key "C-x" term-raw-map))
-      :bind* (("C-c M-m" . multi-term)
-              :map term-mode-map
-              ("M-p" . term-send-up)
-              ("M-n" . term-send-down)
-              ("M-{" . multi-term-prev)
-              ("M-}" . multi-term-next)
-              :map term-raw-map
-              ("M-p" . term-send-up)
-              ("M-n" . term-send-down)
-              ("M-{" . multi-term-prev)
-              ("M-}" . multi-term-next)
-              ("C-o" . other-window)
-              ("C-x b" . ido-switch-buffer)
-              )
-      )
-  #+end_src
+#+begin_src emacs-lisp
+  (use-package multi-term 
+    :config (setq multi-term-program "/usr/bin/zsh")
+    :config
+    (progn
+      (unbind-key "C-u" term-raw-map)
+      (unbind-key "C-x" term-raw-map))
+    :bind* (("C-c M-m" . multi-term)
+            :map term-mode-map
+            ("M-p" . term-send-up)
+            ("M-n" . term-send-down)
+            ("M-{" . multi-term-prev)
+            ("M-}" . multi-term-next)
+            :map term-raw-map
+            ("M-p" . term-send-up)
+            ("M-n" . term-send-down)
+            ("M-{" . multi-term-prev)
+            ("M-}" . multi-term-next)
+            ("C-o" . other-window)
+            ("C-x b" . ido-switch-buffer)
+            )
+    )
+#+end_src
 * flyspell
-  #+begin_src emacs-lisp
-    (use-package flyspell
-      :config (progn 
-                (add-hook 'text-mode-hook 'flyspell-mode)
-                (add-hook 'org-mode-hook 'flyspell-mode)
-                (add-hook 'LaTeX-mode-hook 'flyspell-mode)
-                ))
+#+begin_src emacs-lisp
+  (use-package flyspell
+    :config (progn 
+              (add-hook 'text-mode-hook 'flyspell-mode)
+              (add-hook 'org-mode-hook 'flyspell-mode)
+              (add-hook 'LaTeX-mode-hook 'flyspell-mode)
+              ))
 
-    (use-package flyspell-correct
-      :ensure flyspell
-      :config (require 'flyspell-correct-ido)
-      :bind (:map flyspell-mode-map
-                  ("C-;" . flyspell-correct-previous-word-generic)))
-  #+end_src
+  (use-package flyspell-correct
+    :ensure flyspell
+    :config (require 'flyspell-correct-ido)
+    :bind (:map flyspell-mode-map
+                ("C-;" . flyspell-correct-previous-word-generic)))
+#+end_src
 
 * latex
-  #+begin_src emacs-lisp
-    (add-hook 'LaTeX-mode-hook 'visual-line-mode)
-    (add-hook 'LaTeX-mode-hook 'flyspell-mode)
-    (add-hook 'LaTeX-mode-hook 'LaTeX-math-mode)
-    (add-hook 'LaTeX-mode-hook 'TeX-PDF-mode)
+#+begin_src emacs-lisp
+  (add-hook 'LaTeX-mode-hook 'visual-line-mode)
+  (add-hook 'LaTeX-mode-hook 'flyspell-mode)
+  (add-hook 'LaTeX-mode-hook 'LaTeX-math-mode)
+  (add-hook 'LaTeX-mode-hook 'TeX-PDF-mode)
 
-    (setq TeX-PDF-mode t)
-  #+end_src
+  (setq TeX-PDF-mode t)
+#+end_src
 
 * org mode
+** org-archive-subtree-hierarchical
+#+begin_src emacs-lisp
+  ;; org-archive-subtree-hierarchical.el
+  ;; modified from https://lists.gnu.org/archive/html/emacs-orgmode/2014-08/msg00109.html
+
+  ;; In orgmode
+  ;; * A
+  ;; ** AA
+  ;; *** AAA
+  ;; ** AB
+  ;; *** ABA
+  ;; Archiving AA will remove the subtree from the original file and create
+  ;; it like that in archive target:
+
+  ;; * AA
+  ;; ** AAA
+
+  ;; And this give you
+  ;; * A
+  ;; ** AA
+  ;; *** AAA
+
+
+  (require 'org-archive)
+
+  (defun org-archive-subtree-hierarchical--line-content-as-string ()
+    "Returns the content of the current line as a string"
+    (save-excursion
+      (beginning-of-line)
+      (buffer-substring-no-properties
+       (line-beginning-position) (line-end-position))))
+
+  (defun org-archive-subtree-hierarchical--org-child-list ()
+    "This function returns all children of a heading as a list. "
+    (interactive)
+    (save-excursion
+      ;; this only works with org-version > 8.0, since in previous
+      ;; org-mode versions the function (org-outline-level) returns
+      ;; gargabe when the point is not on a heading.
+      (if (= (org-outline-level) 0)
+          (outline-next-visible-heading 1)
+        (org-goto-first-child))
+      (let ((child-list (list (org-archive-subtree-hierarchical--line-content-as-string))))
+        (while (org-goto-sibling)
+          (setq child-list (cons (org-archive-subtree-hierarchical--line-content-as-string) child-list)))
+        child-list)))
+
+  (defun org-archive-subtree-hierarchical--org-struct-subtree ()
+    "This function returns the tree structure in which a subtree
+  belongs as a list."
+    (interactive)
+    (let ((archive-tree nil))
+      (save-excursion
+        (while (org-up-heading-safe)
+          (let ((heading
+                 (buffer-substring-no-properties
+                  (line-beginning-position) (line-end-position))))
+            (if (eq archive-tree nil)
+                (setq archive-tree (list heading))
+              (setq archive-tree (cons heading archive-tree))))))
+      archive-tree))
+
+  (defun org-archive-subtree-hierarchical ()
+    "This function archives a subtree hierarchical"
+    (interactive)
+    (let ((org-tree (org-archive-subtree-hierarchical--org-struct-subtree))
+          (this-buffer (current-buffer))
+          (file (abbreviate-file-name
+                 (or (buffer-file-name (buffer-base-buffer))
+                     (error "No file associated to buffer")))))
+      (save-excursion
+        (setq location (org-get-local-archive-location)
+              afile (org-extract-archive-file location)
+              heading (org-extract-archive-heading location)
+              infile-p (equal file (abbreviate-file-name (or afile ""))))
+        (unless afile
+          (error "Invalid `org-archive-location'"))
+        (if (> (length afile) 0)
+            (setq newfile-p (not (file-exists-p afile))
+                  visiting (find-buffer-visiting afile)
+                  buffer (or visiting (find-file-noselect afile)))
+          (setq buffer (current-buffer)))
+        (unless buffer
+          (error "Cannot access file \"%s\"" afile))
+        (org-cut-subtree)
+        (set-buffer buffer)
+        (org-mode)
+        (goto-char (point-min))
+        (while (not (equal org-tree nil))
+          (let ((child-list (org-archive-subtree-hierarchical--org-child-list)))
+            (if (member (car org-tree) child-list)
+                (progn
+                  (search-forward (car org-tree) nil t)
+                  (setq org-tree (cdr org-tree)))
+              (progn
+                (goto-char (point-max))
+                (newline)
+                (org-insert-struct org-tree)
+                (setq org-tree nil)))))
+        (newline)
+        (org-yank)
+        (when (not (eq this-buffer buffer))
+          (save-buffer))
+        (message "Subtree archived %s"
+                 (concat "in file: " (abbreviate-file-name afile))))))
+
+  (defun org-insert-struct (struct)
+    "TODO"
+    (interactive)
+    (when struct
+      (insert (car struct))
+      (newline)
+      (org-insert-struct (cdr struct))))
+
+  (defun org-archive-subtree ()
+    (org-archive-subtree-hierarchical)
+    )
+#+end_src
+
+#+RESULTS:
+: org-archive-subtree
 ** org keybindings
    Global keybindings
    #+begin_src emacs-lisp
      (bind-keys* 
       ("C-c a" . org-agenda)
       ("C-c l" . org-store-link)
-      ("C-c '" . org-capture)
+      ("C-'" . org-capture)
       )
    #+end_src
    Local keybindings
@@ -323,9 +454,7 @@
        (org-insert-time-stamp (current-time))
        )
      (bind-keys :map org-mode-map
-                ("C-c $" . org-archive-subtree-hierarchical)
-                ("C-c e" . org-latex-subtree-to-pdf)
-                )
+                ("C-c s" . org-archive-subtree-hierarchical) )
    #+end_src
 ** org options
    This includes options for source blocks and agenda.
@@ -335,14 +464,14 @@
 
      (setq org-agenda-start-on-weekday 6) ;; start week on Saturdays
      (setq org-agenda-span 2)
-     (setq org-agenda-tags-column -100) ; take advantage of the screen width
+     (setq org-agenda-tags-column -70) ; take advantage of the screen width
      (setq org-agenda-sticky nil)
      (setq org-agenda-inhibit-startup t)
      (setq org-agenda-use-tag-inheritance t)
      (setq org-agenda-show-log t)
      (setq org-agenda-skip-scheduled-if-done t)
      (setq org-agenda-skip-deadline-if-done t)
-     (setq org-agenda-skip-deadline-prewarning-if-scheduled 'pre-scheduled)
+     (setq org-agenda-skip-deadline-prewarning-if-scheduled t)
      (setq org-deadline-warning-days 6)
      (setq org-agenda-time-grid
            '((daily today require-timed)
@@ -354,26 +483,28 @@
      (setq org-refile-use-outline-path 'file)
      (setq org-completion-use-ido t)
      (setq org-outline-path-complete-in-steps nil)
-   #+end_src
+     #+end_src
 
    #+RESULTS:
 
 ** todo
-   #+begin_src emacs-lisp
-     (setq org-todo-keywords
-           '((sequence "NEXT(n!)" "TODO(t!)" "IN-PROGRESS(i!)" "WAITING(w@/!)"
-                       "SOMEDAY(s)" "PROJECT(p)" "DELEGATED(l@/!)"
-                       "|" "DONE(d)" "CANCELED(c)")
-             (sequence "TO-READ(r@)" "READING(e)" "|" "READ(a)")
-             ))
-   #+end_src
+#+begin_src emacs-lisp
+  (setq org-todo-keywords
+        '((sequence "TODO(t)" "IN-PROGRESS(i)" "WAITING(w@/!)"
+                    "SOMEDAY(s)" "PROJECT(p)"
+                    "|" "DONE(d!)" "CANCELED(c!)")
+          (sequence "TO-READ(r@)" "READING(e)" "|" "READ(a)")
+          ))
+#+end_src
 ** misc
-   #+begin_src emacs-lisp
-     ;; org archives are org files too!
-     (add-to-list 'auto-mode-alist '("\\.org_archive\\'" . org-mode))
+#+begin_src emacs-lisp
+  ;; org archives are org files too!
+  (add-to-list 'auto-mode-alist '("\\.org_archive\\'" . org-mode))
 
-     ;; don't confirm when execute code blocks
-     (setq org-confirm-babel-evaluate nil)
+  ;; don't confirm when execute code blocks
+  (setq org-confirm-babel-evaluate nil)
+
+  (add-hook 'org-mode-hook (lambda () (interactive) (org-indent-mode +1)))
    #+end_src
 
 ** spelling
@@ -411,133 +542,14 @@
 
    #+end_src
 
-** org-archive-subtree-hierarchical
-   #+begin_src emacs-lisp
-     ;; org-archive-subtree-hierarchical.el
-     ;; modified from https://lists.gnu.org/archive/html/emacs-orgmode/2014-08/msg00109.html
-
-     ;; In orgmode
-     ;; * A
-     ;; ** AA
-     ;; *** AAA
-     ;; ** AB
-     ;; *** ABA
-     ;; Archiving AA will remove the subtree from the original file and create
-     ;; it like that in archive target:
-
-     ;; * AA
-     ;; ** AAA
-
-     ;; And this give you
-     ;; * A
-     ;; ** AA
-     ;; *** AAA
-
-
-     (require 'org-archive)
-
-     (defun org-archive-subtree-hierarchical--line-content-as-string ()
-       "Returns the content of the current line as a string"
-       (save-excursion
-         (beginning-of-line)
-         (buffer-substring-no-properties
-          (line-beginning-position) (line-end-position))))
-
-     (defun org-archive-subtree-hierarchical--org-child-list ()
-       "This function returns all children of a heading as a list. "
-       (interactive)
-       (save-excursion
-         ;; this only works with org-version > 8.0, since in previous
-         ;; org-mode versions the function (org-outline-level) returns
-         ;; gargabe when the point is not on a heading.
-         (if (= (org-outline-level) 0)
-             (outline-next-visible-heading 1)
-           (org-goto-first-child))
-         (let ((child-list (list (org-archive-subtree-hierarchical--line-content-as-string))))
-           (while (org-goto-sibling)
-             (setq child-list (cons (org-archive-subtree-hierarchical--line-content-as-string) child-list)))
-           child-list)))
-
-     (defun org-archive-subtree-hierarchical--org-struct-subtree ()
-       "This function returns the tree structure in which a subtree
-     belongs as a list."
-       (interactive)
-       (let ((archive-tree nil))
-         (save-excursion
-           (while (org-up-heading-safe)
-             (let ((heading
-                    (buffer-substring-no-properties
-                     (line-beginning-position) (line-end-position))))
-               (if (eq archive-tree nil)
-                   (setq archive-tree (list heading))
-                 (setq archive-tree (cons heading archive-tree))))))
-         archive-tree))
-
-     (defun org-archive-subtree-hierarchical ()
-       "This function archives a subtree hierarchical"
-       (interactive)
-       (let ((org-tree (org-archive-subtree-hierarchical--org-struct-subtree))
-             (this-buffer (current-buffer))
-             (file (abbreviate-file-name
-                    (or (buffer-file-name (buffer-base-buffer))
-                        (error "No file associated to buffer")))))
-         (save-excursion
-           (setq location (org-get-local-archive-location)
-                 afile (org-extract-archive-file location)
-                 heading (org-extract-archive-heading location)
-                 infile-p (equal file (abbreviate-file-name (or afile ""))))
-           (unless afile
-             (error "Invalid `org-archive-location'"))
-           (if (> (length afile) 0)
-               (setq newfile-p (not (file-exists-p afile))
-                     visiting (find-buffer-visiting afile)
-                     buffer (or visiting (find-file-noselect afile)))
-             (setq buffer (current-buffer)))
-           (unless buffer
-             (error "Cannot access file \"%s\"" afile))
-           (org-cut-subtree)
-           (set-buffer buffer)
-           (org-mode)
-           (goto-char (point-min))
-           (while (not (equal org-tree nil))
-             (let ((child-list (org-archive-subtree-hierarchical--org-child-list)))
-               (if (member (car org-tree) child-list)
-                   (progn
-                     (search-forward (car org-tree) nil t)
-                     (setq org-tree (cdr org-tree)))
-                 (progn
-                   (goto-char (point-max))
-                   (newline)
-                   (org-insert-struct org-tree)
-                   (setq org-tree nil)))))
-           (newline)
-           (org-yank)
-           (when (not (eq this-buffer buffer))
-             (save-buffer))
-           (message "Subtree archived %s"
-                    (concat "in file: " (abbreviate-file-name afile))))))
-
-     (defun org-insert-struct (struct)
-       "TODO"
-       (interactive)
-       (when struct
-         (insert (car struct))
-         (newline)
-         (org-insert-struct (cdr struct))))
-
-     (defun org-archive-subtree ()
-       (org-archive-subtree-hierarchical)
-       )
-   #+end_src
-
-   #+RESULTS:
-   : org-archive-subtree
-
 ** org latex
 #+begin_src emacs-lisp
-(fset 'org-latex-subtree-to-pdf
-      "\C-c\C-e\C-slp")
-(bind-key "C-c e" 'org-latex-subtree-to-pdf org-mode-map)
+  (fset 'org-latex-subtree-to-pdf
+        "\C-c\C-e\C-slp")
+  (bind-keys :map org-mode-map
+             ("C-c e" . org-latex-subtree-to-pdf)
+             ("C-c 4" . org-toggle-latex-fragment))
+  (plist-put org-format-latex-options :scale 2.5)
 #+end_src
 
 * python
@@ -545,7 +557,8 @@
    #+begin_src emacs-lisp
      (use-package python
        :config
-       (setq python-shell-interpreter "ipython"
+       (setq python-shell-interpreter "ipython3"
              python-shell-interpreter-args "--simple-prompt -i"
              python-shell-completion-native-enable nil))
    #+end_src
+

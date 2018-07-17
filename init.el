@@ -19,7 +19,7 @@
 (when (boundp 'package-pinned-packages)
   (setq package-pinned-packages
         '((org-plus-contrib . "org"))))
-(package-initialize)
+;;(package-initialize)
 
 ;;; Bootstrap use-package
 ;; Install use-package if it's not already installed.
@@ -34,6 +34,7 @@
 (require 'diminish)                ;; if you use :diminish
 (require 'bind-key)
 ;; (setq use-package-verbose t)
+(server-force-delete)
 (server-start)
 
 ;;; Load the config

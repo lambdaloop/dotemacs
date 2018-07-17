@@ -6,3 +6,11 @@ ido.last
 smex-items
 bookmarks
 abbrev_defs
+tramp
+eshell
+srecode-map.el
+/request/
+/eshell/
+history
+ac-comphist.dat
+*.elc

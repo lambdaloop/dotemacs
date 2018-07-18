@@ -14,3 +14,7 @@ srecode-map.el
 history
 ac-comphist.dat
 *.elc
+/.sx
+130
+/emojis
+/url

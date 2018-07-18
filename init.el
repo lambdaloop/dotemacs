@@ -35,9 +35,10 @@
 (require 'bind-key)
 ;; (setq use-package-verbose t)
 (server-force-delete)
-(server-start)
 
 ;;; Load the config
 (org-babel-load-file (concat user-emacs-directory "config.org"))
 
-(setq gc-cons-threshold 800000)
+(server-start)
+
+(setq gc-cons-threshold 20000000)

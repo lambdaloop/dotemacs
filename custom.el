@@ -5,11 +5,13 @@
  ;; If there is more than one, they won't work right.
  '(ansi-color-faces-vector
    [default bold shadow italic underline bold bold-italic bold])
+ '(beacon-color "#f2777a")
  '(compilation-message-face 'default)
  '(custom-safe-themes
    '("bb08c73af94ee74453c90422485b29e5643b73b05e8de029a6909af6a3fb3f58" "c74e83f8aa4c78a121b52146eadb792c9facc5b1f02c917e3dbb454fca931223" "3c83b3676d796422704082049fc38b6966bcad960f896669dfc21a7a37a748fa" "628278136f88aa1a151bb2d6c8a86bf2b7631fbea5f0f76cba2a0079cd910f7d" "7b4d9b8a6ada8e24ac9eecd057093b0572d7008dbd912328231d0cada776065a" default))
  '(fci-rule-color "#515151")
  '(flycheck-color-mode-line-face-to-color 'mode-line-buffer-id)
+ '(frame-background-mode 'dark)
  '(highlight-changes-colors '("#FD5FF0" "#AE81FF"))
  '(highlight-tail-colors
    '(("#3C3D37" . 0)
@@ -58,7 +60,7 @@
       (file "~/Dropbox/org/templates/tpl-review.txt"))))
  '(org-refile-targets '((org-agenda-files :maxlevel . 2) (nil :maxlevel . 2)))
  '(package-selected-packages
-   '(sx dired-du slack ido-hacks ido-describe-bindings ido-at-point ido-grid-mode ido-load-library esh-autosuggest pcmpl-args pcmpl-git pcomplete-extension dashboard org-dashboard exwm counsel switch-window god-mode helm-swoop evil-dvorak platformio-mode ein lua-mode auctex-latexmk pdf-tools anaphora matlab-mode csv-mode git-timemachine org-download org-plus-contrib gitignore-mode toml-mode haskell-mode ivy-bibtex org-ref arduino-mode avy writeroom-mode ag flyspell-correct neotree nyan-mode smart-mode-line multi-term flx-ido org-bullets zotxt ess expand-region org-edit-latex auctex latex-extra bind-key page-break-lines use-package undo-tree))
+   '(benchmark-init ido-sort-mtime ido-yes-or-no ido-completing-read+ smex flatui-dark-theme flatland-theme molokai-theme moe-theme spacemacs-theme sx dired-du slack ido-hacks ido-describe-bindings ido-at-point ido-grid-mode ido-load-library esh-autosuggest pcmpl-args pcmpl-git pcomplete-extension dashboard org-dashboard exwm counsel switch-window god-mode helm-swoop evil-dvorak platformio-mode ein lua-mode auctex-latexmk pdf-tools anaphora matlab-mode csv-mode git-timemachine org-download org-plus-contrib gitignore-mode toml-mode haskell-mode ivy-bibtex org-ref arduino-mode avy writeroom-mode ag flyspell-correct neotree nyan-mode smart-mode-line multi-term flx-ido org-bullets zotxt ess expand-region org-edit-latex auctex latex-extra bind-key page-break-lines use-package undo-tree))
  '(pos-tip-background-color "#A6E22E")
  '(pos-tip-foreground-color "#272822")
  '(sml/active-background-color "#98ece8")

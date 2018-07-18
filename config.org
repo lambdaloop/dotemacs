@@ -17,7 +17,6 @@ I almost never use the *scratch* buffer. Let's start using the dashboard!
           (setq dashboard-items '((recents  . 8)
                                   (bookmarks . 8)
                                   (agenda . 8)))
-          dashboard-banner-logo-title-face
           (setq dashboard-startup-banner "~/Pictures/wallpapers/chosen/small/772110.png")
           (add-hook 'dashboard-mode-hook (lambda () (god-local-mode t))))
         :config
@@ -113,8 +112,10 @@ From [[https://github.com/danielmai/.emacs.d/blob/master/config.org][Daniel Mai]
 
 ** current theme
 #+begin_src emacs-lisp
-  (use-package color-theme-sanityinc-tomorrow
-    :config (switch-theme 'sanityinc-tomorrow-eighties))
+  ;; (use-package color-theme-sanityinc-tomorrow
+  ;;   :config (switch-theme 'sanityinc-tomorrow-eighties)) 
+  (use-package flatland-theme
+    :config (switch-theme 'flatland)) 
 #+end_src
 ** smart-mode-line
 #+begin_src emacs-lisp
@@ -151,6 +152,7 @@ From [[https://github.com/danielmai/.emacs.d/blob/master/config.org][Daniel Mai]
       (setq ido-file-extensions-order '(".org" ".txt" ".md" ".py" ".r" ".R" ".el"))
       (setq ido-default-buffer-method 'selected-window)))
 
+
   (use-package ido-completing-read+
     :ensure ido
     :config (ido-ubiquitous-mode +1)
@@ -166,8 +168,8 @@ From [[https://github.com/danielmai/.emacs.d/blob/master/config.org][Daniel Mai]
     )
 
   (use-package ido-at-point
-    :init (ido-at-point-mode))
-#+end_src
+    :config (ido-at-point-mode))
+      #+end_src
 
 
 ** bookmark jump
@@ -259,8 +261,12 @@ Here's a bunch of one-liners for package requires
   (use-package magit :bind ("C-x g" . magit-status)
     :config (setq magit-completing-read-function
                   'magit-ido-completing-read))
-  (use-package pdf-tools
+
+  (setq pdf-view-use-unicode-ligther nil)
+
+  (use-package "pdf-tools"
     :config (pdf-tools-install))
+
   (use-package expand-region
     :bind* (("M-." . er/expand-region)))
   (use-package ess-site
@@ -345,7 +351,7 @@ I want to have movement using Ctrl+something
 ** key chords
 #+begin_src emacs-lisp
   (use-package key-chord
-    :init
+    :config
     (progn
       ;; (fset 'key-chord-define 'my/key-chord-define)
       (setq key-chord-one-key-delay 0.16)
@@ -449,15 +455,14 @@ I want to have movement using Ctrl+something
     (add-hook 'eshell-mode-hook (lambda ()
                                   (eshell/alias "e" "find-file $1")
                                   (eshell/alias "ff" "find-file $1")
-                                  (eshell/alias "emacs" "find-file $1")
-                                  (eshell/alias "ee" "find-file-other-window $1")
-
+                                  (eshell/alias "fo" "find-file-other-window $1")
                                   (eshell/alias "gd" "magit-diff-unstaged")
                                   (eshell/alias "gds" "magit-diff-staged")
                                   (eshell/alias "d" "dired $1")
                                   (eshell/alias "l" "ls -hA $1")
                                   (eshell/alias "ll" "ls -lhA $1")
                                   (eshell/alias "rs" "rsync -ah --info=progress2 $1 $2")
+                                  (eshell/alias "mpc" "/usr/bin/mpc $*")
                                   )))
 #+end_src
 *** C-d to delete or exit
@@ -502,10 +507,10 @@ I want to have movement using Ctrl+something
       (insert (concat "ls"))
       (eshell-send-input)))
 
-  (bind-key* "C-'" (lambda () (interactive) (eshell-here t)))
-  (bind-key* "C-c C-m" (lambda () (interactive) (eshell-here nil)))
+  ;; (bind-key* "C-'" (lambda () (interactive) (eshell-here t)))
+  ;; (bind-key* "C-c C-m" (lambda () (interactive) (eshell-here nil)))
 
-  (bind-key "C-c M-m" (lambda () (interactive) (eshell "new")))
+  (bind-key "C-c C-m" (lambda () (interactive) (eshell "new")))
   (bind-key "S-s-<return>" (lambda () (interactive) (eshell)))
 
 
@@ -581,13 +586,21 @@ I want to have movement using Ctrl+something
         `(:foreground ,(face-attribute 'font-lock-constant-face :foreground)
                       :weight bold ))
 
+  (setq bold-default-face
+        `(:foreground ,(face-attribute 'default :foreground)
+                      :weight bold ))
+
+  (setq bold-function-face
+        `(:foreground ,(face-attribute 'font-lock-function-name-face :foreground)
+                      :weight bold ))
+
   (defun my-eshell-banner-hook ()
     (setq eshell-banner-message
           (format
            "\nWelcome to %s.\nHave a %s day! %s\n\n"
            (propertize "eshell" 'face bold-constant-face)
            (propertize (get-random-line-file happy-words-fname)
-                       'face bold-keyword-face)
+                       'face bold-function-face)
            (get-random-line-file happy-faces-fname)
            ))
     )
@@ -600,26 +613,37 @@ I want to have movement using Ctrl+something
 #+end_src
 *** eshell prompt
 #+begin_src emacs-lisp
-  (defun shortened-path (path max-len)
-    "Return a modified version of `path', replacing some components
-         with single characters starting from the left to try and get
-         the path down to `max-len'"
+  (defun fish-path (path max-len)
+    "Return a potentially trimmed-down version of the directory PATH, replacing
+  parent directories with their initial characters to try to get the character
+  length of PATH (sans directory slashes) down to MAX-LEN."
     (let* ((components (split-string (abbreviate-file-name path) "/"))
            (len (+ (1- (length components))
                    (reduce '+ components :key 'length)))
            (str ""))
       (while (and (> len max-len)
                   (cdr components))
-        (setq str (concat str (if (= 0 (length (car components)))
-                                  "/"
-                                (string (elt (car components) 0) ?/)))
+        (setq str (concat str
+                          (cond ((= 0 (length (car components))) "/")
+                                ((= 1 (length (car components)))
+                                 (concat (car components) "/"))
+                                (t
+                                 (if (string= "."
+                                              (string (elt (car components) 0)))
+                                     (concat (substring (car components) 0 2)
+                                             "/")
+                                   (string (elt (car components) 0) ?/)))))
               len (- len (1- (length (car components))))
               components (cdr components)))
       (concat str (reduce (lambda (a b) (concat a "/" b)) components))))
 
+  (setq eshell-path-face
+        `(:foreground ,(face-attribute 'font-lock-keyword-face :foreground)
+                      :weight normal ))
+
   (defun my-eshell-prompt-function ()
     (concat
-     (propertize (shortened-path (eshell/pwd) 20) 'face 'font-lock-keyword-face)
+     (propertize (fish-path (eshell/pwd) 20) 'face eshell-path-face)
      (if (= (user-uid) 0) " # " " $ "))
     )
   (setq eshell-highlight-prompt nil)
@@ -810,6 +834,7 @@ Local keybindings
              ("t" . org-agenda-previous-line)
              ("c" . org-agenda-todo)
              ("s" . org-agenda-schedule)
+             ("d" . org-agenda-deadline)
              )
 #+end_src
 ** org options
@@ -845,7 +870,7 @@ This includes options for source blocks and agenda.
   (setq org-completion-use-ido t)
   (setq org-outline-path-complete-in-steps nil)
 
-  (setq org-cycle-separator-lines 1)
+  (setq org-cycle-separator-lines 2)
 #+end_src
 
 #+RESULTS:
@@ -1020,10 +1045,10 @@ Languages which can be evaluated in Org buffers
 ** ipython-notebook
 #+begin_src emacs-lisp
   (use-package ein
-    :config (progn
-              (require 'ein-loaddefs)
-              (require 'ein-notebook)
-              (require 'ein-subpackages))
+    ;; :after (progn
+    ;;           (require 'ein-loaddefs)
+    ;;           (require 'ein-notebook)
+    ;;           (require 'ein-subpackages))
     :bind (:map ein:notebook-mode-map
                 ("M-p" . ein:worksheet-goto-prev-input)
                 ("M-n" . ein:worksheet-goto-next-input)
@@ -1249,3 +1274,4 @@ From https://github.com/mbork/beeminder.el
 #+begin_src emacs-lisp
   (exwm-enable)
 #+end_src
+

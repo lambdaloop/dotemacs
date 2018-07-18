@@ -58,7 +58,7 @@
       (file "~/Dropbox/org/templates/tpl-review.txt"))))
  '(org-refile-targets '((org-agenda-files :maxlevel . 2) (nil :maxlevel . 2)))
  '(package-selected-packages
-   '(exwm counsel switch-window god-mode helm-swoop evil-dvorak platformio-mode ein lua-mode auctex-latexmk pdf-tools anaphora matlab-mode csv-mode git-timemachine org-download org-plus-contrib gitignore-mode toml-mode haskell-mode ivy-bibtex org-ref arduino-mode avy writeroom-mode ag flyspell-correct neotree nyan-mode smart-mode-line multi-term flx-ido org-bullets zotxt ess expand-region org-edit-latex auctex latex-extra bind-key page-break-lines use-package undo-tree))
+   '(sx dired-du slack ido-hacks ido-describe-bindings ido-at-point ido-grid-mode ido-load-library esh-autosuggest pcmpl-args pcmpl-git pcomplete-extension dashboard org-dashboard exwm counsel switch-window god-mode helm-swoop evil-dvorak platformio-mode ein lua-mode auctex-latexmk pdf-tools anaphora matlab-mode csv-mode git-timemachine org-download org-plus-contrib gitignore-mode toml-mode haskell-mode ivy-bibtex org-ref arduino-mode avy writeroom-mode ag flyspell-correct neotree nyan-mode smart-mode-line multi-term flx-ido org-bullets zotxt ess expand-region org-edit-latex auctex latex-extra bind-key page-break-lines use-package undo-tree))
  '(pos-tip-background-color "#A6E22E")
  '(pos-tip-foreground-color "#272822")
  '(sml/active-background-color "#98ece8")
@@ -100,5 +100,7 @@
  '(beeminder-red ((t (:foreground "firebrick1"))))
  '(beeminder-warning ((t (:foreground "yellow1" :weight bold))))
  '(beeminder-yellow ((t (:foreground "LightGoldenrod1"))))
+ '(dashboard-banner-logo-title-face ((t (:inherit org-document-title))))
+ '(dashboard-heading-face ((t (:inherit org-level-1 :weight bold))))
  '(subtle-highlight ((t (:foreground "antique white"))))
  '(variable-pitch ((t (:height 80 :width normal :family "Noto Sans")))))

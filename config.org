@@ -8,10 +8,27 @@ Who am I?
         user-mail-address "krchtchk@gmail.com")
 #+end_src
 * startup
-I almost never use the *scratch* buffer. life.org is a good start
+I almost never use the *scratch* buffer. Let's start using the dashboard!
 #+begin_src emacs-lisp
-  (setq initial-buffer-choice "~/Dropbox/org/life.org")
-#+end_src
+      (use-package dashboard
+        :ensure t
+        :init
+        (progn
+          (setq dashboard-items '((recents  . 8)
+                                  (bookmarks . 8)
+                                  (agenda . 8)))
+          dashboard-banner-logo-title-face
+          (setq dashboard-startup-banner "~/Pictures/wallpapers/chosen/small/772110.png")
+          (add-hook 'dashboard-mode-hook (lambda () (god-local-mode t))))
+        :config
+        (progn
+          (dashboard-setup-startup-hook)
+          (setq initial-buffer-choice (lambda () (get-buffer "*dashboard*")))
+          )
+        )
+
+
+    #+end_src
 
 Setup the PATH
 #+begin_src emacs-lisp
@@ -40,7 +57,7 @@ Set up the customize file to its own separate file, instead of saving
   (unless (assoc-default "org" package-archives)
     (add-to-list 'package-archives '("org" . "http://orgmode.org/elpa/") t))
 #+end_src
-* elisp functions 
+* elisp functions
 #+begin_src emacs-lisp
   (defun jlp/add-to-list-multiple (list to-add)
     "Adds multiple items to LIST.
@@ -147,10 +164,11 @@ From [[https://github.com/danielmai/.emacs.d/blob/master/config.org][Daniel Mai]
               (setq ido-use-faces nil)
               )
     )
+
+  (use-package ido-at-point
+    :init (ido-at-point-mode))
 #+end_src
 
-#+RESULTS:
-: t
 
 ** bookmark jump
 #+begin_src emacs-lisp
@@ -162,7 +180,7 @@ From [[https://github.com/danielmai/.emacs.d/blob/master/config.org][Daniel Mai]
   (define-key global-map [remap bookmark-jump] 'ido-bookmark-jump)
 #+end_src
 * sane defaults
-Copied from [[https://github.com/danielmai/.emacs.d][Daniel Mai]], with some of my own additions 
+Copied from [[https://github.com/danielmai/.emacs.d][Daniel Mai]], with some of my own additions
 Let's start with some sane defaults, shall we?
 Sources for this section include [[https://github.com/magnars/.emacs.d/blob/master/settings/sane-defaults.el][Magnars Sveen]] and [[http://pages.sachachua.com/.emacs.d/Sacha.html][Sacha Chua]].
 ** misc
@@ -258,7 +276,7 @@ Here's a bunch of one-liners for package requires
             ))
 
   (use-package switch-window
-    :config (progn 
+    :config (progn
               (setq switch-window-shortcut-style 'dvorak)
               (setq switch-window-dvorak-shortcuts
                     '("a" "o" "e" "u" "h" "t" "n" "s" "," "." "c" "r"))
@@ -288,6 +306,7 @@ I want to have movement using Ctrl+something
 
   (bind-keys*
    ("C-." . set-mark-command)
+   ("C-c r" . ido-bookmark-jump)
    )
 
   (define-key key-translation-map (kbd "M-h") (kbd "C-x C-s"))
@@ -409,13 +428,13 @@ I want to have movement using Ctrl+something
        eshell-error-if-no-glob t
        eshell-hist-ignoredups t
        eshell-save-history-on-exit t
-       eshell-prefer-lisp-functions nil
+       eshell-prefer-lisp-functions t
        eshell-destroy-buffer-when-process-dies t)
       (add-hook 'eshell-mode-hook
                 (lambda ()
-                  (jlp/add-to-list-multiple 
-                   'eshell-visual-commands 
-                   '("ssh" "tail" "top" "htop" "mosh" "mpsyt" "sudo"))
+                  (jlp/add-to-list-multiple
+                   'eshell-visual-commands
+                   '("ssh" "tail" "top" "htop" "mosh" "mpsyt"))
                   )))
     )
 
@@ -425,8 +444,8 @@ I want to have movement using Ctrl+something
 #+end_src
 *** aliases
 #+begin_src emacs-lisp
-  (use-package eshell 
-    :init 
+  (use-package eshell
+    :init
     (add-hook 'eshell-mode-hook (lambda ()
                                   (eshell/alias "e" "find-file $1")
                                   (eshell/alias "ff" "find-file $1")
@@ -435,7 +454,11 @@ I want to have movement using Ctrl+something
 
                                   (eshell/alias "gd" "magit-diff-unstaged")
                                   (eshell/alias "gds" "magit-diff-staged")
-                                  (eshell/alias "d" "dired $1"))))
+                                  (eshell/alias "d" "dired $1")
+                                  (eshell/alias "l" "ls -hA $1")
+                                  (eshell/alias "ll" "ls -lhA $1")
+                                  (eshell/alias "rs" "rsync -ah --info=progress2 $1 $2")
+                                  )))
 #+end_src
 *** C-d to delete or exit
 #+begin_src emacs-lisp
@@ -446,8 +469,10 @@ I want to have movement using Ctrl+something
       (if (and (eolp) (looking-back eshell-prompt-regexp))
           (progn
             (eshell-life-is-too-much) ; Why not? (eshell/exit)
-            (ignore-errors
-              (delete-window)))
+            ;; (ignore-errors
+            ;;   (delete-window)
+            ;; )
+            )
         (delete-forward-char arg)))
     :init
     (add-hook 'eshell-mode-hook
@@ -459,8 +484,8 @@ I want to have movement using Ctrl+something
 #+begin_src emacs-lisp
   (defun eshell-here (split)
     "Opens up a new shell in the directory associated with the
-    current buffer's file. The eshell is renamed to match that
-    directory to make multiple eshell windows easier."
+      current buffer's file. The eshell is renamed to match that
+      directory to make multiple eshell windows easier."
     (interactive "p")
     (let* ((parent (if (buffer-file-name)
                        (file-name-directory (buffer-file-name))
@@ -479,11 +504,15 @@ I want to have movement using Ctrl+something
 
   (bind-key* "C-'" (lambda () (interactive) (eshell-here t)))
   (bind-key* "C-c C-m" (lambda () (interactive) (eshell-here nil)))
-  (bind-key "C-c M-m" 'eshell)
+
+  (bind-key "C-c M-m" (lambda () (interactive) (eshell "new")))
+  (bind-key "S-s-<return>" (lambda () (interactive) (eshell)))
+
 
 
 
 #+end_src
+
 *** better history handling
 #+begin_src emacs-lisp
   (defun eshell-next-prompt (n)
@@ -509,9 +538,93 @@ I want to have movement using Ctrl+something
                                   (ring-elements eshell-history-ring)))))
 
   (add-hook 'eshell-mode-hook (lambda ()
-                                (define-key eshell-mode-map (kbd "M-S-P") 'eshell-previous-prompt)
-                                (define-key eshell-mode-map (kbd "M-S-N") 'eshell-next-prompt)
+                                (define-key eshell-mode-map (kbd "M-P") 'eshell-previous-prompt)
+                                (define-key eshell-mode-map (kbd "M-N") 'eshell-next-prompt)
                                 (define-key eshell-mode-map (kbd "M-r") 'eshell-insert-history)))
+#+end_src
+*** completions
+#+begin_src emacs-lisp
+  (use-package pcmpl-args)
+  (use-package esh-autosuggest
+    :hook (eshell-mode . esh-autosuggest-mode)
+    ;; If you have use-package-hook-name-suffix set to nil, uncomment and use the
+    ;; line below instead:
+    ;; :hook (eshell-mode-hook . esh-autosuggest-mode)
+    :ensure t)
+
+  (defun setup-eshell-completion ()
+    (define-key eshell-mode-map (kbd "<tab>") 'completion-at-point)
+    (esh-autosuggest-mode +1)
+    (bind-key "C-e"  'company-complete-selection  esh-autosuggest-active-map))
+
+  (add-hook 'eshell-mode-hook #'setup-eshell-completion)
+
+#+end_src
+*** eshell banner intro
+#+begin_src emacs-lisp
+
+  (setq happy-words-fname "~/Dropbox/lists/happy_articles.txt")
+  (setq happy-faces-fname "~/Dropbox/lists/happy_emoticons.txt")
+
+  (defun get-random-line-file (fname)
+    (string-trim-right
+     (shell-command-to-string
+      (format "shuf %s | head -1" fname))))
+
+
+
+  (setq bold-keyword-face
+        `(:foreground ,(face-attribute 'font-lock-keyword-face :foreground)
+                      :weight bold ))
+
+  (setq bold-constant-face
+        `(:foreground ,(face-attribute 'font-lock-constant-face :foreground)
+                      :weight bold ))
+
+  (defun my-eshell-banner-hook ()
+    (setq eshell-banner-message
+          (format
+           "\nWelcome to %s.\nHave a %s day! %s\n\n"
+           (propertize "eshell" 'face bold-constant-face)
+           (propertize (get-random-line-file happy-words-fname)
+                       'face bold-keyword-face)
+           (get-random-line-file happy-faces-fname)
+           ))
+    )
+
+
+
+  (add-hook 'eshell-banner-load-hook 'my-eshell-banner-hook)
+
+
+#+end_src
+*** eshell prompt
+#+begin_src emacs-lisp
+  (defun shortened-path (path max-len)
+    "Return a modified version of `path', replacing some components
+         with single characters starting from the left to try and get
+         the path down to `max-len'"
+    (let* ((components (split-string (abbreviate-file-name path) "/"))
+           (len (+ (1- (length components))
+                   (reduce '+ components :key 'length)))
+           (str ""))
+      (while (and (> len max-len)
+                  (cdr components))
+        (setq str (concat str (if (= 0 (length (car components)))
+                                  "/"
+                                (string (elt (car components) 0) ?/)))
+              len (- len (1- (length (car components))))
+              components (cdr components)))
+      (concat str (reduce (lambda (a b) (concat a "/" b)) components))))
+
+  (defun my-eshell-prompt-function ()
+    (concat
+     (propertize (shortened-path (eshell/pwd) 20) 'face 'font-lock-keyword-face)
+     (if (= (user-uid) 0) " # " " $ "))
+    )
+  (setq eshell-highlight-prompt nil)
+
+  (setq eshell-prompt-function 'my-eshell-prompt-function)
 #+end_src
 * dired
 #+begin_src emacs-lisp
@@ -524,6 +637,7 @@ I want to have movement using Ctrl+something
     (lambda ()
       (interactive)
       (find-alternate-file "..")))
+  (setq dired-listing-switches "-alh")
 
 #+end_src
 * flyspell
@@ -537,9 +651,13 @@ I want to have movement using Ctrl+something
 
   (use-package flyspell-correct
     :ensure flyspell
-    :config (require 'flyspell-correct-ido)
+    :config (progn
+              (require 'flyspell-correct-ido)
+              (unbind-key "C-M-i" flyspell-mode-map)
+              )
     :bind (:map flyspell-mode-map
                 ("C-;" . flyspell-correct-previous-word-generic)))
+
 #+end_src
 * org mode
 ** org requires
@@ -956,6 +1074,8 @@ From https://github.com/mbork/beeminder.el
   (setq window-divider-default-right-width 5)
   (window-divider-mode)
 
+(setq exwm-workspace-show-all-buffers t)
+(setq exwm-layout-show-all-buffers t)
 #+end_src
 ** renaming buffers to appropriate name
 #+begin_src emacs-lisp
@@ -995,12 +1115,12 @@ From https://github.com/mbork/beeminder.el
                           (exwm-workspace-switch-create (- ,i 1)))))
                     (number-sequence 1 9))
           ,@(cl-mapcar (lambda (key i)
-                      `(,(kbd (format "s-%s" key)) .
-                        (lambda ()
-                          (interactive)
-                          (exwm-workspace-move-window ,i))))
-                    '("!" "@" "#" "$" "%" "^" "&" "*" "(")
-                    (number-sequence 0 8))
+                         `(,(kbd (format "s-%s" key)) .
+                           (lambda ()
+                             (interactive)
+                             (exwm-workspace-move-window ,i))))
+                       '("!" "@" "#" "$" "%" "^" "&" "*" "(")
+                       (number-sequence 0 8))
           ;; Bind "s-&" to launch applications ('M-&' also works if the output
           ;; buffer does not bother you).
           ;; ([?\s-&] . (lambda (command)
@@ -1021,26 +1141,26 @@ From https://github.com/mbork/beeminder.el
   (defmacro exwm-input-set-keys (keys)
     "Set a list of global keybindings for exwm"
     (cons 'progn
-          (mapcar 
-           (lambda (var) 
+          (mapcar
+           (lambda (var)
              (let ((key (car var))
                    (fun (cdr var)))
                `(exwm-input-set-key (kbd ,key) ,fun)))
            keys)))
 
   (require 'cl)
-  (defun spawn (process) 
+  (defun spawn (process)
     (lexical-let ((proc process))
       (lambda () (interactive)
         (start-process-shell-command proc nil proc))
       ))
 
-  (exwm-input-set-keys 
-   ( 
+  (exwm-input-set-keys
+   (
     ;; basic stuff
     ("s-p" . 'counsel-linux-app)
     ("s-<backspace>" . 'exwm-reset)
-    ("C-s-q" . 'kill-emacs)
+    ("C-s-Q" . 'save-buffers-kill-terminal)
 
     ;; manage windows
     ("s-q" . 'really-kill-this-buffer)
@@ -1048,17 +1168,19 @@ From https://github.com/mbork/beeminder.el
     ("s-o" . 'switch-window)
     ("s-h" . 'shrink-window-horizontally)
     ("s-s" . 'enlarge-window-horizontally)
+    ("s-n" . 'exwm-floating-toggle-floating)
 
     ("s-<return>" . 'delete-other-windows)
     ("s-." . 'split-window-right)
     ("s-," . 'split-window-below)
     ("s-w" . 'delete-window)
+    ("s-0" . 'delete-window)
 
     ;; launch stuff
     ("s-r" . (spawn "anki"))
     ("s-i" . (spawn "firefox"))
-    ("S-s-<return>" . (spawn "xfce4-terminal"))
-    ("s-l" . (spawn "cantata")) 
+    ("s-C-<return>" . (spawn "xfce4-terminal"))
+    ("s-l" . (spawn "cantata"))
 
     ;; convienient things
     ("s-P" . (spawn "bash ~/scripts/pick_music.sh"))
@@ -1094,30 +1216,36 @@ From https://github.com/mbork/beeminder.el
 
     ))
 
+
   ;; (bind-keys "C-c C-c"  exwm-mode-map)
 #+end_src
 
-#+RESULTS:
 
-** simulation keys 
+** simulation keys
 #+begin_src emacs-lisp
   (setq exwm-input-simulation-keys
         '(
           ([?\C-t] . [up])
           ([?\C-n] . [down])
-          ([?\C-a] . [home])
+          ;; ([?\C-x h] . ?\C-a)
+          ;; ([?\C-a] . [home])
           ([?\C-e] . [end])
           ([?\C-c ?\C-c] . ?\C-c)
-          ([?\C-m] . ?\C-t)
           ([?\C-k] . [S-end delete])))
 
+
+  ;; remove C-t binding for firefox
+  (add-hook 'exwm-manage-finish-hook
+            (lambda ()
+              (when (and exwm-class-name
+                         (string= exwm-class-name "Firefox"))
+                (exwm-input-set-local-simulation-keys
+               (cons '([?\C-t] . ?\C-t)
+                 (remove '([?\C-t] . [up]) exwm-input-simulation-keys))
+                 ))))
 
 #+end_src
 ** enable exwm
 #+begin_src emacs-lisp
   (exwm-enable)
 #+end_src
-
-
-
-

@@ -10,21 +10,22 @@ Who am I?
 * startup
 I almost never use the *scratch* buffer. Let's start using the dashboard!
 #+begin_src emacs-lisp
-      (use-package dashboard
-        :ensure t
-        :init
-        (progn
-          (setq dashboard-items '((recents  . 8)
-                                  (bookmarks . 8)
-                                  (agenda . 8)))
-          (setq dashboard-startup-banner "~/Pictures/wallpapers/chosen/small/772110.png")
-          (add-hook 'dashboard-mode-hook (lambda () (god-local-mode t))))
-        :config
-        (progn
-          (dashboard-setup-startup-hook)
-          (setq initial-buffer-choice (lambda () (get-buffer "*dashboard*")))
-          )
-        )
+  (use-package dashboard
+    :ensure t
+    :init
+    (progn
+      (setq dashboard-items '((recents  . 8)
+                              (bookmarks . 8)
+                              (agenda . 8)))
+      (setq dashboard-startup-banner "~/Pictures/wallpapers/chosen/small/772110.png")
+      ;; (add-hook 'dashboard-mode-hook (lambda () (god-local-mode t))
+      ))
+  :config
+  (progn
+    (dashboard-setup-startup-hook)
+    (setq initial-buffer-choice (lambda () (get-buffer "*dashboard*")))
+    )
+  )
 
 
     #+end_src
@@ -50,8 +51,8 @@ Set up the customize file to its own separate file, instead of saving
 #+begin_src emacs-lisp
   (unless (assoc-default "melpa" package-archives)
     (add-to-list 'package-archives '("melpa" . "http://melpa.org/packages/") t))
-  (unless (assoc-default "melpa-stable" package-archives)
-    (add-to-list 'package-archives '("melpa-stable" . "http://stable.melpa.org/packages/") t))
+  ;; (unless (assoc-default "melpa-stable" package-archives)
+  ;;   (add-to-list 'package-archives '("melpa-stable" . "http://stable.melpa.org/packages/") t))
 
   (unless (assoc-default "org" package-archives)
     (add-to-list 'package-archives '("org" . "http://orgmode.org/elpa/") t))
@@ -137,6 +138,18 @@ From [[https://github.com/danielmai/.emacs.d/blob/master/config.org][Daniel Mai]
               ("^~/desktop_scripts/" ":DSc:")
               ))
       (sml/setup)))
+
+
+#+end_src
+** modeline
+#+begin_src emacs-lisp
+  (use-package time
+    :init (setq display-time-format " %H:%M"
+                display-time-24hr-format t
+                display-time-default-load-average nil)
+    :config
+    (display-time-mode 1))
+
 #+end_src
 * ido
 ** enable ido + basic settings
@@ -167,10 +180,11 @@ From [[https://github.com/danielmai/.emacs.d/blob/master/config.org][Daniel Mai]
               )
     )
 
+  (setq ido-use-virtual-buffers t)
+
   (use-package ido-at-point
     :config (ido-at-point-mode))
       #+end_src
-
 
 ** bookmark jump
 #+begin_src emacs-lisp
@@ -198,6 +212,11 @@ Sources for this section include [[https://github.com/magnars/.emacs.d/blob/mast
   ;; Keep all backup and auto-save files in one directory
   (setq backup-directory-alist '(("." . "~/tmp/emacs-backups")))
   (setq auto-save-file-name-transforms '((".*" "~/tmp/auto-save-list/" t)))
+
+  ;; save lots of backups
+  (setq delete-old-versions -1)
+  (setq version-control t)
+  (setq vc-make-backup-files t)
 
   ;; UTF-8 please
   (setq locale-coding-system 'utf-8) ; pretty
@@ -255,39 +274,77 @@ Page-Breaks in GNU Emacs" by Eric J. M. Ritz.]]
 * misc packages
 Here's a bunch of one-liners for package requires
 #+begin_src emacs-lisp
-  (use-package smex
-    :config (smex-initialize)
-    :bind ("M-x" . smex) )
-  (use-package magit :bind ("C-x g" . magit-status)
-    :config (setq magit-completing-read-function
-                  'magit-ido-completing-read))
+      (use-package smex
+        :config (smex-initialize)
+        :bind ("M-x" . smex) )
+      (use-package magit :bind ("C-x g" . magit-status)
+        :config (setq magit-completing-read-function
+                      'magit-ido-completing-read))
 
-  (setq pdf-view-use-unicode-ligther nil)
+      (setq pdf-view-use-unicode-ligther nil)
 
-  (use-package "pdf-tools"
-    :config (pdf-tools-install))
+      (use-package "pdf-tools"
+        :config (pdf-tools-install))
 
-  (use-package expand-region
-    :bind* (("M-." . er/expand-region)))
-  (use-package ess-site
-    :config (progn
-              (setq ess-use-ido t)
-              (ess-toggle-underscore nil)))
-  (use-package nyan-mode
-    :config (nyan-mode +1))
-  (use-package avy
-    :config (setq avy-timeout-seconds 0.3)
-    :bind* (("C-c g" . avy-goto-char-timer)
-            ("C--" . avy-goto-char-timer)
-            ))
+      (use-package expand-region
+        :bind* (("M-." . er/expand-region)))
 
-  (use-package switch-window
-    :config (progn
-              (setq switch-window-shortcut-style 'dvorak)
-              (setq switch-window-dvorak-shortcuts
-                    '("a" "o" "e" "u" "h" "t" "n" "s" "," "." "c" "r"))
-              )
-    :bind (("C-x o" . switch-window)))
+      (use-package ess-site
+        :config (progn
+                  (setq ess-use-ido t)
+                  (ess-toggle-underscore nil)))
+
+      (use-package nyan-mode :config (nyan-mode +1))
+
+      (use-package avy
+        :config (setq avy-timeout-seconds 0.3)
+        :bind* (("C-c g" . avy-goto-char-timer)
+                ("C--" . avy-goto-char-timer)
+                ))
+
+      (use-package switch-window
+        :config (progn
+                  (setq switch-window-shortcut-style 'dvorak)
+                  (setq switch-window-dvorak-shortcuts
+                        '("a" "o" "e" "u" "h" "t" "n" "s" "," "." "c" "r"))
+                  )
+        :bind (("C-x o" . switch-window)))
+
+
+      (use-package sudo-edit :ensure t :defer t)
+
+    ;;(setq paradox-github-token "5c806564fa37150e8d4005371292687c14726f96")
+
+    (use-package paradox                    ; Better package menu
+      :ensure t
+      :config
+      (setq paradox-execute-asynchronously nil
+            paradox-spinner-type 'moon      ; Fancy spinner
+            ;; Show all possible counts
+            paradox-display-download-count t
+            paradox-display-star-count t
+            ;; Don't star automatically
+            paradox-automatically-star nil
+            ;; Hide download button, and wiki packages
+            paradox-use-homepage-buttons nil ; Can type v instead
+    paradox-hide-wiki-packages t))
+
+  (use-package async
+    :defer t
+    :ensure t
+    :config
+    (setq async-bytecomp-package-mode t))
+
+
+  (use-package beacon
+    :ensure t
+    :config
+    (beacon-mode 1)
+    (setq beacon-push-mark 35
+          beacon-blink-when-focused t 
+          beacon-size 5
+          beacon-color "deep sky blue"))
+
 #+end_src
 * keybindings
 ** ergonomic keys
@@ -316,6 +373,8 @@ I want to have movement using Ctrl+something
    )
 
   (define-key key-translation-map (kbd "M-h") (kbd "C-x C-s"))
+  (define-key key-translation-map (kbd "s-g") (kbd "C-g"))
+
 #+end_src
 
 ** misc keys
@@ -343,6 +402,7 @@ I want to have movement using Ctrl+something
            ("C-x C-2" . split-window-below)
            ("C-x C-3" . split-window-right)
            ("C-x C-0" . delete-window)
+           ("C-x C-h" . mark-whole-buffer)
            :map god-local-mode-map
            ("z" . repeat)
            )
@@ -354,12 +414,13 @@ I want to have movement using Ctrl+something
     :config
     (progn
       ;; (fset 'key-chord-define 'my/key-chord-define)
-      (setq key-chord-one-key-delay 0.16)
+      (setq key-chord-one-key-delay 0.18)
+      (setq key-chord-two-keys-delay 0.1)
       (key-chord-mode 1)
       ;; k can be bound too
-      (key-chord-define-global "uu"     'undo)
+      ;; (key-chord-define-global "uu"     'undo)
       ;; (key-chord-define-global "jr"     'my/goto-random-char-hydra/my/goto-random-char)
-      (key-chord-define-global "kk"     'kill-whole-line)
+      ;; (key-chord-define-global "kk"     'kill-whole-line)
       (key-chord-define-global "hd"     'avy-goto-char-timer)
       ;; (key-chord-define-global "yy"    'my/window-movement/body)
 
@@ -368,7 +429,7 @@ I want to have movement using Ctrl+something
       ;; (key-chord-define-global "jl"     'avy-goto-line)
       ;; (key-chord-define-global "j."     'join-lines/body)
                                           ;(key-chord-define-global "jZ"     'avy-zap-to-char)
-      (key-chord-define-global "FF"     'find-file)
+      ;; (key-chord-define-global "FF"     'find-file)
       ;; (key-chord-define-global "qq"     'my/quantified-hydra/body)
       ;; (key-chord-define-global "hh"     'my/key-chord-commands/body)
       ;; (key-chord-define-global "xx"     'er/expand-region)
@@ -376,6 +437,7 @@ I want to have movement using Ctrl+something
       (key-chord-define-global "vv" 'god-mode-all)
       ;; (key-chord-define-global "JJ"     'my/switch-to-previous-buffe)
       ))
+
 #+END_SRC
 ** windows
 #+begin_src emacs-lisp
@@ -510,7 +572,7 @@ I want to have movement using Ctrl+something
   ;; (bind-key* "C-'" (lambda () (interactive) (eshell-here t)))
   ;; (bind-key* "C-c C-m" (lambda () (interactive) (eshell-here nil)))
 
-  (bind-key "C-c C-m" (lambda () (interactive) (eshell "new")))
+  (bind-key* "C-c C-m" (lambda () (interactive) (eshell "new")))
   (bind-key "S-s-<return>" (lambda () (interactive) (eshell)))
 
 
@@ -563,6 +625,12 @@ I want to have movement using Ctrl+something
     (bind-key "C-e"  'company-complete-selection  esh-autosuggest-active-map))
 
   (add-hook 'eshell-mode-hook #'setup-eshell-completion)
+
+  (use-package fish-completion
+    :config
+    (progn 
+      (setq fish-completion-fallback-on-bash-p t)
+      (global-fish-completion-mode)))
 
 #+end_src
 *** eshell banner intro
@@ -649,6 +717,30 @@ I want to have movement using Ctrl+something
   (setq eshell-highlight-prompt nil)
 
   (setq eshell-prompt-function 'my-eshell-prompt-function)
+#+end_src
+* recentf
+#+begin_src emacs-lisp
+(defun ido-recentf-open ()
+  "Use `ido-completing-read' to find a recent file."
+  (interactive)
+  (if (find-file (ido-completing-read "Find recent file: " recentf-list))
+      (message "Opening file...")
+    (message "Aborting")))
+
+  (use-package recentf                    ; Save recently visited files
+    :init (recentf-mode)
+    :bind (("C-c f" . ido-recentf-open))
+    :config
+    (setq recentf-max-saved-items 200
+          recentf-max-menu-items 15
+          ;; Cleanup recent files only when Emacs is idle, but not when the mode
+          ;; is enabled, because that unnecessarily slows down Emacs. My Emacs
+          ;; idles often enough to have the recent files list clean up regularly
+          recentf-auto-cleanup 'never ;; disable before we start recentf! If using Tramp a lot.
+          recentf-exclude (list "/\\.git/.*\\'" ; Git contents
+                                "/elpa/.*\\'" ; Package files
+                                "/itsalltext/" ; It's all text temp files
+                                )))
 #+end_src
 * dired
 #+begin_src emacs-lisp
@@ -833,7 +925,8 @@ Local keybindings
              :map org-agenda-mode-map
              ("t" . org-agenda-previous-line)
              ("c" . org-agenda-todo)
-             ("s" . org-agenda-schedule)
+             ("r" . org-agenda-schedule)
+             ("s" . org-save-all-org-buffers)
              ("d" . org-agenda-deadline)
              )
 #+end_src
@@ -1027,6 +1120,33 @@ Languages which can be evaluated in Org buffers
 
 
 #+end_src
+* company mode
+#+begin_src emacs-lisp
+(use-package company                    ; Graphical (auto-)completion
+  :ensure t
+  :diminish company-mode
+  :init (global-company-mode)
+  :config
+  (setq company-tooltip-align-annotations t
+        company-tooltip-flip-when-above t
+        ;; Easy navigation to candidates with M-<n>
+        company-show-numbers t)
+  :diminish company-mode)
+
+(use-package company-quickhelp          ; Show help in tooltip
+  :disabled t                           ; M-h clashes with mark-paragraph
+  :ensure t
+  :after company
+  :config (company-quickhelp-mode))
+
+(use-package company-statistics         ; Sort company candidates by statistics
+  :ensure t
+  :after company
+:config (company-statistics-mode))
+#+end_src
+
+
+
 * python
 ** ipython shell
 #+begin_src emacs-lisp
@@ -1057,6 +1177,13 @@ Languages which can be evaluated in Org buffers
     )
 
 
+#+end_src
+** python company
+#+begin_src emacs-lisp
+(defun my/python-mode-hook ()
+  (add-to-list 'company-backends 'company-jedi))
+
+(add-hook 'python-mode-hook 'my/python-mode-hook)
 #+end_src
 * matlab
 #+begin_src emacs-lisp
@@ -1099,8 +1226,8 @@ From https://github.com/mbork/beeminder.el
   (setq window-divider-default-right-width 5)
   (window-divider-mode)
 
-(setq exwm-workspace-show-all-buffers t)
-(setq exwm-layout-show-all-buffers t)
+  (setq exwm-workspace-show-all-buffers t)
+  (setq exwm-layout-show-all-buffers t)
 #+end_src
 ** renaming buffers to appropriate name
 #+begin_src emacs-lisp
@@ -1189,15 +1316,14 @@ From https://github.com/mbork/beeminder.el
 
     ;; manage windows
     ("s-q" . 'really-kill-this-buffer)
-    ("s-u" . 'ido-switch-buffer)
+    ("s-h" . 'ido-switch-buffer)
     ("s-o" . 'switch-window)
-    ("s-h" . 'shrink-window-horizontally)
-    ("s-s" . 'enlarge-window-horizontally)
+    ("s-u" . 'shrink-window-horizontally)
+    ("s-a" . 'enlarge-window-horizontally)
     ("s-n" . 'exwm-floating-toggle-floating)
-
     ("s-<return>" . 'delete-other-windows)
-    ("s-." . 'split-window-right)
-    ("s-," . 'split-window-below)
+    ("s-," . 'split-window-right)
+    ("s-." . 'split-window-below)
     ("s-w" . 'delete-window)
     ("s-0" . 'delete-window)
 
@@ -1206,15 +1332,21 @@ From https://github.com/mbork/beeminder.el
     ("s-i" . (spawn "firefox"))
     ("s-C-<return>" . (spawn "xfce4-terminal"))
     ("s-l" . (spawn "cantata"))
+    ("s-z" . (spawn "zotero"))
 
     ;; convienient things
-    ("s-P" . (spawn "bash ~/scripts/pick_music.sh"))
-    ("s-r" . (spawn "bash ~/scripts/pick_radio.sh"))
     ("s-R" . (spawn "bash ~/scripts/pick_password.sh"))
-    ("s-c" . (spawn "bash ~/scripts/pick_google_music.sh"))
-    ("s-C" . (spawn "bash ~/scripts/pick_google_music_title.sh"))
+
+    ;; emacs functions
+    ("s-c c" . 'org-capture)
+    ("s-c a" . 'org-agenda)
+    ("s-f" . 'ido-find-file)
 
     ;; all the music stuff
+    ("s-P" . (spawn "bash ~/scripts/pick_music.sh"))
+    ;; ("s-c" . (spawn "bash ~/scripts/pick_google_music.sh"))
+    ;; ("s-C" . (spawn "bash ~/scripts/pick_google_music_title.sh"))
+
     ("<XF86AudioRaiseVolume>" . (spawn "amixer -c 1 set Master 1%+; bash ~/scripts/vol_xmobar.sh"))
     ("<XF86AudioLowerVolume>" . (spawn "amixer -c 1 set Master 1%-; bash ~/scripts/vol_xmobar.sh"))
 
@@ -1244,6 +1376,8 @@ From https://github.com/mbork/beeminder.el
 
   ;; (bind-keys "C-c C-c"  exwm-mode-map)
 #+end_src
+
+#+RESULTS:
 
 
 ** simulation keys

@@ -210,26 +210,32 @@ From [[https://github.com/danielmai/.emacs.d/blob/master/config.org][Daniel Mai]
 
   ;; (define-key global-map [remap bookmark-jump] 'ido-bookmark-jump)
 #+end_src
-* ivy
+* ivy - counsel - swiper
 #+begin_src emacs-lisp
   (use-package ivy
+    :diminish ivy-mode
     :config
     (progn  
-      (setq ivy-re-builders-alist '((t . ivy--regex-fuzzy))
+      (setq ivy-re-builders-alist 
+            '((swiper . ivy--regex-plus)
+              (t      . ivy--regex-fuzzy))
             ivy-initial-inputs-alist nil
             ivy-use-virtual-buffers t
             ivy-virtual-abbreviate 'full
             ivy-count-format "%d/%d "
+            ivy-height 8
             )
       (ido-mode -1)
       (ivy-mode +1))
     :bind (
+           ("C-s" . swiper)
            ("M-x" . counsel-M-x)
            ("C-x C-f" . counsel-find-file)
            :map ivy-minibuffer-map
            ("C-m" . ivy-alt-done)
            ("C-s" . ivy-next-line)
            ("C-r" . ivy-previous-line)
+           ("C-w" . ivy-yank-word)
            :map ivy-switch-buffer-map
            ("C-k" . ivy-switch-buffer-kill)
            :map org-mode-map
@@ -237,6 +243,17 @@ From [[https://github.com/danielmai/.emacs.d/blob/master/config.org][Daniel Mai]
            ))
 
 
+#+end_src
+** counsel dash
+#+begin_src emacs-lisp
+  (defun eww-open-other-window (url)  
+    (split-window-horizontally) 
+    (other-window 1) 
+    (eww-browse-url url))
+
+  (use-package counsel-dash 
+    :init 
+    (setq counsel-dash-browser-func 'eww-open-other-window))
 #+end_src
 
 * sane defaults
@@ -304,6 +321,8 @@ Sources for this section include [[https://github.com/magnars/.emacs.d/blob/mast
   ;; enable electric pair mode everywhere
   (electric-pair-mode +1)
 
+  (diminish 'auto-revert-mode)
+
   #+end_src
 
 ** page breaks
@@ -319,124 +338,123 @@ Page-Breaks in GNU Emacs" by Eric J. M. Ritz.]]
 Here's a bunch of one-liners for package requires
 #+begin_src emacs-lisp
 
-  (use-package helm
-    :config
-    (progn 
-      (setq helm-display-header-line nil)
-      (set-face-attribute 'helm-source-header nil
-                          :height 0.1)
-      (setq helm-autoresize-max-height 30)
-      (helm-autoresize-mode 1)
-      (setq helm-split-window-in-side-p t)
+    (use-package helm
+      :config
+      (progn 
+        (setq helm-display-header-line nil)
+        (set-face-attribute 'helm-source-header nil
+                            :height 0.1)
+        (setq helm-autoresize-max-height 30)
+        (helm-autoresize-mode 1)
+        (setq helm-split-window-in-side-p t)
 
-      (define-key helm-map (kbd "<tab>") 'helm-execute-persistent-action) ; rebind tab to run persistent action
-      (define-key helm-map (kbd "C-i") 'helm-execute-persistent-action) ; make TAB work in terminal
-      (define-key helm-map (kbd "C-z")  'helm-select-action) ; list actions using C-z
-      ))
+        (define-key helm-map (kbd "<tab>") 'helm-execute-persistent-action) ; rebind tab to run persistent action
+        (define-key helm-map (kbd "C-i") 'helm-execute-persistent-action) ; make TAB work in terminal
+        (define-key helm-map (kbd "C-z")  'helm-select-action) ; list actions using C-z
+        ))
 
-  (use-package darkroom)
+    (use-package darkroom)
 
-  (use-package magit :bind ("C-x g" . magit-status)
-    :config (setq magit-completing-read-function
-                  'magit-ido-completing-read))
+    (use-package magit :bind ("C-x g" . magit-status)
+      :config (setq magit-completing-read-function
+                    'magit-ido-completing-read))
 
-  (setq pdf-view-use-unicode-ligther nil)
+    (setq pdf-view-use-unicode-ligther nil)
 
-  (use-package "pdf-tools"
-    :config (pdf-tools-install))
+    (use-package "pdf-tools"
+      :config (pdf-tools-install))
 
-  (use-package expand-region
-    :bind* (("M-." . er/expand-region)))
+    (use-package expand-region
+      :bind* (("M-." . er/expand-region)))
 
-  (use-package ess-site
-    :config (progn
-              (setq ess-use-ido t)
-              (ess-toggle-underscore nil)))
+    (use-package ess-site
+      :config (progn
+                (setq ess-use-ido t)
+                (ess-toggle-underscore nil)))
 
-  (use-package nyan-mode :config (nyan-mode +1))
+    (use-package nyan-mode :config (nyan-mode +1))
 
-  (use-package avy
-    :config (setq avy-timeout-seconds 0.3
-                  avy-keys '(?a ?o ?e ?u ?i ?d ?h ?t ?n))
-    :bind* (("C-c h" . avy-goto-word-1)
-            ("s-h" . avy-goto-word-1)
-            ))
-
-
-  (use-package switch-window
-    :init (progn
-            (setq switch-window-threshold 3)
-            (setq switch-window-shortcut-style 'qwerty)
-            (setq switch-window-qwerty-shortcuts
-                  '("h" "t" "n" "s" "a" "o" "e" "u" "g" "c" "r" "l"))
-            )
-    :bind (("C-x o" . switch-window)))
+    (use-package avy
+      :config (setq avy-timeout-seconds 0.3
+                    avy-keys '(?a ?o ?e ?u ?i ?d ?h ?t ?n))
+      :bind* (("C-c h" . avy-goto-word-1)
+              ("s-h" . avy-goto-word-1)
+              ))
 
 
-  (use-package sudo-edit :ensure t :defer t)
+    (use-package switch-window
+      :init (progn
+              (setq switch-window-threshold 3)
+              (setq switch-window-shortcut-style 'qwerty)
+              (setq switch-window-qwerty-shortcuts
+                    '("h" "t" "n" "s" "a" "o" "e" "u" "g" "c" "r" "l"))
+              )
+      :bind (("C-x o" . switch-window)))
 
-  ;;(setq paradox-github-token "5c806564fa37150e8d4005371292687c14726f96")
 
-  (use-package paradox                    ; Better package menu
-    :ensure t
-    :defer 2 
-    :config
-    (progn
-      (setq paradox-execute-asynchronously nil
-            paradox-spinner-type 'moon      ; Fancy spinner
-            ;; Show all possible counts
-            paradox-display-download-count t
-            paradox-display-star-count t
-            ;; Don't star automatically
-            paradox-automatically-star nil
-            ;; Hide download button, and wiki packages
-            paradox-use-homepage-buttons nil ; Can type v instead
-            paradox-hide-wiki-packages t)
-      (paradox-enable)))
+    (use-package sudo-edit :ensure t :defer t)
 
-  (use-package async
-    :defer t
-    :ensure t
-    :config
-    (setq async-bytecomp-package-mode t
-          async-bytecomp-allowed-packages '(all)))
+    (use-package paradox                    ; Better package menu
+      :ensure t
+      :defer 2 
+      :config
+      (progn
+        (setq paradox-execute-asynchronously nil
+              paradox-spinner-type 'moon      ; Fancy spinner
+              ;; Show all possible counts
+              paradox-display-download-count t
+              paradox-display-star-count t
+              ;; Don't star automatically
+              paradox-automatically-star nil
+              ;; Hide download button, and wiki packages
+              paradox-use-homepage-buttons nil ; Can type v instead
+              paradox-hide-wiki-packages t)
+        (paradox-enable)))
+
+    (use-package async
+      :defer t
+      :ensure t
+      :config
+      (setq async-bytecomp-package-mode t
+            async-bytecomp-allowed-packages '(all)))
 
 
 
-  (use-package beacon
-    :ensure t
-    :config
-    (beacon-mode 1)
-    (setq beacon-push-mark 35
-          beacon-blink-when-focused t 
-          beacon-size 5
-          beacon-color "deep sky blue"))
+    (use-package beacon
+      :ensure t
+      :config
+      (beacon-mode 1)
+      (setq beacon-push-mark 35
+            beacon-blink-when-focused t 
+            beacon-size 5
+            beacon-color "deep sky blue"))
 
 
-  (use-package undo-tree                  ; Branching undo
-    :ensure t
-    :init (global-undo-tree-mode)
-    :diminish undo-tree-mode)
+    (use-package undo-tree                  ; Branching undo
+      :ensure t
+      :init (global-undo-tree-mode)
+      :diminish undo-tree-mode)
 
-  (use-package zoom 
-    :disabled t
-    :init (custom-set-variables
-           '(zoom-size '(0.618 . 0.618))
-           '(zoom-ignored-major-modes 
-             '(dired-mode inferior-python-mode))
-           '(zoom-ignored-buffer-names '("zoom.el" "init.el"))
-           '(zoom-ignored-buffer-name-regexps '("^*Calc"))
-           '(zoom-ignore-predicates '((lambda () (> (count-lines (point-min) (point-max)) 20)))))
-    :config (zoom-mode +1)
-    :bind ("C-x +" . zoom))
+    (use-package zoom 
+      :disabled t
+      :init (custom-set-variables
+             '(zoom-size '(0.618 . 0.618))
+             '(zoom-ignored-major-modes 
+               '(dired-mode inferior-python-mode))
+             '(zoom-ignored-buffer-names '("zoom.el" "init.el"))
+             '(zoom-ignored-buffer-name-regexps '("^*Calc"))
+             '(zoom-ignore-predicates '((lambda () (> (count-lines (point-min) (point-max)) 20)))))
+      :config (zoom-mode +1)
+      :bind ("C-x +" . zoom))
 
-  (use-package golden-ratio
-    :config (golden-ratio-mode))
+    (use-package golden-ratio
+      :config (golden-ratio-mode)
+      :diminish golden-ratio-mode)
 
-  ;; Fortune path
-  (use-package fortune 
-    :init (setq fortune-dir "/usr/share/fortune"
-                fortune-file "/usr/share/fortune/fortunes"))
+    ;; Fortune path
+    (use-package fortune 
+      :init (setq fortune-dir "/usr/share/fortune"
+                  fortune-file "/usr/share/fortune/fortunes"))
 
 #+end_src
 

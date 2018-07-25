@@ -124,9 +124,9 @@ From [[https://github.com/danielmai/.emacs.d/blob/master/config.org][Daniel Mai]
 ** current theme
 #+begin_src emacs-lisp
   ;; (use-package color-theme-sanityinc-tomorrow
-  ;;   :config (switch-theme 'sanityinc-tomorrow-night)) 
+  ;;   :config (switch-theme 'sanityinc-tomorrow-night))
   (use-package flatland-theme
-    :config (switch-theme 'flatland)) 
+    :config (switch-theme 'flatland))
 #+end_src
 ** smart-mode-line
 #+begin_src emacs-lisp
@@ -163,7 +163,7 @@ From [[https://github.com/danielmai/.emacs.d/blob/master/config.org][Daniel Mai]
 #+end_src
 * ido
 ** enable ido + basic settings
-#+begin_src emacs-lisp 
+#+begin_src emacs-lisp
   (use-package ido
     :disabled t
     :config
@@ -215,8 +215,8 @@ From [[https://github.com/danielmai/.emacs.d/blob/master/config.org][Daniel Mai]
   (use-package ivy
     :diminish ivy-mode
     :config
-    (progn  
-      (setq ivy-re-builders-alist 
+    (progn
+      (setq ivy-re-builders-alist
             '((swiper . ivy--regex-plus)
               (t      . ivy--regex-fuzzy))
             ivy-initial-inputs-alist nil
@@ -246,13 +246,13 @@ From [[https://github.com/danielmai/.emacs.d/blob/master/config.org][Daniel Mai]
 #+end_src
 ** counsel dash
 #+begin_src emacs-lisp
-  (defun eww-open-other-window (url)  
-    (split-window-horizontally) 
-    (other-window 1) 
+  (defun eww-open-other-window (url)
+    (split-window-horizontally)
+    (other-window 1)
     (eww-browse-url url))
 
-  (use-package counsel-dash 
-    :init 
+  (use-package counsel-dash
+    :init
     (setq counsel-dash-browser-func 'eww-open-other-window))
 #+end_src
 
@@ -340,7 +340,7 @@ Here's a bunch of one-liners for package requires
 
     (use-package helm
       :config
-      (progn 
+      (progn
         (setq helm-display-header-line nil)
         (set-face-attribute 'helm-source-header nil
                             :height 0.1)
@@ -396,7 +396,7 @@ Here's a bunch of one-liners for package requires
 
     (use-package paradox                    ; Better package menu
       :ensure t
-      :defer 2 
+      :defer 2
       :config
       (progn
         (setq paradox-execute-asynchronously nil
@@ -425,7 +425,7 @@ Here's a bunch of one-liners for package requires
       :config
       (beacon-mode 1)
       (setq beacon-push-mark 35
-            beacon-blink-when-focused t 
+            beacon-blink-when-focused t
             beacon-size 5
             beacon-color "deep sky blue"))
 
@@ -435,11 +435,11 @@ Here's a bunch of one-liners for package requires
       :init (global-undo-tree-mode)
       :diminish undo-tree-mode)
 
-    (use-package zoom 
+    (use-package zoom
       :disabled t
       :init (custom-set-variables
              '(zoom-size '(0.618 . 0.618))
-             '(zoom-ignored-major-modes 
+             '(zoom-ignored-major-modes
                '(dired-mode inferior-python-mode))
              '(zoom-ignored-buffer-names '("zoom.el" "init.el"))
              '(zoom-ignored-buffer-name-regexps '("^*Calc"))
@@ -452,7 +452,7 @@ Here's a bunch of one-liners for package requires
       :diminish golden-ratio-mode)
 
     ;; Fortune path
-    (use-package fortune 
+    (use-package fortune
       :init (setq fortune-dir "/usr/share/fortune"
                   fortune-file "/usr/share/fortune/fortunes"))
 
@@ -596,7 +596,7 @@ I want to have movement using Ctrl+something
       ;; (key-chord-define-global "  "     'my/insert-space-or-expand)
       (key-chord-define-global "vv" 'toggle-god-mode)
       ;; (key-chord-define-global "JJ"     'my/switch-to-previous-buffe)
-      )) 
+      ))
 
 #+END_SRC
 ** windows
@@ -773,7 +773,7 @@ I want to have movement using Ctrl+something
     (interactive)
     (let ( (fname (buffer-file-name)) )
       (eshell)
-      (when fname 
+      (when fname
         (with-current-buffer "*eshell*"
           (cd (file-name-directory fname))
           (eshell-emit-prompt)
@@ -837,7 +837,7 @@ I want to have movement using Ctrl+something
 
   (use-package fish-completion
     :config
-    (progn 
+    (progn
       (setq fish-completion-fallback-on-bash-p t)
       (global-fish-completion-mode)))
 
@@ -1206,7 +1206,7 @@ This includes options for source blocks and agenda.
   (setq org-confirm-babel-evaluate nil)
 
   (add-hook 'org-mode-hook
-            (lambda () (interactive) 
+            (lambda () (interactive)
               (org-indent-mode +1)
               (org-overview)))
   (diminish 'org-indent-mode)
@@ -1318,7 +1318,7 @@ Languages which can be evaluated in Org buffers
           (lambda () (and (looking-at org-outline-regexp) (looking-back "^\**"))))
 
     (setq org-speed-commands-user
-          '(("t" . (lambda () (interactive) 
+          '(("t" . (lambda () (interactive)
                      (org-speed-move-safe 'org-previous-visible-heading)))
           ("T" . org-todo)
   ))

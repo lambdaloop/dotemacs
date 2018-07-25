@@ -35,6 +35,10 @@
    "/usr/bin/python3 ~/scripts/get_workspaces.py > /tmp/xmobar.ws")
   )
 
+(add-hook 'exwm-workspace-switch-hook 'update-workspace-bar)
+(add-hook 'exwm-workspace-list-change-hook 'update-workspace-bar)
+(add-hook 'exwm-init-hook 'update-workspace-bar)
+
 ;; setup workspace switch keys
 (setq exwm-input-global-keys
       `(
@@ -43,8 +47,7 @@
                     `(,(kbd (format "s-%d" i)) .
                       (lambda ()
                         (interactive)
-                        (exwm-workspace-switch-create (- ,i 1))
-                        (update-workspace-bar))))
+                        (exwm-workspace-switch-create (- ,i 1)))))
                   (number-sequence 1 9))
         ,@(cl-mapcar (lambda (key i)
                        `(,(kbd (format "s-%s" key)) .
@@ -72,7 +75,7 @@
  (
   ;; basic stuff
   ("s-p" . 'counsel-linux-app)
-  ("s-<backspace>" . 'exwm-reset)
+  ("s-<backspace>" . (spawn "killall xmobar; bash ~/scripts/run_xmobar.sh"))
   ("C-s-Q" . 'save-buffers-kill-terminal)
 
   ;; manage windows
@@ -106,7 +109,8 @@
 
   ;; the terminal
   ("s-C-<return>" . (spawn "xfce4-terminal"))
-  ("S-s-<return>" . 'eshell-cwd)
+  ("s-m" . 'eshell-cwd)
+  ("S-s-<return>" . 'eshell)
   ("s-_" . (lambda () (interactive) (split-window-horizontally) (other-window 1) (eshell)))
 
   ;; convenient things

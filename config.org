@@ -8,6 +8,12 @@ Who am I?
         user-mail-address "krchtchk@gmail.com")
 #+end_src
 * startup
+
+This supposedly fixes some problem with loading?
+#+begin_src emacs-lisp
+(setq tramp-ssh-controlmaster-options "")
+#+end_src
+
 I almost never use the *scratch* buffer. Let's start using the dashboard!
 #+begin_src emacs-lisp
   (use-package dashboard
@@ -63,7 +69,15 @@ Set up the customize file to its own separate file, instead of saving
     (dolist (item to-add)
       (add-to-list list item)))
 
-
+(defun package-reinstall-all-activated-packages ()
+  "Refresh and reinstall all activated packages."
+  (interactive)
+  (package-refresh-contents)
+  (dolist (package-name package-activated-list)
+    (when (package-installed-p package-name)
+      (unless (ignore-errors                   ;some packages may fail to install
+                (package-reinstall package-name))
+        (warn "Package %s failed to reinstall" package-name)))))
 #+end_src
 * appearance
 ** basic appearance
@@ -151,11 +165,13 @@ From [[https://github.com/danielmai/.emacs.d/blob/master/config.org][Daniel Mai]
 ** enable ido + basic settings
 #+begin_src emacs-lisp 
   (use-package ido
+    :disabled t
     :config
     (progn
       (setq ido-enable-flex-matching t)
-      (setq ido-everywhere t)
-      (ido-mode +1)
+      ;; (setq ido-everywhere t)
+      (setq ido-use-virtual-buffers t)
+      (ido-mode -1)
       (setq ido-use-filename-at-point 'guess)
       (setq ido-use-url-at-point nil)
       (setq ido-file-extensions-order '(".org" ".txt" ".md" ".py" ".r" ".R" ".el"))
@@ -163,11 +179,13 @@ From [[https://github.com/danielmai/.emacs.d/blob/master/config.org][Daniel Mai]
 
 
   (use-package ido-completing-read+
+    :disabled t
     :ensure ido
-    :config (ido-ubiquitous-mode +1)
+    ;; :config (ido-ubiquitous-mode +1)
     )
 
   (use-package flx-ido
+    :disabled t
     :ensure ido
     :config (progn
               (flx-ido-mode +1)
@@ -176,30 +194,49 @@ From [[https://github.com/danielmai/.emacs.d/blob/master/config.org][Daniel Mai]
               )
     )
 
-  (setq ido-use-virtual-buffers t)
 
   (use-package ido-at-point
+    :disabled t
     :config (ido-at-point-mode))
 
 #+end_src
 
 ** bookmark jump
 #+begin_src emacs-lisp
-  (defun ido-bookmark-jump (bname)
-    "*Switch to bookmark interactively using `ido'."
-    (interactive (list (ido-completing-read "Bookmark: " (bookmark-all-names) nil t)))
-    (bookmark-jump bname))
+  ;; (defun ido-bookmark-jump (bname)
+  ;;   "*Switch to bookmark interactively using `ido'."
+  ;;   (interactive (list (ido-completing-read "Bookmark: " (bookmark-all-names) nil t)))
+  ;;   (bookmark-jump bname))
 
-  (define-key global-map [remap bookmark-jump] 'ido-bookmark-jump)
+  ;; (define-key global-map [remap bookmark-jump] 'ido-bookmark-jump)
 #+end_src
 * ivy
 #+begin_src emacs-lisp
   (use-package ivy
-    :config 
-    (setq ivy-re-builders-alist '((t . ivy--regex-fuzzy))
-          ivy-initial-inputs-alist nil
-          )
-    :bind ("M-x" . counsel-M-x))
+    :config
+    (progn  
+      (setq ivy-re-builders-alist '((t . ivy--regex-fuzzy))
+            ivy-initial-inputs-alist nil
+            ivy-use-virtual-buffers t
+            ivy-virtual-abbreviate 'full
+            ivy-count-format "%d/%d "
+            )
+      (ido-mode -1)
+      (ivy-mode +1))
+    :bind (
+           ("M-x" . counsel-M-x)
+           ("C-x C-f" . counsel-find-file)
+           :map ivy-minibuffer-map
+           ("C-m" . ivy-alt-done)
+           ("C-s" . ivy-next-line)
+           ("C-r" . ivy-previous-line)
+           :map ivy-switch-buffer-map
+           ("C-k" . ivy-switch-buffer-kill)
+           :map org-mode-map
+           ("C-c j" . counsel-org-goto)
+           ))
+
+
 #+end_src
 
 * sane defaults
@@ -281,10 +318,6 @@ Page-Breaks in GNU Emacs" by Eric J. M. Ritz.]]
 * misc packages
 Here's a bunch of one-liners for package requires
 #+begin_src emacs-lisp
-  ;; (use-package smex
-  ;;   :config (smex-initialize)
-  ;;   :bind ("M-x" . smex) )
-
 
   (use-package helm
     :config
@@ -323,7 +356,8 @@ Here's a bunch of one-liners for package requires
   (use-package nyan-mode :config (nyan-mode +1))
 
   (use-package avy
-    :config (setq avy-timeout-seconds 0.3)
+    :config (setq avy-timeout-seconds 0.3
+                  avy-keys '(?a ?o ?e ?u ?i ?d ?h ?t ?n))
     :bind* (("C-c h" . avy-goto-word-1)
             ("s-h" . avy-goto-word-1)
             ))
@@ -345,6 +379,7 @@ Here's a bunch of one-liners for package requires
 
   (use-package paradox                    ; Better package menu
     :ensure t
+    :defer 2 
     :config
     (progn
       (setq paradox-execute-asynchronously nil
@@ -363,7 +398,9 @@ Here's a bunch of one-liners for package requires
     :defer t
     :ensure t
     :config
-    (setq async-bytecomp-package-mode t))
+    (setq async-bytecomp-package-mode t
+          async-bytecomp-allowed-packages '(all)))
+
 
 
   (use-package beacon
@@ -382,6 +419,7 @@ Here's a bunch of one-liners for package requires
     :diminish undo-tree-mode)
 
   (use-package zoom 
+    :disabled t
     :init (custom-set-variables
            '(zoom-size '(0.618 . 0.618))
            '(zoom-ignored-major-modes 
@@ -389,14 +427,20 @@ Here's a bunch of one-liners for package requires
            '(zoom-ignored-buffer-names '("zoom.el" "init.el"))
            '(zoom-ignored-buffer-name-regexps '("^*Calc"))
            '(zoom-ignore-predicates '((lambda () (> (count-lines (point-min) (point-max)) 20)))))
-    :config (zoom-mode)
+    :config (zoom-mode +1)
     :bind ("C-x +" . zoom))
 
+  (use-package golden-ratio
+    :config (golden-ratio-mode))
+
+  ;; Fortune path
+  (use-package fortune 
+    :init (setq fortune-dir "/usr/share/fortune"
+                fortune-file "/usr/share/fortune/fortunes"))
 
 #+end_src
 
 #+RESULTS:
-: zoom
 * system-packages
 #+begin_src emacs-lisp
 (require 'system-packages)
@@ -507,35 +551,34 @@ I want to have movement using Ctrl+something
 #+end_src
 ** key chords
 #+begin_src emacs-lisp
-    (use-package key-chord
-      :disabled t
-      :config
-      (progn
-        ;; (fset 'key-chord-define 'my/key-chord-define)
-        (setq key-chord-one-key-delay 0.18)
-        (setq key-chord-two-keys-delay 0.1)
-        (key-chord-mode 1)
-        ;; k can be bound too
-        ;; (key-chord-define-global "uu"     'undo)
-        ;; (key-chord-define-global "jr"     'my/goto-random-char-hydra/my/goto-random-char)
-        ;; (key-chord-define-global "kk"     'kill-whole-line)
-        (key-chord-define-global "hd"     'avy-goto-char-timer)
-        ;; (key-chord-define-global "yy"    'my/window-movement/body)
+  (use-package key-chord
+    :config
+    (progn
+      ;; (fset 'key-chord-define 'my/key-chord-define)
+      (setq key-chord-one-key-delay 0.18)
+      (setq key-chord-two-keys-delay 0.1)
+      (key-chord-mode 1)
+      ;; k can be bound too
+      ;; (key-chord-define-global "uu"     'undo)
+      ;; (key-chord-define-global "jr"     'my/goto-random-char-hydra/my/goto-random-char)
+      ;; (key-chord-define-global "kk"     'kill-whole-line)
+      ;; (key-chord-define-global "hd"     'avy-goto-char-timer)
+      ;; (key-chord-define-global "yy"    'my/window-movement/body)
 
-        (key-chord-define-global "xb"     'ido-switch-buffer)
-        (key-chord-define-global "yy"     'switch-window)
-        (key-chord-define-global "xf"     'ido-find-file)
-        ;; (key-chord-define-global "jl"     'avy-goto-line)
-        ;; (key-chord-define-global "j."     'join-lines/body)
-                                            ;(key-chord-define-global "jZ"     'avy-zap-to-char)
-        ;; (key-chord-define-global "FF"     'find-file)
-        ;; (key-chord-define-global "qq"     'my/quantified-hydra/body)
-        ;; (key-chord-define-global "hh"     'my/key-chord-commands/body)
-        ;; (key-chord-define-global "xx"     'er/expand-region)
-        ;; (key-chord-define-global "  "     'my/insert-space-or-expand)
-        (key-chord-define-global "vv" 'toggle-god-mode)
-        ;; (key-chord-define-global "JJ"     'my/switch-to-previous-buffe)
-        )) 
+      (key-chord-define-global "xb"     'ido-switch-buffer)
+      (key-chord-define-global "yy"     'switch-window)
+      (key-chord-define-global "xf"     'counsel-find-file)
+      ;; (key-chord-define-global "jl"     'avy-goto-line)
+      ;; (key-chord-define-global "j."     'join-lines/body)
+                                          ;(key-chord-define-global "jZ"     'avy-zap-to-char)
+      ;; (key-chord-define-global "FF"     'find-file)
+      ;; (key-chord-define-global "qq"     'my/quantified-hydra/body)
+      ;; (key-chord-define-global "hh"     'my/key-chord-commands/body)
+      ;; (key-chord-define-global "xx"     'er/expand-region)
+      ;; (key-chord-define-global "  "     'my/insert-space-or-expand)
+      (key-chord-define-global "vv" 'toggle-god-mode)
+      ;; (key-chord-define-global "JJ"     'my/switch-to-previous-buffe)
+      )) 
 
 #+END_SRC
 ** windows
@@ -593,6 +636,7 @@ I want to have movement using Ctrl+something
 ** multi term
 #+begin_src emacs-lisp
   (use-package multi-term
+    :disabled t
     :config
     (progn
       (setq multi-term-program "/usr/bin/zsh")
@@ -612,7 +656,7 @@ I want to have movement using Ctrl+something
            ("M-f" . term-send-forward-word)
            :map term-raw-map
            ("C-o" . other-window)
-           ("C-x b" . ido-switch-buffer)
+           ;; ("C-x b" . ido-switch-buffer)
            )
     )
 
@@ -630,7 +674,7 @@ I want to have movement using Ctrl+something
        eshell-error-if-no-glob t
        eshell-hist-ignoredups t
        eshell-save-history-on-exit t
-       eshell-prefer-lisp-functions t
+       eshell-prefer-lisp-functions nil
        eshell-destroy-buffer-when-process-dies t)
       (add-hook 'eshell-mode-hook
                 (lambda ()
@@ -642,6 +686,7 @@ I want to have movement using Ctrl+something
 
   ;; default ssh for tramp
   (setq tramp-default-method "ssh")
+
 
 #+end_src
 *** aliases
@@ -659,6 +704,7 @@ I want to have movement using Ctrl+something
                                   (eshell/alias "ll" "ls -lhA $1")
                                   (eshell/alias "rs" "rsync -ah --info=progress2 $1 $2")
                                   (eshell/alias "mpc" "/usr/bin/mpc $*")
+                                  (eshell/alias "cd" "cd $*; ls")
                                   )))
 #+end_src
 *** C-d to delete or exit
@@ -685,8 +731,8 @@ I want to have movement using Ctrl+something
 #+begin_src emacs-lisp
   (defun eshell-here (split)
     "Opens up a new shell in the directory associated with the
-      current buffer's file. The eshell is renamed to match that
-      directory to make multiple eshell windows easier."
+            current buffer's file. The eshell is renamed to match that
+            directory to make multiple eshell windows easier."
     (interactive "p")
     (let* ((parent (if (buffer-file-name)
                        (file-name-directory (buffer-file-name))
@@ -703,14 +749,28 @@ I want to have movement using Ctrl+something
       (insert (concat "ls"))
       (eshell-send-input)))
 
+
+  (defun eshell-cwd ()
+    "Sets the eshell directory to the current buffer"
+    (interactive)
+    (let ( (fname (buffer-file-name)) )
+      (eshell)
+      (when fname 
+        (with-current-buffer "*eshell*"
+          (cd (file-name-directory fname))
+          (eshell-emit-prompt)
+          (insert (concat "ls -A"))
+          (eshell-send-input)
+          ))))
+
+
   ;; (bind-key* "C-'" (lambda () (interactive) (eshell-here t)))
   ;; (bind-key* "C-c C-m" (lambda () (interactive) (eshell-here nil)))
 
   (bind-key* "C-c M-m" (lambda () (interactive) (eshell "new")))
-  (bind-key "S-s-<return>" 'eshell)
+  ;; (bind-key "S-s-<return>" 'eshell-cwd)
 
 #+end_src
-
 *** better history handling
 #+begin_src emacs-lisp
   (defun eshell-next-prompt (n)
@@ -875,7 +935,7 @@ I want to have movement using Ctrl+something
 #+end_src
 * dired
 #+begin_src emacs-lisp
-  (define-key dired-mode-map "i" 'ido-find-file)
+  (define-key dired-mode-map "i" 'counsel-find-file)
   (define-key dired-mode-map "n" 'dired-next-line)
   (define-key dired-mode-map "h" 'dired-next-line)
   (define-key dired-mode-map "t" 'dired-previous-line)
@@ -1132,6 +1192,10 @@ This includes options for source blocks and agenda.
               (org-indent-mode +1)
               (org-overview)))
   (diminish 'org-indent-mode)
+
+  ;; completion for org goto
+  ;; (setq org-goto-interface 'outline-path-completion)
+  ;; (setq org-outline-path-complete-in-steps nil)
 #+end_src
 
 ** spelling
@@ -1201,6 +1265,7 @@ Languages which can be evaluated in Org buffers
             )
     :bind* ("C-c b" . ivy-bibtex))
   (use-package org-ref
+    :defer 1
     :ensure ivy-bibtex
     :init (progn
             (setq org-ref-bibliography-notes bibtex-completion-notes-path
@@ -1366,27 +1431,27 @@ From https://github.com/mbork/beeminder.el
 * exwm
 ** suggested configuration
 #+begin_src emacs-lisp
-  ;; Load EXWM.
-  (require 'exwm)
+    ;; Load EXWM.
+    (require 'exwm)
 
-  ;; Fix problems with Ido (if you use it).
-  (require 'exwm-config)
-  (exwm-config-ido)
+    ;; Fix problems with Ido (if you use it).
+    (require 'exwm-config)
+    ;; (exwm-config-ido)
 
-  ;; Set the initial number of workspaces (they can also be created later).
-  (setq exwm-workspace-number 9)
+    ;; Set the initial number of workspaces (they can also be created later).
+    (setq exwm-workspace-number 9)
 
-  ;; You can hide the minibuffer and echo area when they're not used, by
-  ;; uncommenting the following line.
-  ;; (setq exwm-workspace-minibuffer-position 'bottom)
+    ;; You can hide the minibuffer and echo area when they're not used, by
+    ;; uncommenting the following line.
+    ;; (setq exwm-workspace-minibuffer-position 'bottom)
 
-  (setq window-divider-default-right-width 5)
-  (window-divider-mode)
+    (setq window-divider-default-right-width 5)
+    (window-divider-mode)
 
-  (setq exwm-workspace-show-all-buffers t)
-  (setq exwm-layout-show-all-buffers t)
+    (setq exwm-workspace-show-all-buffers t)
+    (setq exwm-layout-show-all-buffers t)
 
-(setq exwm-input--update-focus-interval 0.1)
+  (setq exwm-input--update-focus-interval 0.1)
 #+end_src
 ** exwm-edit
 #+begin_src emacs-lisp

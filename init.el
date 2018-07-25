@@ -22,8 +22,8 @@
 
 (setq package-enable-at-startup nil)
 
-;;(unless package--initialized 
-(package-initialize) ;;)
+(unless package--initialized 
+  (package-initialize))
 
 ;;; Bootstrap use-package
 ;; Install use-package if it's not already installed.
@@ -33,6 +33,9 @@
   (package-install 'use-package))
 
 ;; From use-package README
+
+(setq use-package-verbose t)
+
 
 (require 'use-package)
 (require 'diminish)                ;; if you use :diminish

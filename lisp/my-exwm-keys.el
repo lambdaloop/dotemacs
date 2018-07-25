@@ -79,7 +79,7 @@
   ("s-q" . (lambda () (interactive) (really-kill-this-buffer) (delete-window)))
   ("s-Q" . 'really-kill-this-buffer)
   ("s-k" . 'really-kill-this-buffer)
-  ("s-SPC" . 'ido-switch-buffer)
+  ("s-SPC" . 'ivy-switch-buffer)
   ("s-o" . 'switch-window)
   ("s-a" . 'switch-window-mvborder-left)
   ("s-u" . 'switch-window-mvborder-right)
@@ -87,8 +87,8 @@
   ("s-U" . 'switch-window-mvborder-down)
   ("s-n" . 'exwm-floating-toggle-floating)
   ("s-<return>" . 'delete-other-windows)
-  ("s-," . (lambda () (interactive) (split-window-right) (other-window 1) (ido-switch-buffer)))
-  ("s-." . (lambda () (interactive) (split-window-below) (other-window 1) (ido-switch-buffer)))
+  ("s-," . (lambda () (interactive) (split-window-right) (other-window 1) (ivy-switch-buffer)))
+  ("s-." . (lambda () (interactive) (split-window-below) (other-window 1) (ivy-switch-buffer)))
   ("s-w" . 'delete-window)
   ("s-0" . 'delete-window)
   ("s-<down-mouse-1>" . 'exwm-input-move-event)
@@ -106,7 +106,7 @@
 
   ;; the terminal
   ("s-C-<return>" . (spawn "xfce4-terminal"))
-  ("S-s-<return>" . 'eshell)
+  ("S-s-<return>" . 'eshell-cwd)
   ("s-_" . (lambda () (interactive) (split-window-horizontally) (other-window 1) (eshell)))
 
   ;; convenient things
@@ -117,8 +117,8 @@
   ("s-c c" . 'org-capture)
   ("s-c a" . 'org-agenda)
   ("s-c b" . 'beeminder-list-goals)
-  ("s-f" . 'ido-find-file)
-  ("s-b" . 'ido-bookmark-jump)
+  ("s-f" . 'counsel-find-file)
+  ("s-b" . 'counsel-bookmark)
 
   ;; all the music stuff
   ("s-P" . (spawn "bash ~/scripts/pick_music.sh"))

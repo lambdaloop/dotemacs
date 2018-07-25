@@ -19,7 +19,11 @@
 (when (boundp 'package-pinned-packages)
   (setq package-pinned-packages
         '((org-plus-contrib . "org"))))
-;;(package-initialize)
+
+(setq package-enable-at-startup nil)
+
+;;(unless package--initialized 
+(package-initialize) ;;)
 
 ;;; Bootstrap use-package
 ;; Install use-package if it's not already installed.
@@ -29,8 +33,8 @@
   (package-install 'use-package))
 
 ;; From use-package README
-(eval-when-compile
-  (require 'use-package))
+
+(require 'use-package)
 (require 'diminish)                ;; if you use :diminish
 (require 'bind-key)
 ;; (setq use-package-verbose t)

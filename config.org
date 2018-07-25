@@ -17,18 +17,14 @@ I almost never use the *scratch* buffer. Let's start using the dashboard!
       (setq dashboard-items '((recents  . 8)
                               (bookmarks . 8)
                               (agenda . 8)))
-      (setq dashboard-startup-banner "~/Pictures/wallpapers/chosen/small/772110.png")
-      ;; (add-hook 'dashboard-mode-hook (lambda () (god-local-mode t))
-      ))
-  :config
-  (progn
-    (dashboard-setup-startup-hook)
-    (setq initial-buffer-choice (lambda () (get-buffer "*dashboard*")))
+      (setq dashboard-startup-banner "~/Pictures/wallpapers/chosen/small/772110.png"))
+    :config
+    (progn
+      (dashboard-setup-startup-hook)
+      (setq initial-buffer-choice (lambda () (get-buffer "*dashboard*")))
+      )
     )
-  )
-
-
-    #+end_src
+#+end_src
 
 Setup the PATH
 #+begin_src emacs-lisp
@@ -38,7 +34,7 @@ Setup the PATH
 
 Setup the load path
 #+begin_src emacs-lisp
-  (add-to-list 'load-path "~/.emacs.d/extras/")
+  (add-to-list 'load-path "~/.emacs.d/lisp")
 #+end_src
 * customize file
 Set up the customize file to its own separate file, instead of saving
@@ -114,7 +110,7 @@ From [[https://github.com/danielmai/.emacs.d/blob/master/config.org][Daniel Mai]
 ** current theme
 #+begin_src emacs-lisp
   ;; (use-package color-theme-sanityinc-tomorrow
-  ;;   :config (switch-theme 'sanityinc-tomorrow-eighties)) 
+  ;;   :config (switch-theme 'sanityinc-tomorrow-night)) 
   (use-package flatland-theme
     :config (switch-theme 'flatland)) 
 #+end_src
@@ -153,7 +149,7 @@ From [[https://github.com/danielmai/.emacs.d/blob/master/config.org][Daniel Mai]
 #+end_src
 * ido
 ** enable ido + basic settings
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp 
   (use-package ido
     :config
     (progn
@@ -184,7 +180,8 @@ From [[https://github.com/danielmai/.emacs.d/blob/master/config.org][Daniel Mai]
 
   (use-package ido-at-point
     :config (ido-at-point-mode))
-      #+end_src
+
+#+end_src
 
 ** bookmark jump
 #+begin_src emacs-lisp
@@ -195,6 +192,16 @@ From [[https://github.com/danielmai/.emacs.d/blob/master/config.org][Daniel Mai]
 
   (define-key global-map [remap bookmark-jump] 'ido-bookmark-jump)
 #+end_src
+* ivy
+#+begin_src emacs-lisp
+  (use-package ivy
+    :config 
+    (setq ivy-re-builders-alist '((t . ivy--regex-fuzzy))
+          ivy-initial-inputs-alist nil
+          )
+    :bind ("M-x" . counsel-M-x))
+#+end_src
+
 * sane defaults
 Copied from [[https://github.com/danielmai/.emacs.d][Daniel Mai]], with some of my own additions
 Let's start with some sane defaults, shall we?
@@ -260,7 +267,7 @@ Sources for this section include [[https://github.com/magnars/.emacs.d/blob/mast
   ;; enable electric pair mode everywhere
   (electric-pair-mode +1)
 
-#+end_src
+  #+end_src
 
 ** page breaks
 Here we make page-break characters look pretty, instead of appearing
@@ -274,50 +281,72 @@ Page-Breaks in GNU Emacs" by Eric J. M. Ritz.]]
 * misc packages
 Here's a bunch of one-liners for package requires
 #+begin_src emacs-lisp
-      (use-package smex
-        :config (smex-initialize)
-        :bind ("M-x" . smex) )
-      (use-package magit :bind ("C-x g" . magit-status)
-        :config (setq magit-completing-read-function
-                      'magit-ido-completing-read))
-
-      (setq pdf-view-use-unicode-ligther nil)
-
-      (use-package "pdf-tools"
-        :config (pdf-tools-install))
-
-      (use-package expand-region
-        :bind* (("M-." . er/expand-region)))
-
-      (use-package ess-site
-        :config (progn
-                  (setq ess-use-ido t)
-                  (ess-toggle-underscore nil)))
-
-      (use-package nyan-mode :config (nyan-mode +1))
-
-      (use-package avy
-        :config (setq avy-timeout-seconds 0.3)
-        :bind* (("C-c g" . avy-goto-char-timer)
-                ("C--" . avy-goto-char-timer)
-                ))
-
-      (use-package switch-window
-        :config (progn
-                  (setq switch-window-shortcut-style 'dvorak)
-                  (setq switch-window-dvorak-shortcuts
-                        '("a" "o" "e" "u" "h" "t" "n" "s" "," "." "c" "r"))
-                  )
-        :bind (("C-x o" . switch-window)))
+  ;; (use-package smex
+  ;;   :config (smex-initialize)
+  ;;   :bind ("M-x" . smex) )
 
 
-      (use-package sudo-edit :ensure t :defer t)
+  (use-package helm
+    :config
+    (progn 
+      (setq helm-display-header-line nil)
+      (set-face-attribute 'helm-source-header nil
+                          :height 0.1)
+      (setq helm-autoresize-max-height 30)
+      (helm-autoresize-mode 1)
+      (setq helm-split-window-in-side-p t)
 
-    ;;(setq paradox-github-token "5c806564fa37150e8d4005371292687c14726f96")
+      (define-key helm-map (kbd "<tab>") 'helm-execute-persistent-action) ; rebind tab to run persistent action
+      (define-key helm-map (kbd "C-i") 'helm-execute-persistent-action) ; make TAB work in terminal
+      (define-key helm-map (kbd "C-z")  'helm-select-action) ; list actions using C-z
+      ))
 
-    (use-package paradox                    ; Better package menu
-      :ensure t
-      :config
+  (use-package darkroom)
+
+  (use-package magit :bind ("C-x g" . magit-status)
+    :config (setq magit-completing-read-function
+                  'magit-ido-completing-read))
+
+  (setq pdf-view-use-unicode-ligther nil)
+
+  (use-package "pdf-tools"
+    :config (pdf-tools-install))
+
+  (use-package expand-region
+    :bind* (("M-." . er/expand-region)))
+
+  (use-package ess-site
+    :config (progn
+              (setq ess-use-ido t)
+              (ess-toggle-underscore nil)))
+
+  (use-package nyan-mode :config (nyan-mode +1))
+
+  (use-package avy
+    :config (setq avy-timeout-seconds 0.3)
+    :bind* (("C-c h" . avy-goto-word-1)
+            ("s-h" . avy-goto-word-1)
+            ))
+
+
+  (use-package switch-window
+    :init (progn
+            (setq switch-window-threshold 3)
+            (setq switch-window-shortcut-style 'qwerty)
+            (setq switch-window-qwerty-shortcuts
+                  '("h" "t" "n" "s" "a" "o" "e" "u" "g" "c" "r" "l"))
+            )
+    :bind (("C-x o" . switch-window)))
+
+
+  (use-package sudo-edit :ensure t :defer t)
+
+  ;;(setq paradox-github-token "5c806564fa37150e8d4005371292687c14726f96")
+
+  (use-package paradox                    ; Better package menu
+    :ensure t
+    :config
+    (progn
       (setq paradox-execute-asynchronously nil
             paradox-spinner-type 'moon      ; Fancy spinner
             ;; Show all possible counts
@@ -327,7 +356,8 @@ Here's a bunch of one-liners for package requires
             paradox-automatically-star nil
             ;; Hide download button, and wiki packages
             paradox-use-homepage-buttons nil ; Can type v instead
-    paradox-hide-wiki-packages t))
+            paradox-hide-wiki-packages t)
+      (paradox-enable)))
 
   (use-package async
     :defer t
@@ -345,6 +375,54 @@ Here's a bunch of one-liners for package requires
           beacon-size 5
           beacon-color "deep sky blue"))
 
+
+  (use-package undo-tree                  ; Branching undo
+    :ensure t
+    :init (global-undo-tree-mode)
+    :diminish undo-tree-mode)
+
+  (use-package zoom 
+    :init (custom-set-variables
+           '(zoom-size '(0.618 . 0.618))
+           '(zoom-ignored-major-modes 
+             '(dired-mode inferior-python-mode))
+           '(zoom-ignored-buffer-names '("zoom.el" "init.el"))
+           '(zoom-ignored-buffer-name-regexps '("^*Calc"))
+           '(zoom-ignore-predicates '((lambda () (> (count-lines (point-min) (point-max)) 20)))))
+    :config (zoom-mode)
+    :bind ("C-x +" . zoom))
+
+
+#+end_src
+
+#+RESULTS:
+: zoom
+* system-packages
+#+begin_src emacs-lisp
+(require 'system-packages)
+(add-to-list 'system-packages-supported-package-managers
+             '(yay .
+                      ((default-sudo . nil)
+                       (install . "yay -S")
+                       (search . "yay -Ss")
+                       (uninstall . "yay -Rs")
+                       (update . "yay -Syu")
+                       (clean-cache . "yay -Sc")
+                       (log . "cat /var/log/pacman.log")
+                       (get-info . "yay -Qi")
+                       (get-info-remote . "yay -Si")
+                       (list-files-provided-by . "yay -Ql")
+                       (verify-all-packages . "yay -Qkk")
+                       (verify-all-dependencies . "yay -Dk")
+                       (remove-orphaned . "yay -Rns $(pacman -Qtdq)")
+                       (list-installed-packages . "yay -Qe")
+                       (list-installed-packages-all . "yay -Q")
+                       (list-dependencies-of . "yay -Qi")
+                       (noconfirm . "--noconfirm"))))
+
+(setq system-packages-use-sudo t)
+(setq system-packages-package-manager 'yay)
+
 #+end_src
 * keybindings
 ** ergonomic keys
@@ -352,15 +430,12 @@ Based on ergoemacs key bindings, but adjusted for me
 I want to have movement using Ctrl+something
 
 #+begin_src emacs-lisp
-  (define-key global-map [(control u)] ctl-x-map)
-
   (bind-keys
    ("C-o" . other-window)
    ("C-t" . previous-line)
    ;; ("C-p" . (lambda () (interactive) (message "C-p is disabled. Use C-t to go up.")))
    ("C-p" . transpose-chars)
    ("M-i" . universal-argument)
-   ("C-x C-u" . pop-to-mark-command)
    ("M-p" . (lambda () (interactive) (execute-kbd-macro (kbd "M-{"))))
    ("M-g" . (lambda () (interactive) (execute-kbd-macro (kbd "M-}"))))
    ("M-[" . (lambda () (interactive) (execute-kbd-macro (kbd "M-{"))))
@@ -372,6 +447,7 @@ I want to have movement using Ctrl+something
    ("C-c r" . ido-bookmark-jump)
    )
 
+  (define-key key-translation-map (kbd "C-u") (kbd "C-x"))
   (define-key key-translation-map (kbd "M-h") (kbd "C-x C-s"))
   (define-key key-translation-map (kbd "s-g") (kbd "C-g"))
 
@@ -379,7 +455,6 @@ I want to have movement using Ctrl+something
 
 ** misc keys
 #+begin_src emacs-lisp
-  (bind-key "M-/" 'hippie-expand)
 
   (defun really-kill-this-buffer ()
     "Kill this current buffer."
@@ -407,36 +482,60 @@ I want to have movement using Ctrl+something
            ("z" . repeat)
            )
     )
+
+
+  (setq default-cursor-color  (face-attribute 'cursor :background ))
+
+  (defun hook-update-cursor ()
+    (cond ((or (bound-and-true-p god-mode)
+               (bound-and-true-p god-global-mode))
+           (set-cursor-color "lime green"))
+          (t (set-cursor-color default-cursor-color))))
+
+  (add-hook 'buffer-list-update-hook 'hook-update-cursor)
+
+  (add-hook 'god-mode-enabled-hook 'hook-update-cursor)
+  (add-hook 'god-mode-disabled-hook 'hook-update-cursor)
+  (add-hook 'god-local-mode-hook 'hook-update-cursor)
+
+  (defun toggle-god-mode ()
+    (interactive)
+    (god-mode-all)
+    (hook-update-cursor))
+
+
 #+end_src
 ** key chords
 #+begin_src emacs-lisp
-  (use-package key-chord
-    :config
-    (progn
-      ;; (fset 'key-chord-define 'my/key-chord-define)
-      (setq key-chord-one-key-delay 0.18)
-      (setq key-chord-two-keys-delay 0.1)
-      (key-chord-mode 1)
-      ;; k can be bound too
-      ;; (key-chord-define-global "uu"     'undo)
-      ;; (key-chord-define-global "jr"     'my/goto-random-char-hydra/my/goto-random-char)
-      ;; (key-chord-define-global "kk"     'kill-whole-line)
-      (key-chord-define-global "hd"     'avy-goto-char-timer)
-      ;; (key-chord-define-global "yy"    'my/window-movement/body)
+    (use-package key-chord
+      :disabled t
+      :config
+      (progn
+        ;; (fset 'key-chord-define 'my/key-chord-define)
+        (setq key-chord-one-key-delay 0.18)
+        (setq key-chord-two-keys-delay 0.1)
+        (key-chord-mode 1)
+        ;; k can be bound too
+        ;; (key-chord-define-global "uu"     'undo)
+        ;; (key-chord-define-global "jr"     'my/goto-random-char-hydra/my/goto-random-char)
+        ;; (key-chord-define-global "kk"     'kill-whole-line)
+        (key-chord-define-global "hd"     'avy-goto-char-timer)
+        ;; (key-chord-define-global "yy"    'my/window-movement/body)
 
-      (key-chord-define-global "ii"     'ido-switch-buffer)
-      (key-chord-define-global "yy"     'switch-window)
-      ;; (key-chord-define-global "jl"     'avy-goto-line)
-      ;; (key-chord-define-global "j."     'join-lines/body)
-                                          ;(key-chord-define-global "jZ"     'avy-zap-to-char)
-      ;; (key-chord-define-global "FF"     'find-file)
-      ;; (key-chord-define-global "qq"     'my/quantified-hydra/body)
-      ;; (key-chord-define-global "hh"     'my/key-chord-commands/body)
-      ;; (key-chord-define-global "xx"     'er/expand-region)
-      ;; (key-chord-define-global "  "     'my/insert-space-or-expand)
-      (key-chord-define-global "vv" 'god-mode-all)
-      ;; (key-chord-define-global "JJ"     'my/switch-to-previous-buffe)
-      ))
+        (key-chord-define-global "xb"     'ido-switch-buffer)
+        (key-chord-define-global "yy"     'switch-window)
+        (key-chord-define-global "xf"     'ido-find-file)
+        ;; (key-chord-define-global "jl"     'avy-goto-line)
+        ;; (key-chord-define-global "j."     'join-lines/body)
+                                            ;(key-chord-define-global "jZ"     'avy-zap-to-char)
+        ;; (key-chord-define-global "FF"     'find-file)
+        ;; (key-chord-define-global "qq"     'my/quantified-hydra/body)
+        ;; (key-chord-define-global "hh"     'my/key-chord-commands/body)
+        ;; (key-chord-define-global "xx"     'er/expand-region)
+        ;; (key-chord-define-global "  "     'my/insert-space-or-expand)
+        (key-chord-define-global "vv" 'toggle-god-mode)
+        ;; (key-chord-define-global "JJ"     'my/switch-to-previous-buffe)
+        )) 
 
 #+END_SRC
 ** windows
@@ -453,6 +552,41 @@ I want to have movement using Ctrl+something
       (select-window win-curr)))
 
   (bind-key "C-c o" 'other-window-kill-buffer)
+
+#+end_src
+** hippie expand
+#+begin_src emacs-lisp
+  (bind-key "M-/" 'hippie-expand)
+  (setq hippie-expand-try-functions-list
+        '(try-complete-file-name-partially
+          try-complete-file-name
+          try-expand-dabbrev
+          try-expand-dabbrev-all-buffers
+          try-expand-dabbrev-from-kill))
+#+end_src
+** mark region
+#+begin_src emacs-lisp
+  (require 'expand-region)
+
+  (defhydra hydra-mark (:body-pre (call-interactively 'set-mark-command)
+                                  :exit t)
+    "hydra for mark commands"
+    ("SPC" er/expand-region)
+    ("P" er/mark-inside-pairs)
+    ("Q" er/mark-inside-quotes)
+    ("p" er/mark-outside-pairs)
+    ("q" er/mark-outside-quotes)
+    ("d" er/mark-defun)
+    ("c" er/mark-comment)
+    ("." er/mark-text-sentence)
+    ("h" er/mark-text-paragraph)
+    ("w" er/mark-word)
+    ("u" er/mark-url)
+    ("m" er/mark-email)
+    ("s" er/mark-symbol)
+    ("j" (funcall 'set-mark-command t) :exit nil))
+
+  (bind-key* "C-c SPC" 'hydra-mark/body)
 
 #+end_src
 * shells
@@ -572,11 +706,8 @@ I want to have movement using Ctrl+something
   ;; (bind-key* "C-'" (lambda () (interactive) (eshell-here t)))
   ;; (bind-key* "C-c C-m" (lambda () (interactive) (eshell-here nil)))
 
-  (bind-key* "C-c C-m" (lambda () (interactive) (eshell "new")))
-  (bind-key "S-s-<return>" (lambda () (interactive) (eshell)))
-
-
-
+  (bind-key* "C-c M-m" (lambda () (interactive) (eshell "new")))
+  (bind-key "S-s-<return>" 'eshell)
 
 #+end_src
 
@@ -720,12 +851,12 @@ I want to have movement using Ctrl+something
 #+end_src
 * recentf
 #+begin_src emacs-lisp
-(defun ido-recentf-open ()
-  "Use `ido-completing-read' to find a recent file."
-  (interactive)
-  (if (find-file (ido-completing-read "Find recent file: " recentf-list))
-      (message "Opening file...")
-    (message "Aborting")))
+  (defun ido-recentf-open ()
+    "Use `ido-completing-read' to find a recent file."
+    (interactive)
+    (if (find-file (ido-completing-read "Find recent file: " recentf-list))
+        (message "Opening file...")
+      (message "Aborting")))
 
   (use-package recentf                    ; Save recently visited files
     :init (recentf-mode)
@@ -775,6 +906,7 @@ I want to have movement using Ctrl+something
                 ("C-;" . flyspell-correct-previous-word-generic)))
 
 #+end_src
+
 * org mode
 ** org requires
 #+begin_src emacs-lisp
@@ -928,8 +1060,11 @@ Local keybindings
              ("r" . org-agenda-schedule)
              ("s" . org-save-all-org-buffers)
              ("d" . org-agenda-deadline)
+             :map org-src-mode-map
+             ("C-c C-c" . org-edit-src-exit)
              )
 #+end_src
+
 ** org options
 This includes options for source blocks and agenda.
 #+begin_src emacs-lisp
@@ -944,7 +1079,6 @@ This includes options for source blocks and agenda.
   (setq org-agenda-span 9)
   (setq org-agenda-tags-column -40) ; take advantage of the screen width
   (setq org-agenda-sticky nil)
-  (setq org-agenda-inhibit-startup t)
   (setq org-agenda-use-tag-inheritance t)
   (setq org-agenda-show-log t)
   (setq org-agenda-skip-scheduled-if-done t)
@@ -976,6 +1110,13 @@ This includes options for source blocks and agenda.
                     "|" "DONE(d!)" "CANCELED(c!)")
           (sequence "TO-READ(r@)" "READING(e)" "|" "READ(a)")
           ))
+
+(defun org-summary-todo (n-done n-not-done)
+  "Switch entry to DONE when all subentries are done, to TODO otherwise."
+  (let (org-log-done org-log-states)   ; turn off logging
+    (org-todo (if (= n-not-done 0) "DONE" "TODO"))))
+
+(add-hook 'org-after-todo-statistics-hook 'org-summary-todo)
 #+end_src
 ** misc
 #+begin_src emacs-lisp
@@ -986,7 +1127,11 @@ This includes options for source blocks and agenda.
   ;; don't confirm when execute code blocks
   (setq org-confirm-babel-evaluate nil)
 
-  (add-hook 'org-mode-hook (lambda () (interactive) (org-indent-mode +1)))
+  (add-hook 'org-mode-hook
+            (lambda () (interactive) 
+              (org-indent-mode +1)
+              (org-overview)))
+  (diminish 'org-indent-mode)
 #+end_src
 
 ** spelling
@@ -1012,7 +1157,8 @@ Languages which can be evaluated in Org buffers
 ** org hooks
 #+begin_src emacs-lisp
   (use-package org-zotxt
-    :config (add-hook 'org-mode-hook (lambda () (org-zotxt-mode +1))))
+    :config (add-hook 'org-mode-hook (lambda () (org-zotxt-mode +1)))
+    :diminish org-zotxt-mode)
 
   (use-package org-bullets
     :config (progn
@@ -1083,6 +1229,17 @@ Languages which can be evaluated in Org buffers
 
 
 #+end_src
+** org speed keys
+#+begin_src emacs-lisp
+    (setq org-use-speed-commands
+          (lambda () (and (looking-at org-outline-regexp) (looking-back "^\**"))))
+
+    (setq org-speed-commands-user
+          '(("t" . (lambda () (interactive) 
+                     (org-speed-move-safe 'org-previous-visible-heading)))
+          ("T" . org-todo)
+  ))
+#+end_src
 * latex
 #+begin_src emacs-lisp
   (add-hook 'LaTeX-mode-hook 'visual-line-mode)
@@ -1122,30 +1279,30 @@ Languages which can be evaluated in Org buffers
 #+end_src
 * company mode
 #+begin_src emacs-lisp
-(use-package company                    ; Graphical (auto-)completion
-  :ensure t
-  :diminish company-mode
-  :init (global-company-mode)
-  :config
-  (setq company-tooltip-align-annotations t
-        company-tooltip-flip-when-above t
-        ;; Easy navigation to candidates with M-<n>
-        company-show-numbers t)
-  :diminish company-mode)
+  (use-package company
+    :disabled t
+    :defer 2
+    :diminish
+    :custom
+    (company-begin-commands '(self-insert-command))
+    (company-idle-delay .5)
+    (company-minimum-prefix-length 2)
+    (company-show-numbers t)
+    (company-tooltip-align-annotations t)
+    (company-tooltip-flip-when-above t)
+    (global-company-mode t))
 
-(use-package company-quickhelp          ; Show help in tooltip
-  :disabled t                           ; M-h clashes with mark-paragraph
-  :ensure t
-  :after company
-  :config (company-quickhelp-mode))
+    (use-package company-quickhelp          ; Show help in tooltip
+      :disabled t                           ; M-h clashes with mark-paragraph
+      :ensure t
+      :after company
+      :config (company-quickhelp-mode))
 
-(use-package company-statistics         ; Sort company candidates by statistics
-  :ensure t
-  :after company
-:config (company-statistics-mode))
+    (use-package company-statistics         ; Sort company candidates by statistics
+      :ensure t
+      :after company
+    :config (company-statistics-mode))
 #+end_src
-
-
 
 * python
 ** ipython shell
@@ -1180,10 +1337,10 @@ Languages which can be evaluated in Org buffers
 #+end_src
 ** python company
 #+begin_src emacs-lisp
-(defun my/python-mode-hook ()
-  (add-to-list 'company-backends 'company-jedi))
+  ;; (defun my/python-mode-hook ()
+  ;;   (add-to-list 'company-backends 'company-jedi))
 
-(add-hook 'python-mode-hook 'my/python-mode-hook)
+  ;; (add-hook 'python-mode-hook 'my/python-mode-hook)
 #+end_src
 * matlab
 #+begin_src emacs-lisp
@@ -1228,6 +1385,12 @@ From https://github.com/mbork/beeminder.el
 
   (setq exwm-workspace-show-all-buffers t)
   (setq exwm-layout-show-all-buffers t)
+
+(setq exwm-input--update-focus-interval 0.1)
+#+end_src
+** exwm-edit
+#+begin_src emacs-lisp
+(use-package exwm-edit)
 #+end_src
 ** renaming buffers to appropriate name
 #+begin_src emacs-lisp
@@ -1253,159 +1416,11 @@ From https://github.com/mbork/beeminder.el
                         (string= "gimp" exwm-instance-name))
                 (exwm-workspace-rename-buffer exwm-title))))
 #+end_src
-** default global keys
+** set up keybindings
 #+begin_src emacs-lisp
-  ;; Global keybindings can be defined with `exwm-input-global-keys'.
-  ;; Here are a few examples:
-  (setq exwm-input-global-keys
-        `(
-          ;; Bind "s-0" to "s-9" to switch to a workspace by its index.
-          ,@(mapcar (lambda (i)
-                      `(,(kbd (format "s-%d" i)) .
-                        (lambda ()
-                          (interactive)
-                          (exwm-workspace-switch-create (- ,i 1)))))
-                    (number-sequence 1 9))
-          ,@(cl-mapcar (lambda (key i)
-                         `(,(kbd (format "s-%s" key)) .
-                           (lambda ()
-                             (interactive)
-                             (exwm-workspace-move-window ,i))))
-                       '("!" "@" "#" "$" "%" "^" "&" "*" "(")
-                       (number-sequence 0 8))
-          ;; Bind "s-&" to launch applications ('M-&' also works if the output
-          ;; buffer does not bother you).
-          ;; ([?\s-&] . (lambda (command)
-          ;;              (interactive (list (read-shell-command "$ ")))
-          ;;              (start-process-shell-command command nil command)))
-
-          ))
-
-
-
-#+end_src
-** custom global keybindindigs
-#+begin_src emacs-lisp
-  (bind-keys :map exwm-mode-map
-             ("C-q" . exwm-input-send-next-key))
-
-
-  (defmacro exwm-input-set-keys (keys)
-    "Set a list of global keybindings for exwm"
-    (cons 'progn
-          (mapcar
-           (lambda (var)
-             (let ((key (car var))
-                   (fun (cdr var)))
-               `(exwm-input-set-key (kbd ,key) ,fun)))
-           keys)))
-
-  (require 'cl)
-  (defun spawn (process)
-    (lexical-let ((proc process))
-      (lambda () (interactive)
-        (start-process-shell-command proc nil proc))
-      ))
-
-  (exwm-input-set-keys
-   (
-    ;; basic stuff
-    ("s-p" . 'counsel-linux-app)
-    ("s-<backspace>" . 'exwm-reset)
-    ("C-s-Q" . 'save-buffers-kill-terminal)
-
-    ;; manage windows
-    ("s-q" . 'really-kill-this-buffer)
-    ("s-h" . 'ido-switch-buffer)
-    ("s-o" . 'switch-window)
-    ("s-u" . 'shrink-window-horizontally)
-    ("s-a" . 'enlarge-window-horizontally)
-    ("s-n" . 'exwm-floating-toggle-floating)
-    ("s-<return>" . 'delete-other-windows)
-    ("s-," . 'split-window-right)
-    ("s-." . 'split-window-below)
-    ("s-w" . 'delete-window)
-    ("s-0" . 'delete-window)
-
-    ;; launch stuff
-    ("s-r" . (spawn "anki"))
-    ("s-i" . (spawn "firefox"))
-    ("s-C-<return>" . (spawn "xfce4-terminal"))
-    ("s-l" . (spawn "cantata"))
-    ("s-z" . (spawn "zotero"))
-
-    ;; convienient things
-    ("s-R" . (spawn "bash ~/scripts/pick_password.sh"))
-
-    ;; emacs functions
-    ("s-c c" . 'org-capture)
-    ("s-c a" . 'org-agenda)
-    ("s-f" . 'ido-find-file)
-
-    ;; all the music stuff
-    ("s-P" . (spawn "bash ~/scripts/pick_music.sh"))
-    ;; ("s-c" . (spawn "bash ~/scripts/pick_google_music.sh"))
-    ;; ("s-C" . (spawn "bash ~/scripts/pick_google_music_title.sh"))
-
-    ("<XF86AudioRaiseVolume>" . (spawn "amixer -c 1 set Master 1%+; bash ~/scripts/vol_xmobar.sh"))
-    ("<XF86AudioLowerVolume>" . (spawn "amixer -c 1 set Master 1%-; bash ~/scripts/vol_xmobar.sh"))
-
-    ("<XF86AudioMute>" . (spawn "pactl set-sink-mute 1 toggle || amixer set Master toggle; bash ~/scripts/vol_xmobar.sh"))
-
-    ("<f11>" . (spawn "amixer -c 1 set Master 1%+; bash ~/scripts/vol_xmobar.sh"))
-    ("<f10>" . (spawn "amixer -c 1 set Master 1%-; bash ~/scripts/vol_xmobar.sh"))
-    ("<f12>" . (spawn "pactl set-sink-mute 1 toggle || amixer set Master toggle; bash ~/scripts/vol_xmobar.sh"))
-
-    ("<XF86MonBrightnessDown>" . (spawn "xbacklight -inc -2"))
-    ("<XF86MonBrightnessUp>" . (spawn "xbacklight -inc +2"))
-
-    ("<XF86AudioPrev>" . (spawn "python ~/scripts/media.py prev"))
-    ("<XF86AudioNext>" . (spawn "python ~/scripts/media.py next"))
-    ("<XF86AudioPlay>" . (spawn "python ~/scripts/media.py pause"))
-
-    ("s-<XF86AudioPlay>" . (spawn "python ~/scripts/media.py get-details > /tmp/xmonad.music"))
-    ("s-<XF86AudioNext>" . (spawn "mpc random"))
-    ("s-<XF86AudioPrev>" . (spawn "mpc repeat"))
-
-    ("<f7>" . (spawn "python ~/scripts/media.py seek-prev && python ~/scripts/media.py get-time > /tmp/xmonad.music"))
-    ("<f9>" . (spawn "python ~/scripts/media.py seek-next && python ~/scripts/media.py get-time > /tmp/xmonad.music"))
-    ("<f8>" . (spawn "python ~/scripts/media.py get-time > /tmp/xmonad.music"))
-
-    ))
-
-
-  ;; (bind-keys "C-c C-c"  exwm-mode-map)
-#+end_src
-
-#+RESULTS:
-
-
-** simulation keys
-#+begin_src emacs-lisp
-  (setq exwm-input-simulation-keys
-        '(
-          ([?\C-t] . [up])
-          ([?\C-n] . [down])
-          ;; ([?\C-x h] . ?\C-a)
-          ;; ([?\C-a] . [home])
-          ([?\C-e] . [end])
-          ([?\C-c ?\C-c] . ?\C-c)
-          ([?\C-k] . [S-end delete])))
-
-
-  ;; remove C-t binding for firefox
-  (add-hook 'exwm-manage-finish-hook
-            (lambda ()
-              (when (and exwm-class-name
-                         (string= exwm-class-name "Firefox"))
-                (exwm-input-set-local-simulation-keys
-               (cons '([?\C-t] . ?\C-t)
-                 (remove '([?\C-t] . [up]) exwm-input-simulation-keys))
-                 ))))
-
+(require 'my-exwm-keys)
 #+end_src
 ** enable exwm
 #+begin_src emacs-lisp
-  (exwm-enable)
+(exwm-enable)
 #+end_src
-

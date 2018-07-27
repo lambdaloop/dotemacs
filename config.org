@@ -16,6 +16,19 @@ This supposedly fixes some problem with loading?
 
 I almost never use the *scratch* buffer. Let's start using the dashboard!
 #+begin_src emacs-lisp
+  (defun get-random-file (dir)
+    (concat (file-name-as-directory dir)
+            (string-trim-right
+             (shell-command-to-string
+              (format "ls %s | shuf | head -1" dir)))))
+
+  (defun update-dashboard-image ()
+    (interactive)
+    (setq dashboard-startup-banner 
+          (get-random-file "~/Pictures/wallpapers/chosen/small-emacs"))
+    (dashboard-refresh-buffer)
+    )
+
   (use-package dashboard
     :ensure t
     :init
@@ -23,13 +36,16 @@ I almost never use the *scratch* buffer. Let's start using the dashboard!
       (setq dashboard-items '((recents  . 8)
                               (bookmarks . 8)
                               (agenda . 8)))
-      (setq dashboard-startup-banner "~/Pictures/wallpapers/chosen/small/772110.png"))
+      (setq dashboard-startup-banner 
+            (get-random-file "~/Pictures/wallpapers/chosen/small-emacs")))
     :config
     (progn
       (dashboard-setup-startup-hook)
       (setq initial-buffer-choice (lambda () (get-buffer "*dashboard*")))
       )
     )
+
+  (bind-key "z" 'update-dashboard-image dashboard-mode-map)
 #+end_src
 
 Setup the PATH
@@ -125,8 +141,11 @@ From [[https://github.com/danielmai/.emacs.d/blob/master/config.org][Daniel Mai]
 #+begin_src emacs-lisp
   ;; (use-package color-theme-sanityinc-tomorrow
   ;;   :config (switch-theme 'sanityinc-tomorrow-night))
-  (use-package flatland-theme
-    :config (switch-theme 'flatland))
+  ;; (use-package flatland-theme
+  ;;   :config (switch-theme 'flatland))
+  ;; (use-package misterioso-theme
+  ;;   :config (switch-theme 'misterioso))
+(switch-theme 'misterioso)
 #+end_src
 ** smart-mode-line
 #+begin_src emacs-lisp
@@ -211,6 +230,7 @@ From [[https://github.com/danielmai/.emacs.d/blob/master/config.org][Daniel Mai]
   ;; (define-key global-map [remap bookmark-jump] 'ido-bookmark-jump)
 #+end_src
 * ivy - counsel - swiper
+** basic setup 
 #+begin_src emacs-lisp
   (use-package ivy
     :diminish ivy-mode
@@ -223,14 +243,17 @@ From [[https://github.com/danielmai/.emacs.d/blob/master/config.org][Daniel Mai]
             ivy-use-virtual-buffers t
             ivy-virtual-abbreviate 'full
             ivy-count-format "%d/%d "
-            ivy-height 8
+            ivy-height 15
+            ivy-wrap t
             )
       (ido-mode -1)
       (ivy-mode +1))
     :bind (
-           ("C-s" . swiper)
+           ;; ("C-s" . counsel-grep)
            ("M-x" . counsel-M-x)
            ("C-x C-f" . counsel-find-file)
+           ("M-y" . counsel-yank-pop)
+           ("C-c j" . counsel-imenu)
            :map ivy-minibuffer-map
            ("C-m" . ivy-alt-done)
            ("C-s" . ivy-next-line)
@@ -239,7 +262,7 @@ From [[https://github.com/danielmai/.emacs.d/blob/master/config.org][Daniel Mai]
            :map ivy-switch-buffer-map
            ("C-k" . ivy-switch-buffer-kill)
            :map org-mode-map
-           ("C-c j" . counsel-org-goto)
+           ("C-c C-j" . counsel-org-goto)
            ))
 
 
@@ -252,10 +275,22 @@ From [[https://github.com/danielmai/.emacs.d/blob/master/config.org][Daniel Mai]
     (eww-browse-url url))
 
   (use-package counsel-dash
-    :init
-    (setq counsel-dash-browser-func 'eww-open-other-window))
+    :config
+    (setq counsel-dash-browser-func 'eww-open-other-window
+          counsel-dash-common-docsets '("NumPy" "SciPy"))
+    :bind ("C-c r" . counsel-dash))
 #+end_src
-
+** ivy-rich
+#+begin_src emacs-lisp
+  (use-package ivy-rich
+    :config (progn
+              (setq ivy-virtual-abbreviate 'full
+                    ivy-rich-switch-buffer-align-virtual-buffer t
+                    ivy-rich-path-style 'abbrev
+                    ivy-rich-switch-buffer-name-max-length 50)
+              (ivy-rich-mode 1)
+              ))
+#+end_src
 * sane defaults
 Copied from [[https://github.com/danielmai/.emacs.d][Daniel Mai]], with some of my own additions
 Let's start with some sane defaults, shall we?
@@ -338,124 +373,126 @@ Page-Breaks in GNU Emacs" by Eric J. M. Ritz.]]
 Here's a bunch of one-liners for package requires
 #+begin_src emacs-lisp
 
-    (use-package helm
-      :config
-      (progn
-        (setq helm-display-header-line nil)
-        (set-face-attribute 'helm-source-header nil
-                            :height 0.1)
-        (setq helm-autoresize-max-height 30)
-        (helm-autoresize-mode 1)
-        (setq helm-split-window-in-side-p t)
+  (use-package helm
+    :config
+    (progn
+      (setq helm-display-header-line nil)
+      (set-face-attribute 'helm-source-header nil
+                          :height 0.1)
+      (setq helm-autoresize-max-height 30)
+      (helm-autoresize-mode 1)
+      (setq helm-split-window-in-side-p t)
 
-        (define-key helm-map (kbd "<tab>") 'helm-execute-persistent-action) ; rebind tab to run persistent action
-        (define-key helm-map (kbd "C-i") 'helm-execute-persistent-action) ; make TAB work in terminal
-        (define-key helm-map (kbd "C-z")  'helm-select-action) ; list actions using C-z
-        ))
+      (define-key helm-map (kbd "<tab>") 'helm-execute-persistent-action) ; rebind tab to run persistent action
+      (define-key helm-map (kbd "C-i") 'helm-execute-persistent-action) ; make TAB work in terminal
+      (define-key helm-map (kbd "C-z")  'helm-select-action) ; list actions using C-z
+      ))
 
-    (use-package darkroom)
+  (use-package darkroom)
 
-    (use-package magit :bind ("C-x g" . magit-status)
-      :config (setq magit-completing-read-function
-                    'magit-ido-completing-read))
+  (use-package magit :bind ("C-x g" . magit-status)
+    :config (setq magit-completing-read-function
+                  'magit-ido-completing-read))
 
-    (setq pdf-view-use-unicode-ligther nil)
+  (setq pdf-view-use-unicode-ligther nil)
 
-    (use-package "pdf-tools"
-      :config (pdf-tools-install))
+  (use-package "pdf-tools"
+    :config (pdf-tools-install))
 
-    (use-package expand-region
-      :bind* (("M-." . er/expand-region)))
+  (use-package expand-region
+    :bind* (("M-." . er/expand-region)))
 
-    (use-package ess-site
-      :config (progn
-                (setq ess-use-ido t)
-                (ess-toggle-underscore nil)))
+  (use-package ess-site
+    :config (progn
+              (setq ess-use-ido t)
+              (ess-toggle-underscore nil)))
 
-    (use-package nyan-mode :config (nyan-mode +1))
+  (use-package nyan-mode :config (nyan-mode +1))
 
-    (use-package avy
-      :config (setq avy-timeout-seconds 0.3
-                    avy-keys '(?a ?o ?e ?u ?i ?d ?h ?t ?n))
-      :bind* (("C-c h" . avy-goto-word-1)
-              ("s-h" . avy-goto-word-1)
-              ))
-
-
-    (use-package switch-window
-      :init (progn
-              (setq switch-window-threshold 3)
-              (setq switch-window-shortcut-style 'qwerty)
-              (setq switch-window-qwerty-shortcuts
-                    '("h" "t" "n" "s" "a" "o" "e" "u" "g" "c" "r" "l"))
-              )
-      :bind (("C-x o" . switch-window)))
+  (use-package avy
+    :config (setq avy-timeout-seconds 0.3
+                  avy-keys '(?a ?o ?e ?u ?i ?d ?h ?t ?n))
+    :bind* (("s-h" . avy-goto-word-1)
+            ))
 
 
-    (use-package sudo-edit :ensure t :defer t)
-
-    (use-package paradox                    ; Better package menu
-      :ensure t
-      :defer 2
-      :config
-      (progn
-        (setq paradox-execute-asynchronously nil
-              paradox-spinner-type 'moon      ; Fancy spinner
-              ;; Show all possible counts
-              paradox-display-download-count t
-              paradox-display-star-count t
-              ;; Don't star automatically
-              paradox-automatically-star nil
-              ;; Hide download button, and wiki packages
-              paradox-use-homepage-buttons nil ; Can type v instead
-              paradox-hide-wiki-packages t)
-        (paradox-enable)))
-
-    (use-package async
-      :defer t
-      :ensure t
-      :config
-      (setq async-bytecomp-package-mode t
-            async-bytecomp-allowed-packages '(all)))
+  (use-package switch-window
+    :init (progn
+            (setq switch-window-threshold 3)
+            (setq switch-window-shortcut-style 'qwerty)
+            (setq switch-window-qwerty-shortcuts
+                  '("h" "t" "n" "s" "a" "o" "e" "u" "g" "c" "r" "l"))
+            )
+    :bind (("C-x o" . switch-window)))
 
 
+  (use-package sudo-edit :ensure t :defer t)
 
-    (use-package beacon
-      :ensure t
-      :config
-      (beacon-mode 1)
-      (setq beacon-push-mark 35
-            beacon-blink-when-focused t
-            beacon-size 5
-            beacon-color "deep sky blue"))
+  (use-package paradox                    ; Better package menu
+    :ensure t
+    :defer 2
+    :config
+    (progn
+      (setq paradox-execute-asynchronously nil
+            paradox-spinner-type 'moon      ; Fancy spinner
+            ;; Show all possible counts
+            paradox-display-download-count t
+            paradox-display-star-count t
+            ;; Don't star automatically
+            paradox-automatically-star nil
+            ;; Hide download button, and wiki packages
+            paradox-use-homepage-buttons nil ; Can type v instead
+            paradox-hide-wiki-packages t)
+      (paradox-enable)))
+
+  (use-package async
+    :defer t
+    :ensure t
+    :config
+    (setq async-bytecomp-package-mode t
+          async-bytecomp-allowed-packages '(all)))
 
 
-    (use-package undo-tree                  ; Branching undo
-      :ensure t
-      :init (global-undo-tree-mode)
-      :diminish undo-tree-mode)
 
-    (use-package zoom
-      :disabled t
-      :init (custom-set-variables
-             '(zoom-size '(0.618 . 0.618))
-             '(zoom-ignored-major-modes
-               '(dired-mode inferior-python-mode))
-             '(zoom-ignored-buffer-names '("zoom.el" "init.el"))
-             '(zoom-ignored-buffer-name-regexps '("^*Calc"))
-             '(zoom-ignore-predicates '((lambda () (> (count-lines (point-min) (point-max)) 20)))))
-      :config (zoom-mode +1)
-      :bind ("C-x +" . zoom))
+  (use-package beacon
+    :ensure t
+    :config
+    (beacon-mode 1)
+    (setq beacon-push-mark 35
+          beacon-blink-when-focused t
+          beacon-size 5
+          beacon-color "deep sky blue"))
 
-    (use-package golden-ratio
-      :config (golden-ratio-mode)
-      :diminish golden-ratio-mode)
 
-    ;; Fortune path
-    (use-package fortune
-      :init (setq fortune-dir "/usr/share/fortune"
-                  fortune-file "/usr/share/fortune/fortunes"))
+  (use-package undo-tree                  ; Branching undo
+    :ensure t
+    :init (global-undo-tree-mode)
+    :diminish undo-tree-mode)
 
+  (use-package zoom
+    :disabled t
+    :init (custom-set-variables
+           '(zoom-size '(0.618 . 0.618))
+           '(zoom-ignored-major-modes
+             '(dired-mode inferior-python-mode))
+           '(zoom-ignored-buffer-names '("zoom.el" "init.el"))
+           '(zoom-ignored-buffer-name-regexps '("^*Calc"))
+           '(zoom-ignore-predicates '((lambda () (> (count-lines (point-min) (point-max)) 20)))))
+    :config (zoom-mode +1)
+    :bind ("C-x +" . zoom))
+
+  (use-package golden-ratio
+    :disabled t
+    :config (golden-ratio-mode)
+    :diminish golden-ratio-mode)
+
+  ;; Fortune path
+  (use-package fortune
+    :init (setq fortune-dir "/usr/share/fortune"
+                fortune-file "/usr/share/fortune/fortunes"))
+
+  (use-package yasnippet
+    :config (yas-global-mode))
 #+end_src
 
 #+RESULTS:
@@ -493,6 +530,7 @@ I want to have movement using Ctrl+something
 
 #+begin_src emacs-lisp
   (bind-keys
+   ("C-x C-x" . pop-to-mark-command)
    ("C-o" . other-window)
    ("C-t" . previous-line)
    ;; ("C-p" . (lambda () (interactive) (message "C-p is disabled. Use C-t to go up.")))
@@ -502,11 +540,11 @@ I want to have movement using Ctrl+something
    ("M-g" . (lambda () (interactive) (execute-kbd-macro (kbd "M-}"))))
    ("M-[" . (lambda () (interactive) (execute-kbd-macro (kbd "M-{"))))
    ("M-]" . (lambda () (interactive) (execute-kbd-macro (kbd "M-}"))))
+   ("C-z" . repeat)
    )
 
   (bind-keys*
    ("C-." . set-mark-command)
-   ("C-c r" . ido-bookmark-jump)
    )
 
   (define-key key-translation-map (kbd "C-u") (kbd "C-x"))
@@ -514,6 +552,7 @@ I want to have movement using Ctrl+something
   (define-key key-translation-map (kbd "s-g") (kbd "C-g"))
 
 #+end_src
+
 
 ** misc keys
 #+begin_src emacs-lisp
@@ -529,6 +568,45 @@ I want to have movement using Ctrl+something
     "Revert buffer without confirmation."
     (interactive) (revert-buffer t t))
   (bind-key "C-x C-r" 'revert-buffer-no-confirm)
+
+;; https://stackoverflow.com/questions/88399/how-do-i-duplicate-a-whole-line-in-emacs
+(defun duplicate-line (arg)
+  "Duplicate current line, leaving point in lower line."
+  (interactive "*p")
+
+  ;; save the point for undo
+  (setq buffer-undo-list (cons (point) buffer-undo-list))
+
+  ;; local variables for start and end of line
+  (let ((bol (save-excursion (beginning-of-line) (point)))
+        eol)
+    (save-excursion
+
+      ;; don't use forward-line for this, because you would have
+      ;; to check whether you are at the end of the buffer
+      (end-of-line)
+      (setq eol (point))
+
+      ;; store the line and disable the recording of undo information
+      (let ((line (buffer-substring bol eol))
+            (buffer-undo-list t)
+            (count arg))
+        ;; insert the line arg times
+        (while (> count 0)
+          (newline)         ;; because there is no newline in 'line'
+          (insert line)
+          (setq count (1- count)))
+        )
+
+      ;; create the undo information
+      (setq buffer-undo-list (cons (cons eol (point)) buffer-undo-list)))
+    ) ; end-of-let
+
+  ;; put the point in the lowest line and return
+  (next-line arg))
+
+
+(bind-key  "C-c d" 'duplicate-line)
 #+end_src
 
 ** god-mode
@@ -685,7 +763,7 @@ I want to have movement using Ctrl+something
 *** basic config
 #+begin_src emacs-lisp
   (use-package eshell
-    :init
+    :config
     (progn
       (setq ;; eshell-buffer-shorthand t ...  Can't see Bug#19391
        eshell-scroll-to-bottom-on-input 'all
@@ -698,13 +776,17 @@ I want to have movement using Ctrl+something
                 (lambda ()
                   (jlp/add-to-list-multiple
                    'eshell-visual-commands
-                   '("ssh" "tail" "top" "htop" "mosh" "mpsyt"))
+                   '("ssh" "tail" "top" "htop" "mosh" "mpsyt" "watch"))
+                  (bind-keys :map eshell-mode-map
+                             ("C-t" . eshell-previous-matching-input-from-input)
+                             ("C-p" . eshell-previous-matching-input-from-input)
+                             ("C-n" . eshell-next-matching-input-from-input)
+                             )
                   )))
     )
 
   ;; default ssh for tramp
   (setq tramp-default-method "ssh")
-
 
 #+end_src
 *** aliases
@@ -739,11 +821,10 @@ I want to have movement using Ctrl+something
             ;; )
             )
         (delete-forward-char arg)))
-    :init
-    (add-hook 'eshell-mode-hook
-              (lambda ()
-                (bind-keys :map eshell-mode-map
-                           ("C-d" . ha/eshell-quit-or-delete-char)))))
+    :init (add-hook 'eshell-mode-hook
+                    (lambda ()
+                      (bind-keys :map eshell-mode-map
+                                 ("C-d" . ha/eshell-quit-or-delete-char)))))
 #+end_src
 *** eshell-here
 #+begin_src emacs-lisp
@@ -809,7 +890,7 @@ I want to have movement using Ctrl+something
   (defun eshell-insert-history ()
     "Displays the eshell history to select and insert back into your eshell."
     (interactive)
-    (insert (ido-completing-read "Eshell history: "
+    (insert (ivy-completing-read "Eshell history: "
                                  (delete-dups
                                   (ring-elements eshell-history-ring)))))
 
@@ -871,13 +952,16 @@ I want to have movement using Ctrl+something
         `(:foreground ,(face-attribute 'font-lock-function-name-face :foreground)
                       :weight bold ))
 
+(setq banner-eshell-face `(:foreground "sky blue" :weight bold))
+(setq banner-word-face `(:foreground "#9EC400" :weight bold))
+
   (defun my-eshell-banner-hook ()
     (setq eshell-banner-message
           (format
            "\nWelcome to %s.\nHave a %s day! %s\n\n"
-           (propertize "eshell" 'face bold-constant-face)
+           (propertize "eshell" 'face banner-eshell-face)
            (propertize (get-random-line-file happy-words-fname)
-                       'face bold-function-face)
+                       'face banner-word-face)
            (get-random-line-file happy-faces-fname)
            ))
     )
@@ -927,21 +1011,35 @@ I want to have movement using Ctrl+something
 
   (setq eshell-prompt-function 'my-eshell-prompt-function)
 #+end_src
+*** eshell history
+#+BEGIN_SRC emacs-lisp
+  (defun eshell-append-history ()
+    "Call `eshell-write-history' with the `append' parameter set to `t'."
+    (when eshell-history-ring
+      (let ((newest-cmd-ring (make-ring 1)))
+        (ring-insert newest-cmd-ring (car (ring-elements eshell-history-ring)))
+        (let ((eshell-history-ring newest-cmd-ring))
+          (eshell-write-history eshell-history-file-name t)))))
+  (add-hook 'eshell-pre-command-hook #'eshell-append-history)
+  (add-hook 'eshell-mode-hook '(lambda () 
+                                 (setq eshell-exit-hook nil) 
+                                 (setq eshell-save-history-on-exit nil)))
+#+END_SRC
 * recentf
 #+begin_src emacs-lisp
-  (defun ido-recentf-open ()
-    "Use `ido-completing-read' to find a recent file."
-    (interactive)
-    (if (find-file (ido-completing-read "Find recent file: " recentf-list))
-        (message "Opening file...")
-      (message "Aborting")))
+  ;; (defun ido-recentf-open ()
+  ;;   "Use `ido-completing-read' to find a recent file."
+  ;;   (interactive)
+  ;;   (if (find-file (ido-completing-read "Find recent file: " recentf-list))
+  ;;       (message "Opening file...")
+  ;;     (message "Aborting")))
 
   (use-package recentf                    ; Save recently visited files
     :init (recentf-mode)
-    :bind (("C-c f" . ido-recentf-open))
+    :bind (("C-c f" . counsel-recentf))
     :config
-    (setq recentf-max-saved-items 200
-          recentf-max-menu-items 15
+    (setq recentf-max-saved-items nil
+          recentf-max-menu-items 100
           ;; Cleanup recent files only when Emacs is idle, but not when the mode
           ;; is enabled, because that unnecessarily slows down Emacs. My Emacs
           ;; idles often enough to have the recent files list clean up regularly
@@ -950,6 +1048,8 @@ I want to have movement using Ctrl+something
                                 "/elpa/.*\\'" ; Package files
                                 "/itsalltext/" ; It's all text temp files
                                 )))
+
+  (run-with-timer 0 (* 30 60) 'recentf-save-list)
 #+end_src
 * dired
 #+begin_src emacs-lisp
@@ -957,6 +1057,7 @@ I want to have movement using Ctrl+something
   (define-key dired-mode-map "n" 'dired-next-line)
   (define-key dired-mode-map "h" 'dired-next-line)
   (define-key dired-mode-map "t" 'dired-previous-line)
+  (define-key dired-mode-map "o" 'dired-display-file)
   (define-key dired-mode-map "\C-o" 'other-window)
   (define-key dired-mode-map "."
     (lambda ()
@@ -1324,6 +1425,7 @@ Languages which can be evaluated in Org buffers
   ))
 #+end_src
 * latex
+** setup
 #+begin_src emacs-lisp
   (add-hook 'LaTeX-mode-hook 'visual-line-mode)
   (add-hook 'LaTeX-mode-hook 'flyspell-mode)
@@ -1335,8 +1437,31 @@ Languages which can be evaluated in Org buffers
   (add-hook 'pdf-view-mode-hook 'auto-revert-mode)
 
   (use-package auctex-latexmk
-    :config (auctex-latexmk-setup))
+    :config (progn 
+              (setq auctex-latexmk-inherit-TeX-PDF-mode t)
+              (auctex-latexmk-setup)))
 
+
+  (require 'tex-buf)
+
+  (defun run-latexmk ()
+    (interactive)
+    (let ((TeX-save-query nil)
+          (TeX-process-asynchronous nil)
+          (master-file (TeX-master-file)))
+      (TeX-save-document "")
+      (TeX-run-TeX "latexmk" "latexmk -pdf" master-file)
+      (if (plist-get TeX-error-report-switches (intern master-file))
+          (TeX-next-error t)
+        (minibuffer-message "latexmk done"))))
+
+ (bind-key "C-c e" 'run-latexmk LaTeX-mode-map)
+
+#+end_src
+
+
+** org-ref
+#+begin_src emacs-lisp
   (defun org-ref-to-latex-citation ()
     (interactive)
     (let ((end (point)))

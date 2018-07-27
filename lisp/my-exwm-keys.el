@@ -69,13 +69,17 @@
            ("C-q" . exwm-input-send-next-key))
 
 
-
+(defun restart-xmobar ()
+ (interactive)
+ (run-shell-command "killall xmobar && nohup bash ~/scripts/run_xmobar.sh > /dev/null")
+ (sit-for 0.2)
+ (update-workspace-bar))
 
 (exwm-input-set-keys
  (
   ;; basic stuff
   ("s-p" . 'counsel-linux-app)
-  ("s-<backspace>" . (spawn "killall xmobar; bash ~/scripts/run_xmobar.sh"))
+  ("s-<backspace>" . 'restart-xmobar)
   ("C-s-Q" . 'save-buffers-kill-terminal)
 
   ;; manage windows
@@ -110,6 +114,7 @@
   ;; the terminal
   ("s-C-<return>" . (spawn "xfce4-terminal"))
   ("s-m" . 'eshell-cwd)
+  ("s-M" . (lambda () (interactive) (eshell "new")))
   ("S-s-<return>" . 'eshell)
   ("s-_" . (lambda () (interactive) (split-window-horizontally) (other-window 1) (eshell)))
 
@@ -122,7 +127,7 @@
   ("s-c a" . 'org-agenda)
   ("s-c b" . 'beeminder-list-goals)
   ("s-f" . 'counsel-find-file)
-  ("s-b" . 'counsel-bookmark)
+  ("s-b" . (lambda () (interactive) (switch-to-buffer "*dashboard*")))
 
   ;; all the music stuff
   ("s-P" . (spawn "bash ~/scripts/pick_music.sh"))
@@ -164,7 +169,8 @@
         ;; ([?\C-a] . [home])
         ([?\C-e] . [end])
         ([?\C-c ?\C-c] . ?\C-c)
-        ([?\C-k] . [S-end delete])))
+        ;; ([?\C-k] . [S-end delete])
+))
 
 
 ;; remove C-t binding for firefox

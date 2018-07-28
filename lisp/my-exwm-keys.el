@@ -110,6 +110,7 @@
   ("s-k" . 'really-kill-this-buffer)
   ("s-SPC" . 'ivy-switch-buffer)
   ("s-o" . 'switch-window)
+  ("s-O" . 'switch-window-then-swap-buffer)
   ("s-a" . 'switch-window-mvborder-left)
   ("s-u" . 'switch-window-mvborder-right)
   ("s-A" . 'switch-window-mvborder-up)

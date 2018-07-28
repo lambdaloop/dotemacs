@@ -429,6 +429,7 @@ Here's a bunch of one-liners for package requires
       :init (progn
               (setq switch-window-threshold 2)
               (setq switch-window-input-style 'minibuffer)
+              (setq switch-window-preferred 'ivy)
               (setq switch-window-shortcut-style 'qwerty)
               (setq switch-window-qwerty-shortcuts
                     '("h" "t" "n" "s" "a" "o" "e" "u" "g" "c" "r" "l"))

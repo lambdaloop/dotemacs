@@ -23,3 +23,5 @@ ac-comphist.dat
 /url
 .#*
 image-dired
+secrets.el.gpg
+async-bytecomp.log

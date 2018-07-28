@@ -586,6 +586,7 @@ Here's a bunch of one-liners for package requires
     (progn
       (crux-with-region-or-buffer indent-region)
       (crux-with-region-or-buffer untabify)
+      (crux-with-region-or-line comment-or-uncomment-region)
       ))
 #+END_SRC
 * system-packages

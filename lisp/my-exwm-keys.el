@@ -10,6 +10,28 @@
              `(exwm-input-set-key (kbd ,key) ,fun)))
          keys)))
 
+(defun pick-mpd-song ()
+  (let ((songs (shell-command-to-string "mpc -f '%position% - [%title%|%file%|%track%] - %artist%[ - %album%]' playlist"))
+        (ivy-sort-max-size 0))
+    (split-string (completing-read "Pick a song: " (split-string songs "\n"))
+                  " - ")
+    ))
+
+(defun play-mpd-song ()
+  (interactive)
+  (let* ((song (pick-mpd-song))
+         (picked-id (car song)))
+    (run-shell-command (format "mpc play %s" picked-id))
+    (message "") ; clear the shell message
+    ))
+
+
+(defun pick-run-command ()
+  (interactive)
+  (run-shell-command
+   (completing-read "Pick command: "
+                    (split-string (shell-command-to-string "bash -c 'compgen -c'") "\n")))
+  )
 
 (defun run-shell-command (proc)
   (start-process-shell-command proc nil proc) )
@@ -130,7 +152,8 @@
   ("s-b" . (lambda () (interactive) (switch-to-buffer "*dashboard*")))
 
   ;; all the music stuff
-  ("s-P" . (spawn "bash ~/scripts/pick_music.sh"))
+  ;; ("s-P" . (spawn "bash ~/scripts/pick_music.sh"))
+  ("s-P" . 'play-mpd-song)
   ;; ("s-c" . (spawn "bash ~/scripts/pick_google_music.sh"))
   ;; ("s-C" . (spawn "bash ~/scripts/pick_google_music_title.sh"))
 
@@ -168,10 +191,16 @@
         ;; ([?\C-x h] . ?\C-a)
         ;; ([?\C-a] . [home])
         ([?\C-e] . [end])
-        ([?\C-c ?\C-c] . ?\C-c)
+        ;; ([?\C-c ?\C-c] . ?\C-c)
         ;; ([?\C-k] . [S-end delete])
 ))
 
+(defun exwm-send-c-c ()
+  (interactive)
+  (exwm-input--fake-key ?\C-c))
+
+(bind-key "C-c C-c" 'exwm-send-c-c exwm-mode-map)
+(bind-key "s-c s-c" 'exwm-send-c-c exwm-mode-map)
 
 ;; remove C-t binding for firefox
 (add-hook 'exwm-manage-finish-hook

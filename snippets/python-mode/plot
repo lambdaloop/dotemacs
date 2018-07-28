@@ -1,0 +1,12 @@
+# -*- mode: snippet -*-
+# name: plt.figure
+# key: plot
+# group : general
+# --
+
+plt.figure($1)
+plt.clf()
+$0
+plt.draw()
+plt.show(block=False)
+

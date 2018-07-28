@@ -202,8 +202,13 @@
   (interactive)
   (exwm-input--fake-key ?\C-c))
 
+(defun exwm-send-c-x ()
+  (interactive)
+  (exwm-input--fake-key ?\C-x))
+
 (bind-key "C-c C-c" 'exwm-send-c-c exwm-mode-map)
 (bind-key "s-c s-c" 'exwm-send-c-c exwm-mode-map)
+(bind-key "C-x C-x" 'exwm-send-c-x exwm-mode-map)
 
 ;; remove C-t binding for firefox
 (add-hook 'exwm-manage-finish-hook

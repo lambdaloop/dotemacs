@@ -109,6 +109,8 @@
   ("s-Q" . 'really-kill-this-buffer)
   ("s-k" . 'really-kill-this-buffer)
   ("s-SPC" . 'ivy-switch-buffer)
+  ("<XF86LaunchA>" . 'ivy-switch-buffer)
+  ("<XF86LaunchB>" . 'counsel-M-x)
   ("s-o" . 'switch-window)
   ("s-O" . 'switch-window-then-swap-buffer)
   ("s-a" . 'switch-window-mvborder-left)

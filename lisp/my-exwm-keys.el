@@ -150,9 +150,9 @@
   ;; emacs functions
   ("s-c c" . 'org-capture)
   ("s-c a" . 'org-agenda)
-  ("s-c b" . 'beeminder-list-goals)
+  ("s-b" . 'beeminder-list-goals)
   ("s-f" . 'counsel-find-file)
-  ("s-b" . (lambda () (interactive) (switch-to-buffer "*dashboard*")))
+  ("<XF86KbdBrightnessDown>" . (lambda () (interactive) (switch-to-buffer "*dashboard*")))
 
   ;; all the music stuff
   ;; ("s-P" . (spawn "bash ~/scripts/pick_music.sh"))

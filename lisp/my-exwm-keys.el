@@ -154,6 +154,11 @@
   ("s-f" . 'counsel-find-file)
   ("<XF86KbdBrightnessDown>" . (lambda () (interactive) (switch-to-buffer "*dashboard*")))
 
+  ;; useful laptop functions
+  ("<XF86MonBrightnessDown>" . (spawn "xbacklight -inc -2"))
+  ("<XF86MonBrightnessUp>" . (spawn "xbacklight -inc +2"))
+  ("C-s-l" . (spawn "slimlock"))
+
   ;; all the music stuff
   ;; ("s-P" . (spawn "bash ~/scripts/pick_music.sh"))
   ("s-P" . 'play-mpd-song)
@@ -168,9 +173,6 @@
   ("<f11>" . (spawn "amixer -c 1 set Master 1%+; bash ~/scripts/vol_xmobar.sh"))
   ("<f10>" . (spawn "amixer -c 1 set Master 1%-; bash ~/scripts/vol_xmobar.sh"))
   ("<f12>" . (spawn "pactl set-sink-mute 1 toggle || amixer set Master toggle; bash ~/scripts/vol_xmobar.sh"))
-
-  ("<XF86MonBrightnessDown>" . (spawn "xbacklight -inc -2"))
-  ("<XF86MonBrightnessUp>" . (spawn "xbacklight -inc +2"))
 
   ("<XF86AudioPrev>" . (spawn "python ~/scripts/media.py prev"))
   ("<XF86AudioNext>" . (spawn "python ~/scripts/media.py next"))

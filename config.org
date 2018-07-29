@@ -416,7 +416,8 @@ Here's a bunch of one-liners for package requires
 #+end_src
 ** darkroom
 #+begin_src emacs-lisp
-  (use-package darkroom)
+  (use-package darkroom
+      :config (setq darkroom-text-scale-increase 1))
 #+end_src
 ** magit
 #+begin_src emacs-lisp
@@ -587,7 +588,8 @@ Here's a bunch of one-liners for package requires
       (crux-with-region-or-buffer indent-region)
       (crux-with-region-or-buffer untabify)
       (crux-with-region-or-line comment-or-uncomment-region)
-      ))
+      )
+:bind (("C-x o" . crux-open-with)))
 #+END_SRC
 * system-packages
 #+begin_src emacs-lisp
@@ -790,6 +792,33 @@ I want to have movement using Ctrl+something
       (select-window win-curr)))
 
   (bind-key "C-c o" 'other-window-kill-buffer)
+
+(defun toggle-window-split ()
+  (interactive)
+  (if (= (count-windows) 2)
+      (let* ((this-win-buffer (window-buffer))
+         (next-win-buffer (window-buffer (next-window)))
+         (this-win-edges (window-edges (selected-window)))
+         (next-win-edges (window-edges (next-window)))
+         (this-win-2nd (not (and (<= (car this-win-edges)
+                     (car next-win-edges))
+                     (<= (cadr this-win-edges)
+                     (cadr next-win-edges)))))
+         (splitter
+          (if (= (car this-win-edges)
+             (car (window-edges (next-window))))
+          'split-window-horizontally
+        'split-window-vertically)))
+    (delete-other-windows)
+    (let ((first-win (selected-window)))
+      (funcall splitter)
+      (if this-win-2nd (other-window 1))
+      (set-window-buffer (selected-window) this-win-buffer)
+      (set-window-buffer (next-window) next-win-buffer)
+      (select-window first-win)
+      (if this-win-2nd (other-window 1))))))
+
+(bind-key "C-c t" 'toggle-window-split)
 
 #+end_src
 ** mark region
@@ -1373,6 +1402,9 @@ This includes options for source blocks and agenda.
   (setq org-outline-path-complete-in-steps nil)
 
   (setq org-cycle-separator-lines 2)
+
+  (setq org-agenda-log-mode-items '(closed clock state))
+
 #+end_src
 
 #+RESULTS:
@@ -1382,16 +1414,20 @@ This includes options for source blocks and agenda.
   (setq org-todo-keywords
         '((sequence "TODO(t)" "IN-PROGRESS(i)" "WAITING(w@/!)"
                     "SOMEDAY(s)" "PROJECT(p)"
-                    "|" "DONE(d!)" "CANCELED(c!)")
+                    "|" "DONE(d)" "CANCELED(c)")
           (sequence "TO-READ(r@)" "READING(e)" "|" "READ(a)")
           ))
+
+  (setq org-log-done 'time)
 
   (defun org-summary-todo (n-done n-not-done)
     "Switch entry to DONE when all subentries are done, to TODO otherwise."
     (let (org-log-done org-log-states)   ; turn off logging
       (org-todo (if (= n-not-done 0) "DONE" "TODO"))))
 
+
   (add-hook 'org-after-todo-statistics-hook 'org-summary-todo)
+
 #+end_src
 ** misc
 #+begin_src emacs-lisp
@@ -1517,7 +1553,10 @@ Languages which can be evaluated in Org buffers
   (setq org-speed-commands-user
         '(("t" . (lambda () (interactive)
                    (org-speed-move-safe 'org-previous-visible-heading)))
-          ("T" . org-todo)
+          ("c" . org-todo)
+          ("r" . org-schedule)
+          ("d" . org-deadline)
+          ("h" . org-cycle)
           ))
 #+end_src
 * latex

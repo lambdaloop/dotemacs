@@ -109,7 +109,6 @@
   ("s-Q" . 'really-kill-this-buffer)
   ("s-k" . 'really-kill-this-buffer)
   ("s-SPC" . 'ivy-switch-buffer)
-  ("<XF86LaunchA>" . 'ivy-switch-buffer)
   ("<XF86LaunchB>" . 'counsel-M-x)
   ("s-o" . 'switch-window)
   ("s-O" . 'switch-window-then-swap-buffer)
@@ -146,6 +145,8 @@
   ;; convenient things
   ;; ("s-R" . (spawn "bash ~/scripts/pick_password.sh"))
   ("s-R" . 'password-store-copy)
+  ("s-v" . (spawn "bash ~/scripts/take_screenshot.sh"))
+  ("C-s-l" . (spawn "slimlock"))
 
   ;; emacs functions
   ("s-c c" . 'org-capture)
@@ -153,11 +154,11 @@
   ("s-b" . 'beeminder-list-goals)
   ("s-f" . 'counsel-find-file)
   ("<XF86KbdBrightnessDown>" . (lambda () (interactive) (switch-to-buffer "*dashboard*")))
+  ("<XF86LaunchA>" . (lambda (&optional arg) (interactive "P") (org-agenda arg "a")))
 
   ;; useful laptop functions
   ("<XF86MonBrightnessDown>" . (spawn "xbacklight -inc -2"))
   ("<XF86MonBrightnessUp>" . (spawn "xbacklight -inc +2"))
-  ("C-s-l" . (spawn "slimlock"))
 
   ;; all the music stuff
   ;; ("s-P" . (spawn "bash ~/scripts/pick_music.sh"))

@@ -465,7 +465,7 @@ Here's a bunch of one-liners for package requires
   (use-package switch-window
     :defer nil
     :init (progn
-            (setq switch-window-threshold 2)
+            (setq switch-window-threshold 3)
             (setq switch-window-input-style 'minibuffer)
             (setq switch-window-preferred 'ivy)
             (setq switch-window-shortcut-style 'qwerty)
@@ -1154,6 +1154,7 @@ I want to have movement using Ctrl+something
 *** xterm color
 #+BEGIN_SRC emacs-lisp
   (use-package xterm-color 
+    :disabled t
     :config (progn 
               (add-hook 'eshell-before-prompt-hook
                         (lambda ()

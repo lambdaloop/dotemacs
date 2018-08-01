@@ -5,6 +5,8 @@
  ;; If there is more than one, they won't work right.
  '(ansi-color-faces-vector
    [default bold shadow italic underline bold bold-italic bold])
+ '(ansi-color-names-vector
+   ["#2d3743" "#ff4242" "#74af68" "#dbdb95" "#34cae2" "#008b8b" "#00ede1" "#e1e1e0"])
  '(beacon-color "#f2777a")
  '(compilation-message-face 'default)
  '(custom-safe-themes
@@ -60,9 +62,11 @@
      ("w" "Weekly review" entry
       (file+datetree+prompt "~/Dropbox/org/daily.org")
       (file "~/Dropbox/org/templates/tpl-review.org"))))
+ '(org-outline-path-complete-in-steps nil)
  '(org-refile-targets '((org-agenda-files :maxlevel . 2) (nil :maxlevel . 2)))
+ '(org-refile-use-outline-path 'file)
  '(package-selected-packages
-   '(image+ xterm-color crux buffer-move artbollocks-mode ivy-posframe sublime-themes sublimity smooth-scrolling yasnippet-snippets helm-org-rifle zenburn-theme gruvbox-theme darkokai-theme monokai-alt-theme monokai-theme monotropic-theme dracula-theme ivy-rich counsel-dash zeal-at-point counsel-pydoc golden-ratio counsel-org-capture-string counsel-tramp worf ido-clever-match picpocket helm-system-packages system-packages symon fancy-battery org org-edna nord-theme zotelo zoom ivy-hydra korean-holidays ukrainian-holidays academic-phrases ivy-dired-history ivy-historian ivy-mpdel ivy-pass ivy-todo ivy-yasnippet atom-dark-theme flatland-black-theme color-theme-sanityinc-tomorrow color-theme-sanityinc-solarized badger-theme avy-zap ereader nov exwm-edit darkroom launch company-statistics company-shell company-jedi google-maps google-this beacon esup calfw-gcal calfw-org diminish calfw password-store paradox image-archive image-dired+ sudo-edit fish-completion bash-completion elfeed elfeed-goodies elfeed-org benchmark-init ido-sort-mtime ido-yes-or-no ido-completing-read+ smex flatui-dark-theme flatland-theme molokai-theme moe-theme spacemacs-theme sx dired-du slack ido-hacks ido-describe-bindings ido-at-point ido-grid-mode ido-load-library esh-autosuggest pcmpl-args pcmpl-git pcomplete-extension dashboard org-dashboard exwm counsel switch-window god-mode helm-swoop evil-dvorak platformio-mode ein lua-mode auctex-latexmk anaphora matlab-mode csv-mode git-timemachine org-download org-plus-contrib gitignore-mode toml-mode haskell-mode ivy-bibtex org-ref arduino-mode avy writeroom-mode ag flyspell-correct neotree nyan-mode smart-mode-line multi-term flx-ido org-bullets zotxt ess expand-region org-edit-latex auctex latex-extra bind-key page-break-lines use-package undo-tree))
+   '(danneskjold-theme abyss-theme afternoon-theme borland-blue-theme forest-blue-theme hamburg-theme metalheart-theme northcode-theme underwater-theme dumb-jump import-popwin counsel-notmuch nm notmuch notmuch-labeler image+ xterm-color crux buffer-move artbollocks-mode ivy-posframe helm-org-rifle gruvbox-theme darkokai-theme monokai-alt-theme monokai-theme monotropic-theme dracula-theme ivy-rich counsel-dash counsel-pydoc golden-ratio counsel-org-capture-string counsel-tramp ido-clever-match helm-system-packages fancy-battery org org-edna nord-theme ivy-hydra korean-holidays academic-phrases ivy-dired-history ivy-historian ivy-mpdel ivy-pass ivy-todo ivy-yasnippet atom-dark-theme flatland-black-theme color-theme-sanityinc-tomorrow color-theme-sanityinc-solarized badger-theme avy-zap ereader nov exwm-edit darkroom launch company-shell company-jedi google-maps google-this esup calfw-gcal calfw-org diminish calfw image-archive image-dired+ fish-completion bash-completion elfeed elfeed-goodies elfeed-org benchmark-init ido-sort-mtime ido-yes-or-no ido-completing-read+ flatui-dark-theme flatland-theme molokai-theme moe-theme dired-du ido-hacks ido-describe-bindings ido-at-point ido-grid-mode ido-load-library esh-autosuggest dashboard org-dashboard exwm counsel god-mode helm-swoop evil-dvorak ein lua-mode auctex-latexmk anaphora matlab-mode csv-mode git-timemachine org-download org-plus-contrib gitignore-mode haskell-mode ivy-bibtex arduino-mode ag flyspell-correct neotree nyan-mode multi-term flx-ido org-bullets ess expand-region org-edit-latex auctex latex-extra bind-key undo-tree))
  '(paradox-github-token t)
  '(pos-tip-background-color "#A6E22E")
  '(pos-tip-foreground-color "#272822")
@@ -125,10 +129,19 @@
  '(dashboard-heading-face ((t (:inherit org-level-1 :weight bold))))
  '(diff-added ((t :foreground "green" :underline nil)))
  '(diff-removed ((t :foreground "red" :underline nil)))
+ '(font-lock-builtin-face ((t (:foreground "deep sky blue"))))
+ '(font-lock-comment-face ((t (:foreground "#7bba6f"))))
  '(font-lock-constant-face ((t (:foreground "#00aecf"))))
  '(highlight ((t :background "black" :underline nil)))
  '(hl-line ((t :background "gray10")))
  '(magit-item-highlight ((t :background "black")))
+ '(org-indent ((t (:inherit (org-hide \(org-hide\ fixed-pitch\))))))
+ '(outline-2 ((t (:inherit font-lock-variable-name-face :weight bold))))
+ '(outline-4 ((t (:inherit font-lock-comment-face :weight bold))))
+ '(outline-5 ((t (:inherit font-lock-type-face :weight bold))))
+ '(outline-6 ((t (:inherit font-lock-constant-face :weight bold))))
+ '(outline-7 ((t (:inherit font-lock-builtin-face :weight bold))))
+ '(outline-8 ((t (:inherit font-lock-string-face :weight bold))))
  '(show-paren-match ((t (:background "#949FAB" :foreground "white smoke" :weight bold))))
  '(subtle-highlight ((t (:foreground "antique white"))))
  '(switch-window-label ((t (:inherit font-lock-builtin-face :height 6.0))))

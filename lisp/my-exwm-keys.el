@@ -11,7 +11,7 @@
          keys)))
 
 (defun pick-mpd-song ()
-  (let ((songs (shell-command-to-string "mpc -f '%position% - [%title%|%file%|%track%] - %artist%[ - %album%]' playlist"))
+  (let ((songs (shell-command-to-string "mpc -f '%position% - [%title%|%name%|%file%|%track%] - %artist%[ - %album%] %time%' playlist"))
         (ivy-sort-max-size 0))
     (split-string (completing-read "Pick a song: " (split-string songs "\n"))
                   " - ")
@@ -52,7 +52,7 @@
       )
     ))
 
-(defun update-workspace-bar ()
+(defun update-workspace-bar (&rest args)
   (run-shell-command
    "/usr/bin/python3 ~/scripts/get_workspaces.py > /tmp/xmobar.ws")
   )
@@ -60,6 +60,7 @@
 (add-hook 'exwm-workspace-switch-hook 'update-workspace-bar)
 (add-hook 'exwm-workspace-list-change-hook 'update-workspace-bar)
 (add-hook 'exwm-init-hook 'update-workspace-bar)
+(advice-add 'switch-to-buffer :after 'update-workspace-bar)
 
 ;; setup workspace switch keys
 (setq exwm-input-global-keys
@@ -145,7 +146,8 @@
   ;; convenient things
   ;; ("s-R" . (spawn "bash ~/scripts/pick_password.sh"))
   ("s-R" . 'password-store-copy)
-  ("s-v" . (spawn "bash ~/scripts/take_screenshot.sh"))
+  ("s-v" . (spawn "maim  -u /tmp/maim-$(date +%Y-%m-%d--%H-%M-%S).png"))
+  ("s-V" . (spawn "maim  -u -s  /tmp/maim-$(date +%Y-%m-%d--%H-%M-%S).png"))
   ("C-s-l" . (spawn "slimlock"))
 
   ;; emacs functions

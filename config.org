@@ -226,13 +226,15 @@ From [[https://github.com/danielmai/.emacs.d/blob/master/config.org][Daniel Mai]
 
 ** current theme
 #+begin_src emacs-lisp
-  ;; (use-package color-theme-sanityinc-tomorrow
-  ;;   :config (switch-theme 'sanityinc-tomorrow-night))
-  ;; (use-package flatland-theme
-  ;;   :config (switch-theme 'flatland))
-  ;; (use-package misterioso-theme
-  ;;   :config (switch-theme 'misterioso))
-  (switch-theme 'misterioso)
+    ;; (use-package color-theme-sanityinc-tomorrow
+    ;;   :config (switch-theme 'sanityinc-tomorrow-night))
+    ;; (use-package flatland-theme
+    ;;   :config (switch-theme 'flatland))
+    ;; (use-package misterioso-theme
+    ;;   :config (switch-theme 'misterioso))
+    ;; (switch-theme 'misterioso)
+  (use-package underwater-theme
+   :config (switch-theme 'underwater))
 #+end_src
 ** smart-mode-line
 #+begin_src emacs-lisp
@@ -586,17 +588,18 @@ Here's a bunch of one-liners for package requires
 #+RESULTS:
 ** crux
 #+BEGIN_SRC emacs-lisp
-    (use-package crux
-      :config
-      (progn
-        (require 'crux)
-        (crux-with-region-or-buffer indent-region)
-        (crux-with-region-or-buffer untabify)
-        (crux-with-region-or-line comment-or-uncomment-region)
-        )
-      :bind (("C-x o" . crux-open-with)
-             ("M-;" . comment-or-uncomment-region)
-             ))
+  (use-package crux
+    :config
+    (progn
+      (autoload-do-load #'crux-with-region-or-buffer)
+      (autoload-do-load #'crux-with-region-or-line)
+      (crux-with-region-or-buffer indent-region)
+      (crux-with-region-or-buffer untabify)
+      (crux-with-region-or-line comment-or-uncomment-region)
+      )
+    :bind (("C-x o" . crux-open-with)
+           ("M-;" . comment-or-uncomment-region)
+           ))
 #+END_SRC
 * system-packages
 #+begin_src emacs-lisp

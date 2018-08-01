@@ -155,6 +155,7 @@
   ("s-c a" . 'org-agenda)
   ("s-b" . 'beeminder-list-goals)
   ("s-f" . 'counsel-find-file)
+  ("s-F" . (lambda () (interactive) (split-window-right) (other-window 1) (counsel-find-file)))
   ("<XF86KbdBrightnessDown>" . (lambda () (interactive) (switch-to-buffer "*dashboard*")))
   ("<XF86LaunchA>" . (lambda (&optional arg) (interactive "P") (org-agenda arg "a")))
 

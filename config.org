@@ -148,6 +148,9 @@ Copied from [[https://github.com/danielmai/.emacs.d][Daniel Mai]], with some of 
 
   ;; auto indent on enter
   (define-key global-map (kbd "RET") 'newline-and-indent)
+
+  (setq vc-follow-symlinks t) 
+
 #+end_src
 
 ** page breaks
@@ -194,7 +197,7 @@ Page-Breaks in GNU Emacs" by Eric J. M. Ritz.]]
   (tool-bar-mode 0)
 
   (custom-set-faces
-   '(variable-pitch ((t (:height 100 :width normal :family "Noto Sans")))))
+   '(variable-pitch ((t (:height 120 :width normal :family "Libertine")))))
 
   (setq-default cursor-type 'box)
   (blink-cursor-mode 0)
@@ -583,14 +586,17 @@ Here's a bunch of one-liners for package requires
 #+RESULTS:
 ** crux
 #+BEGIN_SRC emacs-lisp
-  (use-package crux
-    :config
-    (progn
-      (crux-with-region-or-buffer indent-region)
-      (crux-with-region-or-buffer untabify)
-      (crux-with-region-or-line comment-or-uncomment-region)
-      )
-    :bind (("C-x o" . crux-open-with)))
+    (use-package crux
+      :config
+      (progn
+        (require 'crux)
+        (crux-with-region-or-buffer indent-region)
+        (crux-with-region-or-buffer untabify)
+        (crux-with-region-or-line comment-or-uncomment-region)
+        )
+      :bind (("C-x o" . crux-open-with)
+             ("M-;" . comment-or-uncomment-region)
+             ))
 #+END_SRC
 * system-packages
 #+begin_src emacs-lisp
@@ -648,7 +654,6 @@ I want to have movement using Ctrl+something
   (define-key key-translation-map (kbd "s-g") (kbd "C-g"))
 
 #+end_src
-
 
 ** misc keys
 :PROPERTIES:
@@ -826,6 +831,15 @@ I want to have movement using Ctrl+something
 #+begin_src emacs-lisp
   (require 'expand-region)
 
+  (defun er/mark-line()
+    (interactive)
+    (back-to-indentation)
+    (set-mark (point))
+    (move-end-of-line nil)
+    (re-search-backward "^\\|[^[:space:]]")
+    (when (eq last-command 'er/expand-region)
+      (forward-char)))
+
   (defhydra hydra-mark (:body-pre (call-interactively 'set-mark-command)
                                   :exit t)
     "hydra for mark commands"
@@ -842,6 +856,7 @@ I want to have movement using Ctrl+something
     ("u" er/mark-url)
     ("m" er/mark-email)
     ("s" er/mark-symbol)
+    ("l" er/mark-line)
     ("j" (funcall 'set-mark-command t) :exit nil))
 
   (bind-key* "C-c SPC" 'hydra-mark/body)
@@ -922,6 +937,7 @@ I want to have movement using Ctrl+something
     (add-hook 'eshell-mode-hook (lambda ()
                                   (eshell/alias "e" "find-file $1")
                                   (eshell/alias "ff" "find-file $1")
+                                  (eshell/alias "f" "find-file-other-window $1")
                                   (eshell/alias "fo" "find-file-other-window $1")
                                   (eshell/alias "gd" "magit-diff-unstaged")
                                   (eshell/alias "gds" "magit-diff-staged")
@@ -1418,7 +1434,8 @@ This includes options for source blocks and agenda.
   (setq org-cycle-separator-lines 2)
 
   (setq org-agenda-log-mode-items '(closed clock state))
-
+  (setq org-pretty-entities t)
+  (setq org-pretty-entities-include-sub-superscripts nil)
 #+end_src
 
 #+RESULTS:
@@ -1485,19 +1502,25 @@ Languages which can be evaluated in Org buffers
 
 ** org hooks
 #+begin_src emacs-lisp
-  (use-package org-zotxt
-    :config (add-hook 'org-mode-hook (lambda () (org-zotxt-mode +1)))
-    :diminish org-zotxt-mode)
+    (use-package org-zotxt
+      :config (add-hook 'org-mode-hook (lambda () (org-zotxt-mode +1)))
+      :diminish org-zotxt-mode)
 
-  (use-package org-bullets
-    :config (progn
-              (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
-              (setq org-bullets-bullet-list
-                    '("◉" "⚫" "○" "☉" "◎" "◉" "○" "◌" "◎" "●" "⊙" "⊚" "⊛" "∙" "∘") ;; "✸" "◆" "○" "•"
-                    ;; ♥ ● ◇ ✚ ✜ ☯ ◆ ♠ ♣ ♦ ☢ ❀ ◆ ◖ ▶ ○
-                    )))
+    (use-package org-bullets
+      :config (progn
+                (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
+                (setq org-bullets-bullet-list
+                      '( "⚫")
+                      ;; '(" ")
+                      ;; '("◉" "⚫" "○" "☉" "◎" "◉" "○" "◌" "◎" "●" "⊙" "⊚" "⊛" "∙" "∘")
+                      ;; "✸" "◆" "○" "•"
+                      ;; ♥ ● ◇ ✚ ✜ ☯ ◆ ♠ ♣ ♦ ☢ ❀ ◆ ◖ ▶ ○
+                      )))
 
 #+end_src
+
+#+RESULTS:
+: t
 
 ** org latex
 #+begin_src emacs-lisp
@@ -1573,6 +1596,14 @@ Languages which can be evaluated in Org buffers
           ("h" . org-cycle)
           ))
 #+end_src
+** appearance
+#+BEGIN_SRC emacs-lisp
+  (add-hook 'org-mode-hook (lambda () (progn
+    (setq left-margin-width 2)
+    (setq right-margin-width 2)
+    (set-window-buffer nil (current-buffer))
+    (fringe-mode 0))))
+#+END_SRC
 * latex
 ** setup
 #+begin_src emacs-lisp
@@ -1680,10 +1711,10 @@ Languages which can be evaluated in Org buffers
 ** ipython-notebook
 #+begin_src emacs-lisp
   (use-package ein
-    ;; :after (progn
-    ;;           (require 'ein-loaddefs)
-    ;;           (require 'ein-notebook)
-    ;;           (require 'ein-subpackages))
+    :after (progn
+              (require 'ein-loaddefs)
+              (require 'ein-notebook)
+              (require 'ein-subpackages))
     :bind (:map ein:notebook-mode-map
                 ("M-p" . ein:worksheet-goto-prev-input)
                 ("M-n" . ein:worksheet-goto-next-input)
@@ -1704,6 +1735,20 @@ Languages which can be evaluated in Org buffers
 #+begin_src emacs-lisp
   (add-to-list 'auto-mode-alist '("\\.m\\'" . octave-mode))
 #+end_src
+* elisp
+#+BEGIN_SRC emacs-lisp
+(defun remove-elc-on-save ()
+  "If you're saving an elisp file, likely the .elc is no longer valid."
+  (add-hook 'after-save-hook
+            (lambda ()
+              (if (file-exists-p (concat buffer-file-name "c"))
+                  (delete-file (concat buffer-file-name "c"))))
+            nil
+            t))
+  
+(add-hook 'emacs-lisp-mode-hook 'remove-elc-on-save)
+
+#+END_SRC
 * frontend
 ** jsx
 #+begin_src emacs-lisp
@@ -1795,3 +1840,19 @@ From https://github.com/mbork/beeminder.el
           try-complete-lisp-symbol
           ))
 #+end_src
+* leim
+#+BEGIN_SRC emacs-lisp
+  (require 'quail)
+
+  (add-to-list 'quail-keyboard-layout-alist
+               `("dvorak" . ,(concat "                              "
+                                     "  1!2@3#4$5%6^7&8*9(0)[{]}`~  "
+                                     "  '\",<.>pPyYfFgGcCrRlL/?=+    "
+                                     "  aAoOeEuUiIdDhHtTnNsS-_\\|    "
+                                     "  ;:qQjJkKxXbBmMwWvVzZ        "
+                                     "                              ")))
+
+  (quail-set-keyboard-layout "dvorak")
+  (setq default-input-method "korean-hangul")
+
+#+END_SRC

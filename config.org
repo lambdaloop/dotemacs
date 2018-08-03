@@ -249,7 +249,9 @@ From [[https://github.com/danielmai/.emacs.d/blob/master/config.org][Daniel Mai]
               ("^/sudo:.*:" ":SU:")
               ("^~/Dropbox/" ":DBox:")
               ("^:\\([^:]*\\):Documento?s/" ":\\1/Doc:")
-              ("^~/research/neuroecon" ":NEcon:")
+              ("^~/research/neuroecon" ":Hsu:")
+              ("^~/research/tuthill" ":Tuthill:")
+              ("^~/research/brunton" ":Brunton:")
               ("^~/research/" ":RS:")
               ("^~/cs/projects/" ":CS-PROJ:")
               ("^~/data_analysis/" ":DA:")
@@ -424,7 +426,8 @@ Here's a bunch of one-liners for package requires
 ** darkroom
 #+begin_src emacs-lisp
   (use-package darkroom
-    :config (setq darkroom-text-scale-increase 1))
+    :config (setq darkroom-text-scale-increase 0
+                  darkroom-margins 0.27))
 #+end_src
 ** magit
 #+begin_src emacs-lisp
@@ -468,7 +471,6 @@ Here's a bunch of one-liners for package requires
 ** switch-window
 #+begin_src emacs-lisp
   (use-package switch-window
-    :defer nil
     :init (progn
             (setq switch-window-threshold 3)
             (setq switch-window-input-style 'minibuffer)
@@ -476,7 +478,7 @@ Here's a bunch of one-liners for package requires
             (setq switch-window-shortcut-style 'qwerty)
             (setq switch-window-qwerty-shortcuts
                   '("h" "t" "n" "s" "a" "o" "e" "u" "g" "c" "r" "l"))
-            ))
+            )) 
 #+end_src
 ** buffer-move
 #+begin_src emacs-lisp
@@ -587,19 +589,17 @@ Here's a bunch of one-liners for package requires
 
 #+RESULTS:
 ** crux
+crux has a bunch of autoloads, so we use require instead of use-package
 #+BEGIN_SRC emacs-lisp
-  (use-package crux
-    :config
-    (progn
-      (autoload-do-load #'crux-with-region-or-buffer)
-      (autoload-do-load #'crux-with-region-or-line)
-      (crux-with-region-or-buffer indent-region)
-      (crux-with-region-or-buffer untabify)
-      (crux-with-region-or-line comment-or-uncomment-region)
-      )
-    :bind (("C-x o" . crux-open-with)
-           ("M-;" . comment-or-uncomment-region)
-           ))
+  (require 'crux)
+  (crux-with-region-or-buffer indent-region)
+  (crux-with-region-or-buffer untabify)
+  (crux-with-region-or-line comment-or-uncomment-region)
+
+  (bind-keys
+   ("C-x o" . crux-open-with)
+   ("M-;" . comment-or-uncomment-region)
+   )
 #+END_SRC
 * system-packages
 #+begin_src emacs-lisp
@@ -728,6 +728,7 @@ I want to have movement using Ctrl+something
            ("C-x C-3" . split-window-right)
            ("C-x C-0" . delete-window)
            ("C-x C-h" . mark-whole-buffer)
+           ("C-c g" . toggle-god-mode)
            :map god-local-mode-map
            ("z" . repeat)
            )
@@ -1713,17 +1714,29 @@ Languages which can be evaluated in Org buffers
 #+end_src
 ** ipython-notebook
 #+begin_src emacs-lisp
+
+  (defun bind-ein-keys () 
+    (bind-keys :map ein:notebook-mode-map
+               ("M-p" . ein:worksheet-goto-prev-input)
+               ("M-n" . ein:worksheet-goto-next-input)
+               ("M-g" . ein:worksheet-goto-next-input)
+               ("C-c p" . ein:worksheet-goto-prev-input)
+               ("C-c n" . ein:worksheet-goto-next-input)
+               ("<C-return>" . ein:worksheet-execute-cell-and-goto-next)
+               ("." . self-insert-command)
+               )
+    )
+
   (use-package ein
     :after (progn
-              (require 'ein-loaddefs)
-              (require 'ein-notebook)
-              (require 'ein-subpackages))
-    :bind (:map ein:notebook-mode-map
-                ("M-p" . ein:worksheet-goto-prev-input)
-                ("M-n" . ein:worksheet-goto-next-input)
-                ("M-g" . ein:worksheet-goto-next-input)
-                )
+             (require 'ein-loaddefs)
+             (require 'ein-notebook)
+             (require 'ein-subpackages))
+    :config 
+    (add-hook 'ein:notebook-mode-hook 'bind-ein-keys)
     )
+
+
 
 
 #+end_src
@@ -1858,4 +1871,32 @@ From https://github.com/mbork/beeminder.el
   (quail-set-keyboard-layout "dvorak")
   (setq default-input-method "korean-hangul")
 
+#+END_SRC
+* notmuch
+#+BEGIN_SRC emacs-lisp
+  (setq notmuch-search-oldest-first nil
+        message-sendmail-envelope-from 'header
+        mail-specify-envelope-from 'header
+        mail-envelope-from 'header
+        notmuch-show-all-multipart/alternative-parts nil
+        ;; mime-edit-pgp-signers '("C84EF897")
+        ;; mime-edit-pgp-encrypt-to-self t
+        ;; mml2015-encrypt-to-self t
+        ;; mml2015-sign-with-sender t
+        ;; notmuch-crypto-process-mime t
+        message-send-mail-function 'message-send-mail-with-sendmail
+        sendmail-program "~/mail/scripts/msmtp-enqueue.sh"
+        message-sendmail-f-is-evil nil
+        mail-interactive t
+        message-kill-buffer-on-exit t
+        mail-user-agent 'message-user-agent
+        notmuch-always-prompt-for-sender t
+        ;; notmuch-fcc-dirs '((".*" . "Defunct/Sent"))
+        notmuch-show-indent-messages-width 4
+        notmuch-saved-searches '((:name "inbox" :query "tag:inbox" :key "i")
+                                 (:name "unread" :query "tag:unread" :key "u")
+                                 (:name "flagged" :query "tag:flagged" :key "f")
+                                 (:name "sent" :query "tag:sent" :key "t")
+                                 (:name "drafts" :query "tag:draft" :key "d")
+                                 (:name "all mail" :query "*" :key "a")))
 #+END_SRC

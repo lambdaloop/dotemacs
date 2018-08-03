@@ -175,14 +175,9 @@
   ;; ("s-c" . (spawn "bash ~/scripts/pick_google_music.sh"))
   ;; ("s-C" . (spawn "bash ~/scripts/pick_google_music_title.sh"))
 
-  ("<XF86AudioRaiseVolume>" . (spawn "amixer -c 1 set Master 1%+; bash ~/scripts/vol_xmobar.sh"))
   ("<XF86AudioLowerVolume>" . (spawn "amixer -c 1 set Master 1%-; bash ~/scripts/vol_xmobar.sh"))
-
+  ("<XF86AudioRaiseVolume>" . (spawn "amixer -c 1 set Master 1%+; bash ~/scripts/vol_xmobar.sh"))
   ("<XF86AudioMute>" . (spawn "pactl set-sink-mute 1 toggle || amixer set Master toggle; bash ~/scripts/vol_xmobar.sh"))
-
-  ("<f11>" . (spawn "amixer -c 1 set Master 1%+; bash ~/scripts/vol_xmobar.sh"))
-  ("<f10>" . (spawn "amixer -c 1 set Master 1%-; bash ~/scripts/vol_xmobar.sh"))
-  ("<f12>" . (spawn "pactl set-sink-mute 1 toggle || amixer set Master toggle; bash ~/scripts/vol_xmobar.sh"))
 
   ("<XF86AudioPrev>" . (spawn "python ~/scripts/media.py prev"))
   ("<XF86AudioNext>" . (spawn "python ~/scripts/media.py next"))
@@ -193,8 +188,18 @@
   ("s-<XF86AudioPrev>" . (spawn "mpc repeat"))
 
   ("<f7>" . (spawn "python ~/scripts/media.py seek-prev && python ~/scripts/media.py get-time > /tmp/xmonad.music"))
-  ("<f9>" . (spawn "python ~/scripts/media.py seek-next && python ~/scripts/media.py get-time > /tmp/xmonad.music"))
   ("<f8>" . (spawn "python ~/scripts/media.py get-time > /tmp/xmonad.music"))
+  ("<f9>" . (spawn "python ~/scripts/media.py seek-next && python ~/scripts/media.py get-time > /tmp/xmonad.music"))
+
+  ("<S-f7>" . (spawn "python ~/scripts/media.py prev"))
+  ("<S-f9>" . (spawn "python ~/scripts/media.py next"))
+  ("<S-f8>" . (spawn "python ~/scripts/media.py pause"))
+
+  ("<f10>" . (spawn "pactl set-sink-mute 1 toggle || amixer set Master toggle; bash ~/scripts/vol_xmobar.sh"))
+  ("<f11>" . (spawn "amixer -c 1 set Master 1%-; bash ~/scripts/vol_xmobar.sh"))
+  ("<f12>" . (spawn "amixer -c 1 set Master 1%+; bash ~/scripts/vol_xmobar.sh"))
+
+  
 
   ))
 

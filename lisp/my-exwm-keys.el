@@ -72,6 +72,12 @@
                         (interactive)
                         (exwm-workspace-switch-create (- ,i 1)))))
                   (number-sequence 1 9))
+        ,@(mapcar (lambda (i)
+                    `(,(kbd (format "<s-kp-%d>" i)) .
+                      (lambda ()
+                        (interactive)
+                        (exwm-workspace-switch-create (- ,i 1)))))
+                  (number-sequence 1 9))
         ,@(cl-mapcar (lambda (key i)
                        `(,(kbd (format "s-%s" key)) .
                          (lambda ()

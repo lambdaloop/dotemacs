@@ -82,7 +82,7 @@
                        `(,(kbd (format "s-%s" key)) .
                          (lambda ()
                            (interactive)
-                           (exwm-workspace-move-window ,i)
+                           (exwm-workspace-move exwm-workspace--current ,i)
                            (update-workspace-bar))))
                      '("!" "@" "#" "$" "%" "^" "&" "*" "(")
                      (number-sequence 0 8))
@@ -104,11 +104,17 @@
  (sit-for 0.2)
  (update-workspace-bar))
 
+(defun reset-exwm-xmobar ()
+  (interactive)
+  (restart-xmobar)
+  (exwm-reset)
+  )
+
 (exwm-input-set-keys
  (
   ;; basic stuff
   ("s-p" . 'counsel-linux-app)
-  ("s-<backspace>" . 'restart-xmobar)
+  ("s-<backspace>" . 'reset-exwm-xmobar)
   ("C-s-Q" . 'save-buffers-kill-terminal)
 
   ;; manage windows

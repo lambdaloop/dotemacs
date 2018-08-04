@@ -1212,20 +1212,30 @@ I want to have movement using Ctrl+something
 #+end_src
 * dired
 #+begin_src emacs-lisp
-  (define-key dired-mode-map "i" 'counsel-find-file)
-  (define-key dired-mode-map "n" 'dired-next-line)
-  (define-key dired-mode-map "h" 'dired-next-line)
-  (define-key dired-mode-map "t" 'dired-previous-line)
-  (define-key dired-mode-map "o" 'dired-display-file)
-  (define-key dired-mode-map "P" 'picpocket)
-  (define-key dired-mode-map "\C-o" 'other-window)
-  (define-key dired-mode-map "."
-    (lambda ()
-      (interactive)
-      (find-alternate-file "..")))
+  (bind-keys :map dired-mode-map
+             ("i" . counsel-find-file)
+             ("n" . dired-next-line)
+             ("h" . dired-next-line)
+             ("t" . dired-previous-line)
+             ("o" . dired-display-file)
+             ("\C- .o" . other-window)
+             ("." .
+              (lambda ()
+                (interactive)
+                (find-alternate-file ".."))))
+
   (setq dired-listing-switches "-alh")
 
 #+end_src
+* picpocket
+#+BEGIN_SRC emacs-lisp
+  (bind-keys :map picpocket-mode-map
+             ("<left>" . picpocket-previous)
+             ("<right>" . picpocket-next)
+             :map dired-mode-map
+             ("P" . picpocket)
+  )
+#+END_SRC
 * flyspell
 #+begin_src emacs-lisp
   (use-package flyspell

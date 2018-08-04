@@ -501,7 +501,6 @@ Here's a bunch of one-liners for package requires
 
   (use-package paradox                    ; Better package menu
     :ensure t
-    :defer 2
     :config
     (progn
       (setq paradox-execute-asynchronously nil
@@ -646,6 +645,7 @@ I want to have movement using Ctrl+something
    ("M-[" . (lambda () (interactive) (execute-kbd-macro (kbd "M-{"))))
    ("M-]" . (lambda () (interactive) (execute-kbd-macro (kbd "M-}"))))
    ("C-z" . repeat)
+   ("C-c m" . counsel-describe-face)
    )
 
   (bind-keys*
@@ -715,8 +715,8 @@ I want to have movement using Ctrl+something
 
   (bind-key  "C-c d" 'duplicate-line)
 
-  (bind-keys ("C-=" . text-scale-increase)
-             ("C-\\" . text-scale-decrease))
+  ;; (bind-keys ("C-=" . text-scale-increase)
+  ;;            ("C-\\" . text-scale-decrease))
 #+end_src
 
 ** god-mode
@@ -1217,6 +1217,7 @@ I want to have movement using Ctrl+something
   (define-key dired-mode-map "h" 'dired-next-line)
   (define-key dired-mode-map "t" 'dired-previous-line)
   (define-key dired-mode-map "o" 'dired-display-file)
+  (define-key dired-mode-map "P" 'picpocket)
   (define-key dired-mode-map "\C-o" 'other-window)
   (define-key dired-mode-map "."
     (lambda ()

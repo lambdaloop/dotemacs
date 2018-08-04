@@ -137,6 +137,8 @@
  '(hl-line ((t :background "gray10")))
  '(magit-item-highlight ((t :background "black")))
  '(org-indent ((t (:inherit (org-hide \(org-hide\ fixed-pitch\))))))
+ '(org-level-1 ((t (:foreground "#89E14B" :weight bold))))
+ '(org-level-3 ((t (:inherit outline-3 :weight bold))))
  '(outline-2 ((t (:inherit font-lock-variable-name-face :weight bold))))
  '(outline-4 ((t (:inherit font-lock-comment-face :weight bold))))
  '(outline-5 ((t (:inherit font-lock-type-face :weight bold))))

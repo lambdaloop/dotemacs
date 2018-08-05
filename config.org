@@ -646,6 +646,7 @@ I want to have movement using Ctrl+something
    ("M-]" . (lambda () (interactive) (execute-kbd-macro (kbd "M-}"))))
    ("C-z" . repeat)
    ("C-c m" . counsel-describe-face)
+   ("C-c q" . switch-theme)
    )
 
   (bind-keys*
@@ -875,26 +876,27 @@ I want to have movement using Ctrl+something
       (setq multi-term-program "/usr/bin/zsh")
       (unbind-key "C-u" term-raw-map)
       (unbind-key "C-x" term-raw-map)
+      (unbind-key "C-p" term-raw-map)
+      (unbind-key "C-n" term-raw-map)
       (add-to-list 'term-bind-key-alist '("M-DEL" . term-send-backward-kill-word))
-      )
-    :bind (; ("C-c M-m" . multi-term)
-           :map term-mode-map
-           ("M-p" . term-send-up)
-           ("M-n" . term-send-down)
-           ("C-p" . term-send-up)
-           ("C-n" . term-send-down)
-           ("M-{" . multi-term-prev)
-           ("M-}" . multi-term-next)
-           ("M-b" . term-send-backward-word)
-           ("M-f" . term-send-forward-word)
-           ("C-c C-c" . term-quit-subjob)
-           :map term-raw-map
-           ("C-o" . other-window)
-           ;; ("C-x b" . ido-switch-buffer)
-           )
-    )
-
-
+      (add-hook 'term-mode-hook (lambda () 
+                                  (bind-keys 
+                                   :map term-mode-map
+                                   ("M-p" . term-send-up)
+                                   ("M-n" . term-send-down)
+                                   ("C-p" . term-send-up)
+                                   ("C-n" . term-send-down)
+                                   ("M-{" . multi-term-prev)
+                                   ("M-}" . multi-term-next)
+                                   ("M-b" . term-send-backward-word)
+                                   ("M-f" . term-send-forward-word)
+                                   :map term-raw-map
+                                   ("C-o" . other-window)
+                                   ("C-p" . term-send-up)
+                                   ("C-n" . term-send-down)
+                                   ;; ("C-x b" . ido-switch-buffer)
+                                   )))
+      ))
 
 #+end_src
 ** eshell
@@ -916,7 +918,7 @@ I want to have movement using Ctrl+something
                 (lambda ()
                   (jlp/add-to-list-multiple
                    'eshell-visual-commands
-                   '("ssh" "tail" "top" "htop" "mosh" "mpsyt" "watch" "ncdu" "cmatrix"))
+                   '("ssh" "tail" "top" "htop" "mosh" "mpsyt" "watch" "ncdu" "cmatrix" "bash" "zsh"))
                   (bind-keys :map eshell-mode-map
                              ("C-t" . eshell-previous-matching-input-from-input)
                              ("C-p" . eshell-previous-matching-input-from-input)
@@ -1012,7 +1014,7 @@ I want to have movement using Ctrl+something
   ;; (bind-key* "C-'" (lambda () (interactive) (eshell-here t)))
   ;; (bind-key* "C-c C-m" (lambda () (interactive) (eshell-here nil)))
 
-  (bind-key* "C-c M-m" (lambda () (interactive) (eshell "new")))
+  ;; (bind-key* "C-c M-m" (lambda () (interactive) (eshell "new")))
   ;; (bind-key "S-s-<return>" 'eshell-cwd)
 
 #+end_src
@@ -1229,12 +1231,14 @@ I want to have movement using Ctrl+something
 #+end_src
 * picpocket
 #+BEGIN_SRC emacs-lisp
-  (bind-keys :map picpocket-mode-map
-             ("<left>" . picpocket-previous)
-             ("<right>" . picpocket-next)
-             :map dired-mode-map
-             ("P" . picpocket)
-  )
+  (use-package picpocket
+    :bind (:map picpocket-mode-map
+                ("<left>" . picpocket-previous)
+                ("<right>" . picpocket-next)
+                :map dired-mode-map
+                ("P" . picpocket)
+                )
+    )
 #+END_SRC
 * flyspell
 #+begin_src emacs-lisp

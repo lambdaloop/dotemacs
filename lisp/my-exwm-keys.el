@@ -70,19 +70,26 @@
                     `(,(kbd (format "s-%d" i)) .
                       (lambda ()
                         (interactive)
-                        (exwm-workspace-switch-create (- ,i 1)))))
+                        (exwm-workspace-switch-create ,(- i 1)))))
                   (number-sequence 1 9))
         ,@(mapcar (lambda (i)
                     `(,(kbd (format "<s-kp-%d>" i)) .
                       (lambda ()
                         (interactive)
-                        (exwm-workspace-switch-create (- ,i 1)))))
+                        (exwm-workspace-switch-create ,(- i 1)))))
                   (number-sequence 1 9))
+        ,@(mapcar (lambda (i)
+                       `(,(kbd (format "C-s-%d" i)) .
+                         (lambda ()
+                           (interactive)
+                           (exwm-workspace-move-window ,(- i 1))
+                           (update-workspace-bar))))
+                     (number-sequence 1 9))
         ,@(cl-mapcar (lambda (key i)
                        `(,(kbd (format "s-%s" key)) .
                          (lambda ()
                            (interactive)
-                           (exwm-workspace-move exwm-workspace--current ,i)
+                           (exwm-workspace-move-window ,i)
                            (update-workspace-bar))))
                      '("!" "@" "#" "$" "%" "^" "&" "*" "(")
                      (number-sequence 0 8))
@@ -150,10 +157,10 @@
 
   ;; the terminal
   ("s-C-<return>" . (spawn "xfce4-terminal"))
-  ("s-m" . 'eshell-cwd)
-  ("s-M" . (lambda () (interactive) (eshell "new")))
-  ("S-s-<return>" . 'eshell)
-  ("s-_" . (lambda () (interactive) (split-window-horizontally) (other-window 1) (eshell)))
+  ;; ("s-m" . 'eshell-cwd)
+  ("s-M" . (lambda () (interactive) (multi-term)))
+  ("S-s-<return>" . 'multi-term-next)
+  ("s-_" . (lambda () (interactive) (split-window-horizontally) (other-window 1) (multi-term-next)))
 
   ;; convenient things
   ;; ("s-R" . (spawn "bash ~/scripts/pick_password.sh"))
@@ -170,6 +177,7 @@
   ("s-F" . (lambda () (interactive) (split-window-right) (other-window 1) (counsel-find-file)))
   ("<XF86KbdBrightnessDown>" . (lambda () (interactive) (switch-to-buffer "*dashboard*")))
   ("<XF86LaunchA>" . (lambda (&optional arg) (interactive "P") (org-agenda arg "a")))
+  ("<f3>" . (lambda (&optional arg) (interactive "P") (org-agenda arg "a")))
 
   ;; useful laptop functions
   ("<XF86MonBrightnessDown>" . (spawn "xbacklight -inc -2"))

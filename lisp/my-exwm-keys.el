@@ -82,7 +82,7 @@
                        `(,(kbd (format "C-s-%d" i)) .
                          (lambda ()
                            (interactive)
-                           (exwm-workspace-move-window ,(- i 1))
+                           (exwm-workspace-move ,(- i 1))
                            (update-workspace-bar))))
                      (number-sequence 1 9))
         ,@(cl-mapcar (lambda (key i)
@@ -157,10 +157,13 @@
 
   ;; the terminal
   ("s-C-<return>" . (spawn "xfce4-terminal"))
-  ;; ("s-m" . 'eshell-cwd)
-  ("s-M" . (lambda () (interactive) (multi-term)))
-  ("S-s-<return>" . 'multi-term-next)
-  ("s-_" . (lambda () (interactive) (split-window-horizontally) (other-window 1) (multi-term-next)))
+  ("s-m" . 'eshell-cwd)
+  ("s-M" . 'shell-switcher-new-shell)
+  ("S-s-<return>" . 'shell-switcher-switch-buffer)
+  ("s-_" . (lambda () (interactive) (split-window-horizontally) (other-window 1) (shell-switcher-switch-buffer)))
+  ;; ("s-M" . (lambda () (interactive) (multi-term)))
+  ;; ("S-s-<return>" . 'multi-term-next)
+  ;; ("s-_" . (lambda () (interactive) (split-window-horizontally) (other-window 1) (multi-term-next)))
 
   ;; convenient things
   ;; ("s-R" . (spawn "bash ~/scripts/pick_password.sh"))
@@ -171,6 +174,7 @@
 
   ;; emacs functions
   ("s-c c" . 'org-capture)
+  ("s-'" . 'org-capture)
   ("s-c a" . 'org-agenda)
   ("s-b" . 'beeminder-list-goals)
   ("s-f" . 'counsel-find-file)
@@ -195,7 +199,7 @@
 
   ("<XF86AudioPrev>" . (spawn "python ~/scripts/media.py prev"))
   ("<XF86AudioNext>" . (spawn "python ~/scripts/media.py next"))
-  ("<XF86AudioPlay>" . (spawn "python ~/scripts/media.py pause"))
+  ("<XF86AudioPlay>" . (spawn "python ~/scripts/media.py toggle"))
 
   ("s-<XF86AudioPlay>" . (spawn "python ~/scripts/media.py get-details > /tmp/xmonad.music"))
   ("s-<XF86AudioNext>" . (spawn "mpc random"))

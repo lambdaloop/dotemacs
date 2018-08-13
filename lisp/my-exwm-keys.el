@@ -129,7 +129,6 @@
   ("s-Q" . 'really-kill-this-buffer)
   ("s-k" . 'really-kill-this-buffer)
   ("s-SPC" . 'ivy-switch-buffer)
-  ("<XF86LaunchB>" . 'counsel-M-x)
   ("s-o" . 'switch-window)
   ("s-O" . 'switch-window-then-swap-buffer)
   ("s-a" . 'switch-window-mvborder-left)
@@ -173,8 +172,8 @@
   ("C-s-l" . (spawn "slimlock"))
 
   ;; emacs functions
-  ("s-c c" . 'org-capture)
   ("s-'" . 'org-capture)
+  ("<XF86LaunchB>" . 'org-capture)
   ("s-c a" . 'org-agenda)
   ("s-b" . 'beeminder-list-goals)
   ("s-f" . 'counsel-find-file)

@@ -109,6 +109,7 @@ Copied from [[https://github.com/danielmai/.emacs.d][Daniel Mai]], with some of 
   (setq-default indent-tabs-mode nil)
   (set-language-environment "UTF-8")
   (set-default-coding-systems 'utf-8)
+  (define-coding-system-alias 'UTF-8 'utf-8)
 
   ;; Turn off the blinking cursor
   (blink-cursor-mode -1)
@@ -890,6 +891,7 @@ I want to have movement using Ctrl+something
                                    ("M-}" . multi-term-next)
                                    ("M-b" . term-send-backward-word)
                                    ("M-f" . term-send-forward-word)
+                                   ("C-c C-c" . term-send-raw)
                                    :map term-raw-map
                                    ("C-o" . other-window)
                                    ("C-p" . term-send-up)
@@ -918,7 +920,8 @@ I want to have movement using Ctrl+something
                 (lambda ()
                   (jlp/add-to-list-multiple
                    'eshell-visual-commands
-                   '("ssh" "tail" "top" "htop" "mosh" "mpsyt" "watch" "ncdu" "cmatrix" "bash" "zsh"))
+                   '("ssh" "tail" "top" "htop" "mosh" "mpsyt" "watch" 
+                     "ncdu" "cmatrix" "bash" "zsh"))
                   (bind-keys :map eshell-mode-map
                              ("C-t" . eshell-previous-matching-input-from-input)
                              ("C-p" . eshell-previous-matching-input-from-input)
@@ -945,6 +948,7 @@ I want to have movement using Ctrl+something
                                   (eshell/alias "ff" "find-file $1")
                                   (eshell/alias "f" "find-file-other-window $1")
                                   (eshell/alias "fo" "find-file-other-window $1")
+                                  (eshell/alias "gg" "magit-status")
                                   (eshell/alias "gd" "magit-diff-unstaged")
                                   (eshell/alias "gds" "magit-diff-staged")
                                   (eshell/alias "d" "dired $1")
@@ -1018,35 +1022,6 @@ I want to have movement using Ctrl+something
   ;; (bind-key "S-s-<return>" 'eshell-cwd)
 
 #+end_src
-*** better history handling
-#+begin_src emacs-lisp
-  (defun eshell-next-prompt (n)
-    "Move to end of Nth next prompt in the buffer. See `eshell-prompt-regexp'."
-    (interactive "p")
-    (re-search-forward eshell-prompt-regexp nil t n)
-    (when eshell-highlight-prompt
-      (while (not (get-text-property (line-beginning-position) 'read-only) )
-        (re-search-forward eshell-prompt-regexp nil t n)))
-    (eshell-skip-prompt))
-
-  (defun eshell-previous-prompt (n)
-    "Move to end of Nth previous prompt in the buffer. See `eshell-prompt-regexp'."
-    (interactive "p")
-    (backward-char)
-    (eshell-next-prompt (- n)))
-
-  (defun eshell-insert-history ()
-    "Displays the eshell history to select and insert back into your eshell."
-    (interactive)
-    (insert (ivy-completing-read "Eshell history: "
-                                 (delete-dups
-                                  (ring-elements eshell-history-ring)))))
-
-  (add-hook 'eshell-mode-hook (lambda ()
-                                (define-key eshell-mode-map (kbd "M-P") 'eshell-previous-prompt)
-                                (define-key eshell-mode-map (kbd "M-N") 'eshell-next-prompt)
-                                (define-key eshell-mode-map (kbd "M-r") 'eshell-insert-history)))
-#+end_src
 *** completions
 #+begin_src emacs-lisp
   (use-package pcmpl-args)
@@ -1106,7 +1081,7 @@ I want to have movement using Ctrl+something
   (defun my-eshell-banner-hook ()
     (setq eshell-banner-message
           (format
-           "\nWelcome to %s.\nHave a %s day! %s\n\n"
+           "\nWelcome to %s.\nHave %s day! %s\n\n"
            (propertize "eshell" 'face banner-eshell-face)
            (propertize (get-random-line-file happy-words-fname)
                        'face banner-word-face)
@@ -1159,6 +1134,52 @@ I want to have movement using Ctrl+something
 
   (setq eshell-prompt-function 'my-eshell-prompt-function)
 #+end_src
+*** better history handling
+#+begin_src emacs-lisp
+  (defun eshell-next-prompt (n)
+    "Move to end of Nth next prompt in the buffer. See `eshell-prompt-regexp'."
+    (interactive "p")
+    (re-search-forward eshell-prompt-regexp nil t n)
+    (when eshell-highlight-prompt
+      (while (not (get-text-property (line-beginning-position) 'read-only) )
+        (re-search-forward eshell-prompt-regexp nil t n)))
+    (eshell-skip-prompt))
+
+  (defun eshell-previous-prompt (n)
+    "Move to end of Nth previous prompt in the buffer. See `eshell-prompt-regexp'."
+    (interactive "p")
+    (backward-char)
+    (eshell-next-prompt (- n)))
+
+  (defun eshell-insert-history ()
+    "Displays the eshell history to select and insert back into your eshell."
+    (interactive)
+    (insert (ivy-completing-read "Eshell history: "
+                                 (delete-dups
+                                  (ring-elements eshell-history-ring)))))
+
+  (defun eshell-insert-history-from-file ()
+    "Displays the eshell history to select and insert back into your eshell. Reads history from file directly."
+    (interactive)
+    (let ((ivy-sort-max-size 0)
+          (ivy-historian-mode nil))
+      (insert 
+       (ivy-completing-read
+        "Eshell history: "
+        (reverse
+         (delete-dups
+          (with-temp-buffer
+            (insert-file-contents eshell-history-file-name)
+            (split-string (buffer-string) "\n"))))
+        ))))
+
+
+
+  (add-hook 'eshell-mode-hook (lambda ()
+                                (define-key eshell-mode-map (kbd "M-P") 'eshell-previous-prompt)
+                                (define-key eshell-mode-map (kbd "M-N") 'eshell-next-prompt)
+                                (define-key eshell-mode-map (kbd "M-r") 'eshell-insert-history-from-file)))
+#+end_src
 *** eshell history
 #+BEGIN_SRC emacs-lisp
   (defun eshell-append-history ()
@@ -1185,6 +1206,13 @@ I want to have movement using Ctrl+something
               (add-to-list 'eshell-preoutput-filter-functions 'xterm-color-filter)
               (setq eshell-output-filter-functions (remove 'eshell-handle-ansi-color eshell-output-filter-functions))
               ))
+#+END_SRC
+*** eshell switcher
+#+BEGIN_SRC emacs-lisp
+  (use-package shell-switcher
+    :config 
+    (add-hook 'eshell-mode-hook 'shell-switcher-manually-register-shell)
+    )
 #+END_SRC
 * recentf
 #+begin_src emacs-lisp
@@ -1402,17 +1430,20 @@ Local keybindings
     (interactive)
     (org-insert-time-stamp (current-time))
     )
+
   (bind-keys :map org-mode-map
              ("C-c s" . org-archive-subtree-hierarchical)
              ("C-c C-k" . org-cut-subtree)
              ("C-c 3" . org-toggle-inline-images)
              ("C-c i" . org-ref-ivy-insert-cite-link)
+             ("C-c ," . org-insert-current-date)
              :map org-agenda-mode-map
              ("t" . org-agenda-previous-line)
              ("c" . org-agenda-todo)
              ("r" . org-agenda-schedule)
              ("s" . org-save-all-org-buffers)
              ("d" . org-agenda-deadline)
+             ("'" . org-capture)
              :map org-src-mode-map
              ("C-c C-c" . org-edit-src-exit)
              )

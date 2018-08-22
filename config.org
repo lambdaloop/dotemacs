@@ -60,7 +60,7 @@ Setup the load path
 #+end_src
 * secrets
 #+BEGIN_SRC emacs-lisp
-  (load "~/.emacs.d/secrets.el.gpg")
+ (load "~/.emacs.d/secrets.el.gpg")
 #+END_SRC
 * customize file
 Set up the customize file to its own separate file, instead of saving
@@ -152,6 +152,8 @@ Copied from [[https://github.com/danielmai/.emacs.d][Daniel Mai]], with some of 
 
   (setq vc-follow-symlinks t) 
 
+  ;; I prefer horizontal splits when automatic
+  (setq split-height-threshold nil)
 #+end_src
 
 ** page breaks
@@ -187,11 +189,17 @@ Page-Breaks in GNU Emacs" by Eric J. M. Ritz.]]
 ** basic appearance
 #+begin_src emacs-lisp
   (setq default-frame-alist '((font-backend . "xft")
-                              (font . "Dejavu Sans Mono-9")
+                              ;; (font . "Dejavu Sans Mono-9")
                               (vertical-scroll-bars)
                               (menu-bar-lines . 0)
                               (tool-bar-lines . 0)
                               ))
+
+  (set-face-attribute 'default nil
+                      :family "Dejavu Sans Mono"
+                      :height 90
+                      :weight 'normal
+                      :width 'normal)
 
   ;; remove window bar
   (set-frame-position nil 0 -24)
@@ -529,14 +537,15 @@ Here's a bunch of one-liners for package requires
 #+end_src
 ** beacon
 #+begin_src emacs-lisp
-
-
   (use-package beacon
     :ensure t
     :config
     (beacon-mode 1)
+    (jlp/add-to-list-multiple 'beacon-dont-blink-major-modes '(shell-mode eshell-mode))
     (setq beacon-push-mark 35
           beacon-blink-when-focused t
+          beacon-blink-when-point-moves-vertically nil
+          beacon-blink-when-point-moves-horizontally nil
           beacon-size 5
           beacon-color "deep sky blue"))
 
@@ -904,39 +913,41 @@ I want to have movement using Ctrl+something
 ** eshell
 *** basic config
 #+begin_src emacs-lisp
-  (use-package eshell
-    :config
-    (progn
-      (setq ;; eshell-buffer-shorthand t ...  Can't see Bug#19391
-       eshell-scroll-to-bottom-on-input 'all
-       eshell-error-if-no-glob t
-       eshell-hist-ignoredups t
-       eshell-save-history-on-exit t
-       eshell-prefer-lisp-functions nil
-       eshell-destroy-buffer-when-process-dies t
-       eshell-history-size 1024
-       )
-      (add-hook 'eshell-mode-hook
-                (lambda ()
-                  (jlp/add-to-list-multiple
-                   'eshell-visual-commands
-                   '("ssh" "tail" "top" "htop" "mosh" "mpsyt" "watch" 
-                     "ncdu" "cmatrix" "bash" "zsh"))
-                  (bind-keys :map eshell-mode-map
-                             ("C-t" . eshell-previous-matching-input-from-input)
-                             ("C-p" . eshell-previous-matching-input-from-input)
-                             ("C-n" . eshell-next-matching-input-from-input)
-                             )
-                  )))
-    )
+    (use-package eshell
+      :config
+      (progn
+        (setq ;; eshell-buffer-shorthand t ...  Can't see Bug#19391
+         eshell-scroll-to-bottom-on-input 'all
+         eshell-error-if-no-glob t
+         eshell-hist-ignoredups t
+         eshell-save-history-on-exit t
+         eshell-prefer-lisp-functions nil
+         eshell-destroy-buffer-when-process-dies t
+         eshell-history-size 1024
+         )
+        (add-hook 'eshell-mode-hook
+                  (lambda ()
+                    (jlp/add-to-list-multiple
+                     'eshell-visual-commands
+                     '("ssh" "tail" "top" "htop" "mosh" "mpsyt" 
+                       "watch" "calc" "ncdu" "cmatrix" "bash" "zsh"))
+                    (bind-keys :map eshell-mode-map
+                               ;; ("C-t" . eshell-previous-matching-input-from-input)
+                               ("C-p" . eshell-previous-matching-input-from-input)
+                               ;; ("C-n" . eshell-next-matching-input-from-input)
+                               )
+                    )))
+      )
 
-  ;; default ssh for tramp
-  (setq tramp-default-method "ssh")
 
-  ;; sudo?
-  (add-to-list 'eshell-modules-list 'eshell-tramp)
-  (setq password-cache t) ; enable password caching
-  (setq password-cache-expiry 3600) ; for one hour (time in secs)
+
+    ;; default ssh for tramp
+    (setq tramp-default-method "ssh")
+
+    ;; sudo?
+    (add-to-list 'eshell-modules-list 'eshell-tramp)
+    (setq password-cache t) ; enable password caching
+    (setq password-cache-expiry 3600) ; for one hour (time in secs)
 
 #+end_src
 *** aliases
@@ -1884,6 +1895,16 @@ From https://github.com/mbork/beeminder.el
 #+begin_src emacs-lisp
   (require 'my-exwm-keys)
 #+end_src
+** randr
+#+BEGIN_SRC emacs-lisp
+  (require 'exwm-randr)
+  (setq exwm-randr-workspace-output-plist '(0 "DP1"))
+  ;; (add-hook 'exwm-randr-screen-change-hook
+  ;;           (lambda ()
+  ;;             (start-process-shell-command
+  ;;              "xrandr" nil "xrandr --output DP1 --left-of eDP1 --auto")))
+  (exwm-randr-enable)
+#+END_SRC
 ** enable exwm
 #+begin_src emacs-lisp
   (exwm-enable)

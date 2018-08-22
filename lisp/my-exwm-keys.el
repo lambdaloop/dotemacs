@@ -42,6 +42,7 @@
       (run-shell-command proc) )
     ))
 
+
 (defun spawn-other-window (process)
   (lexical-let ((proc process))
     (lambda () (interactive)
@@ -117,6 +118,17 @@
   (exwm-reset)
   )
 
+(defun spawn-ss (process)
+  "Spawn a process to handle screens & update xmobar following"
+  (lexical-let ((proc process))
+    (lambda () (interactive)
+      (run-shell-command proc)
+      (reset-exwm-xmobar)
+      (update-workspace-bar)
+      )
+    ))
+
+
 (exwm-input-set-keys
  (
   ;; basic stuff
@@ -152,6 +164,7 @@
   ("s-r" . (spawn "anki"))
   ("s-i" . (spawn "firefox"))
   ("s-l" . (spawn "cantata"))
+  ("s-L" . (spawn "spotify --force-device-scale-factor=2"))
   ("s-z" . (spawn "zotero"))
 
   ;; the terminal
@@ -185,6 +198,8 @@
   ;; useful laptop functions
   ("<XF86MonBrightnessDown>" . (spawn "xbacklight -inc -2"))
   ("<XF86MonBrightnessUp>" . (spawn "xbacklight -inc +2"))
+  ("<s-XF86MonBrightnessDown>" . (spawn "xbacklight -inc -0.2"))
+  ("<s-XF86MonBrightnessUp>" . (spawn "xbacklight -inc +0.2"))
 
   ;; all the music stuff
   ;; ("s-P" . (spawn "bash ~/scripts/pick_music.sh"))
@@ -210,13 +225,18 @@
 
   ("<S-f7>" . (spawn "python ~/scripts/media.py prev"))
   ("<S-f9>" . (spawn "python ~/scripts/media.py next"))
-  ("<S-f8>" . (spawn "python ~/scripts/media.py pause"))
+  ("<S-f8>" . (spawn "python ~/scripts/media.py toggle"))
 
   ("<f10>" . (spawn "pactl set-sink-mute 1 toggle || amixer set Master toggle; bash ~/scripts/vol_xmobar.sh"))
   ("<f11>" . (spawn "amixer -c 1 set Master 1%-; bash ~/scripts/vol_xmobar.sh"))
   ("<f12>" . (spawn "amixer -c 1 set Master 1%+; bash ~/scripts/vol_xmobar.sh"))
 
-  
+  ;; screen management
+  ("s-\\" . (spawn-ss "xrandr --output DP1 --scale 1.6x1.6 --panning 4096x2304+0+0 --primary --auto --output eDP1 --off"))
+  ("s-/" . (spawn-ss "xrandr --output DP1 --off --auto --output eDP1 --primary --auto"))
+
+  ("C-s-\\" . (spawn-ss "xrandr --output HDMI2 --scale 2x2 --panning 3840x2160+0+0 --primary --auto --output eDP1 --off"))
+  ("C-s-/" . (spawn-ss "xrandr --output HDMI2 --off --auto --output eDP1 --primary --auto"))
 
   ))
 

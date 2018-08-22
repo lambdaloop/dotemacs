@@ -7,6 +7,7 @@
    [default bold shadow italic underline bold bold-italic bold])
  '(ansi-color-names-vector
    ["#2d3743" "#ff4242" "#74af68" "#dbdb95" "#34cae2" "#008b8b" "#00ede1" "#e1e1e0"])
+ '(auth-source-save-behavior nil)
  '(beacon-color "#f2777a")
  '(compilation-message-face 'default)
  '(custom-safe-themes
@@ -66,7 +67,7 @@
  '(org-refile-targets '((org-agenda-files :maxlevel . 2) (nil :maxlevel . 2)))
  '(org-refile-use-outline-path 'file)
  '(package-selected-packages
-   '(hide-mode-line multishell shell-switcher better-shell base16-theme doom-themes centered-window danneskjold-theme abyss-theme afternoon-theme borland-blue-theme forest-blue-theme hamburg-theme metalheart-theme northcode-theme underwater-theme dumb-jump import-popwin counsel-notmuch nm notmuch notmuch-labeler image+ xterm-color crux buffer-move artbollocks-mode ivy-posframe helm-org-rifle gruvbox-theme darkokai-theme monokai-alt-theme monokai-theme monotropic-theme dracula-theme ivy-rich counsel-dash counsel-pydoc golden-ratio counsel-org-capture-string counsel-tramp ido-clever-match helm-system-packages fancy-battery org org-edna nord-theme ivy-hydra korean-holidays academic-phrases ivy-dired-history ivy-historian ivy-mpdel ivy-pass ivy-todo ivy-yasnippet atom-dark-theme flatland-black-theme color-theme-sanityinc-tomorrow color-theme-sanityinc-solarized badger-theme avy-zap ereader nov exwm-edit darkroom launch company-shell company-jedi google-maps google-this esup calfw-gcal calfw-org diminish calfw image-archive image-dired+ fish-completion bash-completion elfeed elfeed-goodies elfeed-org benchmark-init ido-sort-mtime ido-yes-or-no ido-completing-read+ flatui-dark-theme flatland-theme molokai-theme moe-theme dired-du ido-hacks ido-describe-bindings ido-at-point ido-grid-mode ido-load-library esh-autosuggest dashboard org-dashboard exwm counsel god-mode helm-swoop evil-dvorak ein lua-mode auctex-latexmk anaphora matlab-mode csv-mode git-timemachine org-download org-plus-contrib gitignore-mode haskell-mode ivy-bibtex arduino-mode ag flyspell-correct neotree nyan-mode multi-term flx-ido org-bullets ess expand-region org-edit-latex auctex latex-extra bind-key undo-tree))
+   '(zen-and-art-theme hide-mode-line multishell shell-switcher better-shell base16-theme doom-themes centered-window danneskjold-theme abyss-theme afternoon-theme borland-blue-theme forest-blue-theme hamburg-theme metalheart-theme northcode-theme underwater-theme dumb-jump import-popwin counsel-notmuch nm notmuch notmuch-labeler image+ xterm-color crux buffer-move artbollocks-mode ivy-posframe helm-org-rifle gruvbox-theme darkokai-theme monokai-alt-theme monokai-theme monotropic-theme dracula-theme ivy-rich counsel-dash counsel-pydoc golden-ratio counsel-org-capture-string counsel-tramp ido-clever-match helm-system-packages fancy-battery org org-edna nord-theme ivy-hydra korean-holidays academic-phrases ivy-dired-history ivy-historian ivy-mpdel ivy-pass ivy-todo ivy-yasnippet atom-dark-theme flatland-black-theme color-theme-sanityinc-tomorrow color-theme-sanityinc-solarized badger-theme avy-zap ereader nov exwm-edit darkroom launch company-shell company-jedi google-maps google-this esup calfw-gcal calfw-org diminish calfw image-archive image-dired+ fish-completion bash-completion elfeed elfeed-goodies elfeed-org benchmark-init ido-sort-mtime ido-yes-or-no ido-completing-read+ flatui-dark-theme flatland-theme molokai-theme moe-theme dired-du ido-hacks ido-describe-bindings ido-at-point ido-grid-mode ido-load-library esh-autosuggest dashboard org-dashboard exwm counsel god-mode helm-swoop evil-dvorak ein lua-mode auctex-latexmk anaphora matlab-mode csv-mode git-timemachine org-download org-plus-contrib gitignore-mode haskell-mode ivy-bibtex arduino-mode ag flyspell-correct neotree nyan-mode multi-term flx-ido org-bullets ess expand-region org-edit-latex auctex latex-extra bind-key undo-tree))
  '(paradox-github-token t)
  '(pos-tip-background-color "#A6E22E")
  '(pos-tip-foreground-color "#272822")
@@ -133,13 +134,14 @@
  '(font-lock-builtin-face ((t (:foreground "deep sky blue"))))
  '(font-lock-comment-face ((t (:foreground "#7bba6f"))))
  '(font-lock-constant-face ((t (:foreground "#00aecf"))))
- '(font-lock-warning-face ((t (:foreground "red"))))
+ '(font-lock-warning-face ((t (:foreground "#e6e620"))))
  '(highlight ((t :background "black" :underline nil)))
  '(hl-line ((t :background "gray10")))
  '(magit-item-highlight ((t :background "black")))
  '(org-indent ((t (:inherit (org-hide \(org-hide\ fixed-pitch\))))))
  '(org-level-1 ((t (:foreground "#89E14B" :weight bold))))
  '(org-level-3 ((t (:inherit outline-3 :weight bold))))
+ '(org-scheduled-previously ((t (:foreground "#ffb65c"))))
  '(outline-2 ((t (:inherit font-lock-variable-name-face :weight bold))))
  '(outline-4 ((t (:inherit font-lock-comment-face :weight bold))))
  '(outline-5 ((t (:inherit font-lock-type-face :weight bold))))

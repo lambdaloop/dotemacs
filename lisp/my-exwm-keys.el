@@ -108,7 +108,7 @@
 
 (defun restart-xmobar ()
  (interactive)
- (run-shell-command "killall xmobar && nohup bash ~/scripts/run_xmobar.sh > /dev/null")
+ (run-shell-command "killall xmobar; nohup bash ~/scripts/run_xmobar.sh > /dev/null")
  (sit-for 0.2)
  (update-workspace-bar))
 
@@ -123,9 +123,12 @@
   (lexical-let ((proc process))
     (lambda () (interactive)
       (run-shell-command proc)
-      (reset-exwm-xmobar)
-      (update-workspace-bar)
-      )
+      (run-at-time
+       2 nil
+       (lambda ()
+         (reset-exwm-xmobar)
+         (update-workspace-bar)
+         )))
     ))
 
 
@@ -232,7 +235,7 @@
   ("<f12>" . (spawn "amixer -c 1 set Master 1%+; bash ~/scripts/vol_xmobar.sh"))
 
   ;; screen management
-  ("s-\\" . (spawn-ss "xrandr --output DP1 --scale 1.6x1.6 --panning 4096x2304+0+0 --primary --auto --output eDP1 --off"))
+  ("s-\\" . (spawn-ss "xrandr --output DP1 --scale 1.8x1.8 --panning 4608x2592+0+0 --primary --auto --output eDP1 --off"))
   ("s-/" . (spawn-ss "xrandr --output DP1 --off --auto --output eDP1 --primary --auto"))
 
   ("C-s-\\" . (spawn-ss "xrandr --output HDMI2 --scale 2x2 --panning 3840x2160+0+0 --primary --auto --output eDP1 --off"))

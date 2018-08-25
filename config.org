@@ -189,7 +189,7 @@ Page-Breaks in GNU Emacs" by Eric J. M. Ritz.]]
 ** basic appearance
 #+begin_src emacs-lisp
   (setq default-frame-alist '((font-backend . "xft")
-                              ;; (font . "Dejavu Sans Mono-9")
+                              (font . "Dejavu Sans Mono-9")
                               (vertical-scroll-bars)
                               (menu-bar-lines . 0)
                               (tool-bar-lines . 0)
@@ -197,7 +197,7 @@ Page-Breaks in GNU Emacs" by Eric J. M. Ritz.]]
 
   (set-face-attribute 'default nil
                       :family "Dejavu Sans Mono"
-                      :height 90
+                      :height 87
                       :weight 'normal
                       :width 'normal)
 
@@ -397,11 +397,10 @@ From [[https://github.com/danielmai/.emacs.d/blob/master/config.org][Daniel Mai]
               ))
 #+end_src
 ** historian
-#+BEGIN_SRC emacs-lisp
-  (use-package historian)
-  (use-package ivy-historian)
-
-  (use-package ivy
+#+BEGIN_SRC emacs-lisp :tangle no
+  (use-package historian) 
+  (use-package ivy-historian
+    :disabled t
     :init
     (historian-mode +1)
 
@@ -409,6 +408,7 @@ From [[https://github.com/danielmai/.emacs.d/blob/master/config.org][Daniel Mai]
     (ivy-historian-mode +1)
     (setq ivy-historian-recent-boost most-positive-fixnum))
 #+END_SRC
+
 * misc packages
 Here's a bunch of one-liners for package requires
 ** helm
@@ -930,7 +930,7 @@ I want to have movement using Ctrl+something
                     (jlp/add-to-list-multiple
                      'eshell-visual-commands
                      '("ssh" "tail" "top" "htop" "mosh" "mpsyt" 
-                       "watch" "calc" "ncdu" "cmatrix" "bash" "zsh"))
+                       "watch" "calc" "ncdu" "cmatrix" "zsh"))
                     (bind-keys :map eshell-mode-map
                                ;; ("C-t" . eshell-previous-matching-input-from-input)
                                ("C-p" . eshell-previous-matching-input-from-input)
@@ -1249,7 +1249,7 @@ I want to have movement using Ctrl+something
                                 "/itsalltext/" ; It's all text temp files
                                 )))
 
-  (run-with-timer 0 (* 30 60) 'recentf-save-list)
+  (run-with-timer 0 (* 30 60) (lambda () (interactive) (let ((inhibit-message t)) (recentf-save-list))))
 #+end_src
 * dired
 #+begin_src emacs-lisp

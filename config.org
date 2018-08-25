@@ -929,7 +929,7 @@ I want to have movement using Ctrl+something
                   (lambda ()
                     (jlp/add-to-list-multiple
                      'eshell-visual-commands
-                     '("ssh" "tail" "top" "htop" "mosh" "mpsyt" 
+                     '("ssh" "top" "htop" "mosh" "mpsyt" 
                        "watch" "calc" "ncdu" "cmatrix" "zsh"))
                     (bind-keys :map eshell-mode-map
                                ;; ("C-t" . eshell-previous-matching-input-from-input)
@@ -1967,3 +1967,33 @@ From https://github.com/mbork/beeminder.el
                                  (:name "drafts" :query "tag:draft" :key "d")
                                  (:name "all mail" :query "*" :key "a")))
 #+END_SRC
+* memento mori
+#+BEGIN_SRC emacs-lisp
+  (defun parse-time-string-encode (s)
+    (apply 'encode-time
+           (mapcar (lambda (x) (if (eq x nil) 0 x))
+                   (parse-time-string s)))
+    )
+
+  (defvar estimated-death-date "Aug 26, 2081"
+    "Estimated date for death")
+
+  (defun seconds-left ()
+    (float-time
+     (time-subtract
+      (parse-time-string-encode estimated-death-date)
+      (current-time))))
+
+  (defun hours-left ()
+    (/ (seconds-left) 60 60))
+
+  (defun memento-mori () 
+    (interactive)
+    (message "%.2f remaining hours to live. Is what you are doing important?" (hours-left)))
+
+  (run-with-timer 0 (* 45 60) 'memento-mori)
+
+#+END_SRC
+
+#+RESULTS:
+: seconds-left

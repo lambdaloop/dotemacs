@@ -132,6 +132,15 @@
     ))
 
 
+(defhydra hydra-launcher (:color blue)
+  "launch"
+  ("r" (run-shell-command "anki") "anki")
+  ("f" (run-shell-command "firefox") "firefox")
+  ("m" (run-shell-command "cantata") "mpd viewer")
+  ("s" (run-shell-command "spotify --force-device-scale-factor=2") "spotify")
+  ("z" (run-shell-command "zotero") "zotero")
+  )
+
 (exwm-input-set-keys
  (
   ;; basic stuff
@@ -144,16 +153,12 @@
   ("s-Q" . 'really-kill-this-buffer)
   ("s-k" . 'really-kill-this-buffer)
   ("s-SPC" . 'ivy-switch-buffer)
-  ("s-o" . 'switch-window)
-  ("s-O" . 'switch-window-then-swap-buffer)
-  ("s-a" . 'switch-window-mvborder-left)
-  ("s-u" . 'switch-window-mvborder-right)
-  ("s-A" . 'switch-window-mvborder-up)
-  ("s-U" . 'switch-window-mvborder-down)
+  ("s-o" . 'ace-window)
+  ("s-O" . (lambda () (interactive) (ace-window 4)))
   ("s-n" . 'exwm-floating-toggle-floating)
   ("s-<return>" . 'delete-other-windows)
-  ("s-," . (lambda () (interactive) (split-window-right) (other-window 1) (ivy-switch-buffer)))
-  ("s-." . (lambda () (interactive) (split-window-below) (other-window 1) (ivy-switch-buffer)))
+  ("s-," . (lambda () (interactive) (split-window-right) (other-window 1)))
+  ("s-." . (lambda () (interactive) (split-window-below) (other-window 1)))
   ("s-w" . 'delete-window)
   ("s-0" . 'delete-window)
   ("s-<down-mouse-1>" . 'exwm-input-move-event)
@@ -162,13 +167,18 @@
   ("s-<down>" . 'windmove-down)
   ("s-<right>" . 'windmove-right)
   ("s-<up>" . 'windmove-up)
-
+  ("S-s-<left>" . 'switch-window-mvborder-left)
+  ("S-s-<right>" . 'switch-window-mvborder-right)
+  ("S-s-<up>" . 'switch-window-mvborder-up)
+  ("S-s-<down>" . 'switch-window-mvborder-down)
+  
   ;; launch stuff
-  ("s-r" . (spawn "anki"))
-  ("s-i" . (spawn "firefox"))
-  ("s-l" . (spawn "cantata"))
-  ("s-L" . (spawn "spotify --force-device-scale-factor=2"))
-  ("s-z" . (spawn "zotero"))
+  ("s-u" . 'hydra-launcher/body)
+  ;; ("s-r" . (spawn "anki"))
+  ;; ("s-i" . (spawn "firefox"))
+  ;; ("s-l" . (spawn "cantata"))
+  ;; ("s-L" . (spawn "spotify --force-device-scale-factor=2"))
+  ;; ("s-z" . (spawn "zotero"))
 
   ;; the terminal
   ("s-C-<return>" . (spawn "xfce4-terminal"))
@@ -188,8 +198,9 @@
   ("C-s-l" . (spawn "slimlock"))
 
   ;; emacs functions
-  ("s-'" . 'org-capture)
-  ("<XF86LaunchB>" . 'org-capture)
+  ("s-e" . 'hydra-common-files/body)
+  ("s-'" . 'counsel-org-capture)
+  ("<XF86LaunchB>" . 'counsel-org-capture)
   ("s-c a" . 'org-agenda)
   ("s-b" . 'beeminder-list-goals)
   ("s-f" . 'counsel-find-file)

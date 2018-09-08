@@ -148,6 +148,7 @@
  '(outline-6 ((t (:inherit font-lock-constant-face :weight bold))))
  '(outline-7 ((t (:inherit font-lock-builtin-face :weight bold))))
  '(outline-8 ((t (:inherit font-lock-string-face :weight bold))))
+ '(page-break-lines ((t (:inherit font-lock-comment-face :slant normal :weight normal :height 90))))
  '(show-paren-match ((t (:background "#949FAB" :foreground "white smoke" :weight bold))))
  '(subtle-highlight ((t (:foreground "antique white"))))
  '(switch-window-label ((t (:inherit font-lock-builtin-face :height 6.0))))

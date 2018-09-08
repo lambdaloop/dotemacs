@@ -33,9 +33,9 @@ I almost never use the *scratch* buffer. Let's start using the dashboard!
     :ensure t
     :init
     (progn
-      (setq dashboard-items '((recents  . 8)
-                              (bookmarks . 8)
-                              (agenda . 8)))
+      (setq dashboard-items '((agenda  . 8)
+                              (recents . 8)))
+      (setq dashboard-page-separator "\n\n")
       (setq dashboard-startup-banner
             (get-random-file "~/Pictures/wallpapers/chosen/small-emacs")))
     :config
@@ -60,7 +60,7 @@ Setup the load path
 #+end_src
 * secrets
 #+BEGIN_SRC emacs-lisp
- (load "~/.emacs.d/secrets.el.gpg")
+  (load "~/.emacs.d/secrets.el.gpg")
 #+END_SRC
 * customize file
 Set up the customize file to its own separate file, instead of saving
@@ -169,8 +169,8 @@ Page-Breaks in GNU Emacs" by Eric J. M. Ritz.]]
 #+begin_src emacs-lisp
   (defun jlp/add-to-list-multiple (list to-add)
     "Adds multiple items to LIST.
-    Allows for adding a sequence of items to the same list, rather
-    than having to call `add-to-list' multiple times."
+      Allows for adding a sequence of items to the same list, rather
+      than having to call `add-to-list' multiple times."
     (interactive)
     (dolist (item to-add)
       (add-to-list list item)))
@@ -185,15 +185,15 @@ Page-Breaks in GNU Emacs" by Eric J. M. Ritz.]]
                   (package-reinstall package-name))
           (warn "Package %s failed to reinstall" package-name)))))
 
-(defun joindirs (root &rest dirs)
-  "Joins a series of directories together, like Python's os.path.join,
-  (dotemacs-joindirs \"/tmp\" \"a\" \"b\" \"c\") => /tmp/a/b/c"
+  (defun joindirs (root &rest dirs)
+    "Joins a series of directories together, like Python's os.path.join,
+    (dotemacs-joindirs \"/tmp\" \"a\" \"b\" \"c\") => /tmp/a/b/c"
 
-  (if (not dirs)
-      root
-    (apply 'joindirs
-           (expand-file-name (car dirs) root)
-           (cdr dirs))))
+    (if (not dirs)
+        root
+      (apply 'joindirs
+             (expand-file-name (car dirs) root)
+             (cdr dirs))))
 #+end_src
 * appearance
 ** basic appearance
@@ -220,6 +220,9 @@ Page-Breaks in GNU Emacs" by Eric J. M. Ritz.]]
 
   (setq-default cursor-type 'box)
   (blink-cursor-mode 0)
+
+  (setq-default left-margin-width 2 right-margin-width 2) ; Define new widths.
+  (set-window-buffer nil (current-buffer)) ; Use them now.
 #+end_src
 
 ** theme functions
@@ -245,15 +248,15 @@ From [[https://github.com/danielmai/.emacs.d/blob/master/config.org][Daniel Mai]
 
 ** current theme
 #+begin_src emacs-lisp
-    ;; (use-package color-theme-sanityinc-tomorrow
-    ;;   :config (switch-theme 'sanityinc-tomorrow-night))
-    ;; (use-package flatland-theme
-    ;;   :config (switch-theme 'flatland))
-    ;; (use-package misterioso-theme
-    ;;   :config (switch-theme 'misterioso))
-    ;; (switch-theme 'misterioso)
+  ;; (use-package color-theme-sanityinc-tomorrow
+  ;;   :config (switch-theme 'sanityinc-tomorrow-night))
+  ;; (use-package flatland-theme
+  ;;   :config (switch-theme 'flatland))
+  ;; (use-package misterioso-theme
+  ;;   :config (switch-theme 'misterioso))
+  ;; (switch-theme 'misterioso)
   (use-package underwater-theme
-   :config (switch-theme 'underwater))
+    :config (switch-theme 'underwater))
 #+end_src
 ** smart-mode-line
 #+begin_src emacs-lisp
@@ -501,11 +504,11 @@ Here's a bunch of one-liners for package requires
 #+end_src
 ** ace-window
 #+BEGIN_SRC emacs-lisp
-    (use-package ace-window
-      :init (progn 
-              (setq aw-keys '(?a ?o ?e ?u ?h ?t ?n ?s ?i ?d))
-              (setq aw-scope 'frame)
-              ))
+  (use-package ace-window
+    :init (progn 
+            (setq aw-keys '(?h ?t ?n ?s ?a ?o ?e ?u ?i ?d))
+            (setq aw-scope 'frame)
+            ))
 #+END_SRC
 ** buffer-move
 #+begin_src emacs-lisp
@@ -684,7 +687,6 @@ I want to have movement using Ctrl+something
 
   (define-key key-translation-map (kbd "C-u") (kbd "C-x"))
   (define-key key-translation-map (kbd "M-h") (kbd "C-x C-s"))
-  (define-key key-translation-map (kbd "s-g") (kbd "C-g"))
 
 #+end_src
 
@@ -833,32 +835,32 @@ I want to have movement using Ctrl+something
 
   (bind-key "C-c o" 'other-window-kill-buffer)
 
-(defun toggle-window-split ()
-  (interactive)
-  (if (= (count-windows) 2)
-      (let* ((this-win-buffer (window-buffer))
-         (next-win-buffer (window-buffer (next-window)))
-         (this-win-edges (window-edges (selected-window)))
-         (next-win-edges (window-edges (next-window)))
-         (this-win-2nd (not (and (<= (car this-win-edges)
-                     (car next-win-edges))
-                     (<= (cadr this-win-edges)
-                     (cadr next-win-edges)))))
-         (splitter
-          (if (= (car this-win-edges)
-             (car (window-edges (next-window))))
-          'split-window-horizontally
-        'split-window-vertically)))
-    (delete-other-windows)
-    (let ((first-win (selected-window)))
-      (funcall splitter)
-      (if this-win-2nd (other-window 1))
-      (set-window-buffer (selected-window) this-win-buffer)
-      (set-window-buffer (next-window) next-win-buffer)
-      (select-window first-win)
-      (if this-win-2nd (other-window 1))))))
+  (defun toggle-window-split ()
+    (interactive)
+    (if (= (count-windows) 2)
+        (let* ((this-win-buffer (window-buffer))
+               (next-win-buffer (window-buffer (next-window)))
+               (this-win-edges (window-edges (selected-window)))
+               (next-win-edges (window-edges (next-window)))
+               (this-win-2nd (not (and (<= (car this-win-edges)
+                                           (car next-win-edges))
+                                       (<= (cadr this-win-edges)
+                                           (cadr next-win-edges)))))
+               (splitter
+                (if (= (car this-win-edges)
+                       (car (window-edges (next-window))))
+                    'split-window-horizontally
+                  'split-window-vertically)))
+          (delete-other-windows)
+          (let ((first-win (selected-window)))
+            (funcall splitter)
+            (if this-win-2nd (other-window 1))
+            (set-window-buffer (selected-window) this-win-buffer)
+            (set-window-buffer (next-window) next-win-buffer)
+            (select-window first-win)
+            (if this-win-2nd (other-window 1))))))
 
-(bind-key "C-c t" 'toggle-window-split)
+  (bind-key "C-c t" 'toggle-window-split)
 
 #+end_src
 ** mark region
@@ -932,41 +934,41 @@ I want to have movement using Ctrl+something
 ** eshell
 *** basic config
 #+begin_src emacs-lisp
-    (use-package eshell
-      :config
-      (progn
-        (setq ;; eshell-buffer-shorthand t ...  Can't see Bug#19391
-         eshell-scroll-to-bottom-on-input 'all
-         eshell-error-if-no-glob t
-         eshell-hist-ignoredups t
-         eshell-save-history-on-exit t
-         eshell-prefer-lisp-functions nil
-         eshell-destroy-buffer-when-process-dies t
-         eshell-history-size 1024
-         )
-        (add-hook 'eshell-mode-hook
-                  (lambda ()
-                    (jlp/add-to-list-multiple
-                     'eshell-visual-commands
-                     '("ssh" "top" "htop" "mosh" "mpsyt" 
-                       "watch" "calc" "ncdu" "cmatrix" "zsh"))
-                    (bind-keys :map eshell-mode-map
-                               ;; ("C-t" . eshell-previous-matching-input-from-input)
-                               ("C-p" . eshell-previous-matching-input-from-input)
-                               ;; ("C-n" . eshell-next-matching-input-from-input)
-                               )
-                    )))
-      )
+  (use-package eshell
+    :config
+    (progn
+      (setq ;; eshell-buffer-shorthand t ...  Can't see Bug#19391
+       eshell-scroll-to-bottom-on-input 'all
+       eshell-error-if-no-glob t
+       eshell-hist-ignoredups t
+       eshell-save-history-on-exit t
+       eshell-prefer-lisp-functions nil
+       eshell-destroy-buffer-when-process-dies t
+       eshell-history-size 1024
+       )
+      (add-hook 'eshell-mode-hook
+                (lambda ()
+                  (jlp/add-to-list-multiple
+                   'eshell-visual-commands
+                   '("ssh" "top" "htop" "mosh" "mpsyt" 
+                     "watch" "calc" "ncdu" "cmatrix" "zsh"))
+                  (bind-keys :map eshell-mode-map
+                             ;; ("C-t" . eshell-previous-matching-input-from-input)
+                             ("C-p" . eshell-previous-matching-input-from-input)
+                             ;; ("C-n" . eshell-next-matching-input-from-input)
+                             )
+                  )))
+    )
 
 
 
-    ;; default ssh for tramp
-    (setq tramp-default-method "ssh")
+  ;; default ssh for tramp
+  (setq tramp-default-method "ssh")
 
-    ;; sudo?
-    (add-to-list 'eshell-modules-list 'eshell-tramp)
-    (setq password-cache t) ; enable password caching
-    (setq password-cache-expiry 3600) ; for one hour (time in secs)
+  ;; sudo?
+  (add-to-list 'eshell-modules-list 'eshell-tramp)
+  (setq password-cache t) ; enable password caching
+  (setq password-cache-expiry 3600) ; for one hour (time in secs)
 
 #+end_src
 *** aliases
@@ -1278,7 +1280,7 @@ I want to have movement using Ctrl+something
              ("h" . dired-next-line)
              ("t" . dired-previous-line)
              ("o" . dired-display-file)
-             ("\C- .o" . other-window)
+             ("\C-o" . other-window)
              ("." .
               (lambda ()
                 (interactive)
@@ -1582,20 +1584,20 @@ Languages which can be evaluated in Org buffers
 
 ** org hooks
 #+begin_src emacs-lisp
-    (use-package org-zotxt
-      :config (add-hook 'org-mode-hook (lambda () (org-zotxt-mode +1)))
-      :diminish org-zotxt-mode)
+  (use-package org-zotxt
+    :config (add-hook 'org-mode-hook (lambda () (org-zotxt-mode +1)))
+    :diminish org-zotxt-mode)
 
-    (use-package org-bullets
-      :config (progn
-                (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
-                (setq org-bullets-bullet-list
-                      '( "⚫")
-                      ;; '(" ")
-                      ;; '("◉" "⚫" "○" "☉" "◎" "◉" "○" "◌" "◎" "●" "⊙" "⊚" "⊛" "∙" "∘")
-                      ;; "✸" "◆" "○" "•"
-                      ;; ♥ ● ◇ ✚ ✜ ☯ ◆ ♠ ♣ ♦ ☢ ❀ ◆ ◖ ▶ ○
-                      )))
+  (use-package org-bullets
+    :config (progn
+              (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
+              (setq org-bullets-bullet-list
+                    '( "⚫")
+                    ;; '(" ")
+                    ;; '("◉" "⚫" "○" "☉" "◎" "◉" "○" "◌" "◎" "●" "⊙" "⊚" "⊛" "∙" "∘")
+                    ;; "✸" "◆" "○" "•"
+                    ;; ♥ ● ◇ ✚ ✜ ☯ ◆ ♠ ♣ ♦ ☢ ❀ ◆ ◖ ▶ ○
+                    )))
 
 #+end_src
 
@@ -1679,10 +1681,10 @@ Languages which can be evaluated in Org buffers
 ** appearance
 #+BEGIN_SRC emacs-lisp
   (add-hook 'org-mode-hook (lambda () (progn
-    (setq left-margin-width 2)
-    (setq right-margin-width 2)
-    (set-window-buffer nil (current-buffer))
-    (fringe-mode 0))))
+                                        (setq left-margin-width 2)
+                                        (setq right-margin-width 2)
+                                        (set-window-buffer nil (current-buffer))
+                                        (fringe-mode 0))))
 #+END_SRC
 * latex
 ** setup
@@ -1825,20 +1827,23 @@ Languages which can be evaluated in Org buffers
 #+end_src
 * matlab
 #+begin_src emacs-lisp
-  (add-to-list 'auto-mode-alist '("\\.m\\'" . octave-mode))
+  (add-to-list 'auto-mode-alist '("\\.m\\'" . matlab-mode))
+  (add-hook 'matlab-mode-hook 
+            (lambda ()
+              (bind-keys :map matlab-mode-map ("M-;" . comment-line))))
 #+end_src
 * elisp
 #+BEGIN_SRC emacs-lisp
-(defun remove-elc-on-save ()
-  "If you're saving an elisp file, likely the .elc is no longer valid."
-  (add-hook 'after-save-hook
-            (lambda ()
-              (if (file-exists-p (concat buffer-file-name "c"))
-                  (delete-file (concat buffer-file-name "c"))))
-            nil
-            t))
-  
-(add-hook 'emacs-lisp-mode-hook 'remove-elc-on-save)
+  (defun remove-elc-on-save ()
+    "If you're saving an elisp file, likely the .elc is no longer valid."
+    (add-hook 'after-save-hook
+              (lambda ()
+                (if (file-exists-p (concat buffer-file-name "c"))
+                    (delete-file (concat buffer-file-name "c"))))
+              nil
+              t))
+
+  (add-hook 'emacs-lisp-mode-hook 'remove-elc-on-save)
 
 #+END_SRC
 * frontend
@@ -1939,7 +1944,7 @@ From https://github.com/mbork/beeminder.el
     (interactive)
     (message "%.2f remaining hours to live. Is what you are doing important?" (hours-left)))
 
-  (run-with-timer 0 (* 29 60) 'memento-mori)
+  ;; (run-with-timer 0 (* 29 60) 'memento-mori)
 
 #+END_SRC
 
@@ -1964,9 +1969,9 @@ From https://github.com/mbork/beeminder.el
     ("n" (find-file "~/Dropbox/org/notes.org") "notes")
     ("c" (find-file "~/.emacs.d/config.org") "emacs config")
     ("r" (find-file "~/Dropbox/org/research.org") "research")
-  )
+    )
 
-  (bind-key "s-e" 'hydra-common-files/body)
+  (bind-key "M-s-e" 'hydra-common-files/body)
 #+END_SRC
 * exwm
 ** suggested configuration
@@ -2035,7 +2040,13 @@ From https://github.com/mbork/beeminder.el
   ;;              "xrandr" nil "xrandr --output DP1 --left-of eDP1 --auto")))
   (exwm-randr-enable)
 #+END_SRC
+** all X windows to char-mode
+#+BEGIN_SRC emacs-lisp
+  (add-hook 'exwm-manage-finish-hook
+            (lambda ()
+              (exwm-input-release-keyboard exwm--id)))
+#+END_SRC
 ** enable exwm
 #+begin_src emacs-lisp
-  (exwm-enable)
+  ;; (exwm-enable)
 #+end_src

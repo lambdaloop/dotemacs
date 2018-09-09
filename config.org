@@ -1973,9 +1973,41 @@ From https://github.com/mbork/beeminder.el
 
   (bind-key "M-s-e" 'hydra-common-files/body)
 #+END_SRC
+* keybindings
+#+BEGIN_SRC emacs-lisp
+  (bind-keys
+
+   ;; manage windows
+   ("s-SPC" . ivy-switch-buffer)
+   ("s-k" . really-kill-this-buffer)
+   ("s-o" . ace-window)
+   ("s-O" . (lambda () (interactive) (ace-window 4)))
+   ("s-w" . delete-window)
+   ("<M-return>" . delete-other-windows)
+   ("s-<left>" . switch-window-mvborder-left)
+   ("s-<right>" . switch-window-mvborder-right)
+   ("s-<up>" . switch-window-mvborder-up)
+   ("s-<down>" . switch-window-mvborder-down)
+
+   ;; eshell
+   ("s-m" . eshell-cwd)
+   ("s-M" . shell-switcher-new-shell)
+   ("s-_" . (lambda () (interactive) (split-window-horizontally) (other-window 1) (shell-switcher-switch-buffer)))
+
+   ;; useful navigation
+   ("s-b" . beeminder-list-goals)
+   ("s-f" . counsel-find-file)
+   ("<XF86LaunchA>" . (lambda (&optional arg) (interactive "P") (org-agenda arg "a")))
+   ("<XF86LaunchB>" . counsel-org-capture)
+   ("<XF86KbdBrightnessDown>" . (lambda () (interactive) (switch-to-buffer "*dashboard*")))
+ 
+   )
+#+END_SRC
+
+
 * exwm
 ** suggested configuration
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle no
   ;; Load EXWM.
   (require 'exwm)
 
@@ -1999,11 +2031,11 @@ From https://github.com/mbork/beeminder.el
   (setq exwm-input--update-focus-interval 0.1)
 #+end_src
 ** exwm-edit
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle no
   (use-package exwm-edit)
 #+end_src
 ** renaming buffers to appropriate name
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle no
   ;; All buffers created in EXWM mode are named "*EXWM*". You may want to
   ;; change it in `exwm-update-class-hook' and `exwm-update-title-hook', which
   ;; are run when a new X window class name or title is available.  Here's
@@ -2027,11 +2059,11 @@ From https://github.com/mbork/beeminder.el
                 (exwm-workspace-rename-buffer exwm-title))))
 #+end_src
 ** set up keybindings
-#+begin_src emacs-lisp
-  (require 'my-exwm-keys)
+#+begin_src emacs-lisp :tangle no
+;;  (require 'my-exwm-keys)
 #+end_src
 ** randr
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle no
   (require 'exwm-randr)
   (setq exwm-randr-workspace-output-plist '(0 "DP1"))
   ;; (add-hook 'exwm-randr-screen-change-hook
@@ -2041,12 +2073,12 @@ From https://github.com/mbork/beeminder.el
   (exwm-randr-enable)
 #+END_SRC
 ** all X windows to char-mode
-#+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp :tangle no
   (add-hook 'exwm-manage-finish-hook
             (lambda ()
               (exwm-input-release-keyboard exwm--id)))
 #+END_SRC
 ** enable exwm
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle no
   ;; (exwm-enable)
 #+end_src

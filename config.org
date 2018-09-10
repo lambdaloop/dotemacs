@@ -223,6 +223,10 @@ Page-Breaks in GNU Emacs" by Eric J. M. Ritz.]]
 
   (setq-default left-margin-width 2 right-margin-width 2) ; Define new widths.
   (set-window-buffer nil (current-buffer)) ; Use them now.
+
+  (setq window-divider-default-right-width 2)
+  (window-divider-mode)
+
 #+end_src
 
 ** theme functions
@@ -372,7 +376,7 @@ From [[https://github.com/danielmai/.emacs.d/blob/master/config.org][Daniel Mai]
            ("C-c u" . counsel-semantic-or-imenu)
            :map ivy-minibuffer-map
            ("C-m" . ivy-alt-done)
-           ("M-RET" . ivy-immediate-done)
+           ("<C-return>" . ivy-immediate-done)
            ("C-s" . ivy-next-line)
            ("C-r" . ivy-previous-line)
            ("C-w" . ivy-yank-word)
@@ -487,7 +491,7 @@ Here's a bunch of one-liners for package requires
   (use-package avy
     :config (setq avy-timeout-seconds 0.3
                   avy-keys '(?a ?o ?e ?u ?i ?d ?h ?t ?n))
-    :bind* (("s-h" . avy-goto-word-1)
+    :bind* (("s-d" . avy-goto-word-1)
             ))
 #+end_src
 ** switch-window
@@ -1281,6 +1285,7 @@ I want to have movement using Ctrl+something
              ("t" . dired-previous-line)
              ("o" . dired-display-file)
              ("\C-o" . other-window)
+             ("C-c C-c" . wdired-change-to-wdired-mode)
              ("." .
               (lambda ()
                 (interactive)
@@ -1983,13 +1988,17 @@ From https://github.com/mbork/beeminder.el
    ("s-o" . ace-window)
    ("s-O" . (lambda () (interactive) (ace-window 4)))
    ("s-w" . delete-window)
+   ("s-W" . ace-delete-window)
    ("<M-return>" . delete-other-windows)
    ("s-<left>" . switch-window-mvborder-left)
    ("s-<right>" . switch-window-mvborder-right)
    ("s-<up>" . switch-window-mvborder-up)
    ("s-<down>" . switch-window-mvborder-down)
+   ("s-," . (lambda () (interactive) (split-window-right) (other-window 1)))
+   ("s-." . (lambda () (interactive) (split-window-below) (other-window 1)))
 
    ;; eshell
+   ("M-S-s-<return>" . shell-switcher-switch-buffer)
    ("s-m" . eshell-cwd)
    ("s-M" . shell-switcher-new-shell)
    ("s-_" . (lambda () (interactive) (split-window-horizontally) (other-window 1) (shell-switcher-switch-buffer)))
@@ -2000,7 +2009,7 @@ From https://github.com/mbork/beeminder.el
    ("<XF86LaunchA>" . (lambda (&optional arg) (interactive "P") (org-agenda arg "a")))
    ("<XF86LaunchB>" . counsel-org-capture)
    ("<XF86KbdBrightnessDown>" . (lambda () (interactive) (switch-to-buffer "*dashboard*")))
- 
+
    )
 #+END_SRC
 
@@ -2022,7 +2031,7 @@ From https://github.com/mbork/beeminder.el
   ;; uncommenting the following line.
   ;; (setq exwm-workspace-minibuffer-position 'bottom)
 
-  (setq window-divider-default-right-width 5)
+  (setq window-divider-default-right-width 2)
   (window-divider-mode)
 
   (setq exwm-workspace-show-all-buffers t)

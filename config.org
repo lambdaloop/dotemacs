@@ -89,6 +89,7 @@ Copied from [[https://github.com/danielmai/.emacs.d][Daniel Mai]], with some of 
   ;; These functions are useful. Activate them.
   (put 'narrow-to-region 'disabled nil)
   (put 'dired-find-alternate-file 'disabled nil)
+  (put 'downcase-region 'disabled nil)
 
   ;; Answering just 'y' or 'n' will do
   (defalias 'yes-or-no-p 'y-or-n-p)
@@ -164,6 +165,7 @@ Copied from [[https://github.com/danielmai/.emacs.d][Daniel Mai]], with some of 
   (setq-default use-dialog-box nil)
 
   (setq-default epa-pinentry-mode 'loopback)
+
 #+end_src
 
 ** page breaks

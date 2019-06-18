@@ -16,6 +16,7 @@ This supposedly fixes some problem with loading?
 
 I almost never use the *scratch* buffer. Let's start using the dashboard!
 #+begin_src emacs-lisp
+  (require 'subr-x)
   (defun get-random-file (dir)
     (concat (file-name-as-directory dir)
             (string-trim-right
@@ -59,8 +60,9 @@ Setup the load path
   (add-to-list 'load-path "~/.emacs.d/lisp")
 #+end_src
 * secrets
+Load the secrets. We ignore errors here so that if GPG config is missing, rest of config still loads. 
 #+BEGIN_SRC emacs-lisp
-  (load "~/.emacs.d/secrets.el.gpg")
+(ignore-errors (load "~/.emacs.d/secrets.el.gpg"))
 #+END_SRC
 * customize file
 Set up the customize file to its own separate file, instead of saving
@@ -154,6 +156,14 @@ Copied from [[https://github.com/danielmai/.emacs.d][Daniel Mai]], with some of 
 
   ;; I prefer horizontal splits when automatic
   (setq split-height-threshold nil)
+
+  ;; keep more context when scrolling up and down
+  (setq-default next-screen-context-lines 20)
+
+  ;; disable dialog windows
+  (setq-default use-dialog-box nil)
+
+  (setq-default epa-pinentry-mode 'loopback)
 #+end_src
 
 ** page breaks
@@ -199,7 +209,7 @@ Page-Breaks in GNU Emacs" by Eric J. M. Ritz.]]
 ** basic appearance
 #+begin_src emacs-lisp
   (setq default-frame-alist '((font-backend . "xft")
-                              (font . "Dejavu Sans Mono-9")
+                              (font . "Dejavu Sans Mono-10")
                               (vertical-scroll-bars)
                               (menu-bar-lines . 0)
                               (tool-bar-lines . 0)
@@ -207,7 +217,7 @@ Page-Breaks in GNU Emacs" by Eric J. M. Ritz.]]
 
   (set-face-attribute 'default nil
                       :family "Dejavu Sans Mono"
-                      :height 87
+                      :height 95
                       :weight 'normal
                       :width 'normal)
 
@@ -242,7 +252,9 @@ From [[https://github.com/danielmai/.emacs.d/blob/master/config.org][Daniel Mai]
                                      (custom-available-themes))))))
     (let ((enabled-themes custom-enabled-themes))
       (mapc #'disable-theme custom-enabled-themes)
-      (load-theme theme t)))
+      (load-theme theme t))
+    (setq frame-background-mode nil)
+    (mapc 'frame-set-background-mode (frame-list)))
 
   (defun disable-active-themes ()
     "Disables any currently active themes listed in `custom-enabled-themes'."
@@ -259,9 +271,25 @@ From [[https://github.com/danielmai/.emacs.d/blob/master/config.org][Daniel Mai]
   ;; (use-package misterioso-theme
   ;;   :config (switch-theme 'misterioso))
   ;; (switch-theme 'misterioso)
-  (use-package underwater-theme
-    :config (switch-theme 'underwater))
+  ;; (use-package underwater-theme
+  ;;   :config (switch-theme 'underwater))
+
+  ;; (use-package moe-theme
+  ;;   :config (switch-theme 'moe-light))
+
+  (defun set-my-theme (&optional frame)
+    "Setup the theme."
+    (switch-theme 'sanityinc-tomorrow-eighties))
+
+  (use-package color-theme-sanityinc-tomorrow)
+
+  (set-my-theme)
+
+  (add-hook 'after-make-frame-functions 'set-my-theme)
+
 #+end_src
+
+
 ** smart-mode-line
 #+begin_src emacs-lisp
   (use-package smart-mode-line
@@ -409,8 +437,10 @@ From [[https://github.com/danielmai/.emacs.d/blob/master/config.org][Daniel Mai]
               (setq ivy-virtual-abbreviate 'full
                     ivy-rich-switch-buffer-align-virtual-buffer t
                     ivy-rich-path-style 'abbrev
-                    ivy-rich-switch-buffer-name-max-length 50)
-              (ivy-rich-mode 1)
+                    ivy-rich-switch-buffer-name-max-length 50
+                    ivy-rich-parse-remote-buffer nil
+                    )
+              (ivy-rich-mode +1)
               ))
 #+end_src
 ** historian
@@ -992,6 +1022,7 @@ I want to have movement using Ctrl+something
                                   (eshell/alias "ll" "ls -lhA $1")
                                   (eshell/alias "rs" "rsync -ah --info=progress2 $*")
                                   (eshell/alias "mpc" "/usr/bin/mpc $*")
+                                  (eshell/alias "m" "/usr/bin/mpv $* &; eshell-bol")
                                   (eshell/alias "cd" "cd $*; ls")
                                   )))
 #+end_src
@@ -1321,7 +1352,11 @@ I want to have movement using Ctrl+something
               (unbind-key "C-M-i" flyspell-mode-map)
               )
     :bind (:map flyspell-mode-map
-                ("C-;" . flyspell-correct-previous-word-generic)))
+                ("C-;" . flyspell-correct-previous-word-generic)
+                ("C--" . flyspell-auto-correct-word)
+                ))
+
+
 
 #+end_src
 
@@ -1468,12 +1503,26 @@ Local keybindings
     (org-insert-time-stamp (current-time))
     )
 
+  (defun org-insert-current-date-inactive ()
+    (interactive)
+    (org-insert-time-stamp (current-time) nil t)
+    )
+
+  (defun org-insert-current-datetime-inactive ()
+    (interactive)
+    (org-insert-time-stamp (current-time) t t)
+    )
+
+
   (bind-keys :map org-mode-map
-             ("C-c s" . org-archive-subtree-hierarchical)
+             ;; ("C-c s" . org-archive-subtree-hierarchical)
+             ("C-c s" . org-archive-to-archive-sibling)
              ("C-c C-k" . org-cut-subtree)
              ("C-c 3" . org-toggle-inline-images)
              ("C-c i" . org-ref-ivy-insert-cite-link)
              ("C-c ," . org-insert-current-date)
+             ("C-c C-," . org-insert-current-datetime-inactive)
+             ("C-c C-." . org-insert-current-date-inactive)
              :map org-agenda-mode-map
              ("t" . org-agenda-previous-line)
              ("c" . org-agenda-todo)
@@ -1485,6 +1534,9 @@ Local keybindings
              ("C-c C-c" . org-edit-src-exit)
              )
 #+end_src
+
+#+RESULTS:
+: org-edit-src-exit
 
 ** org options
 This includes options for source blocks and agenda.
@@ -1523,6 +1575,8 @@ This includes options for source blocks and agenda.
   (setq org-agenda-log-mode-items '(closed clock state))
   (setq org-pretty-entities t)
   (setq org-pretty-entities-include-sub-superscripts nil)
+
+
 #+end_src
 
 #+RESULTS:
@@ -1565,6 +1619,14 @@ This includes options for source blocks and agenda.
   ;; completion for org goto
   (setq org-goto-interface 'outline-path-completion)
   (setq org-outline-path-complete-in-steps nil)
+
+  ;; allow alphabetical lists
+  (setq org-list-allow-alphabetical t)
+
+  ;; don't convert sup
+  (add-to-list 'org-entities-user
+               '("sup" "\\sup{}" t "sup" "sup" "sup" "sup"))
+
 #+end_src
 
 ** spelling
@@ -1618,9 +1680,18 @@ Languages which can be evaluated in Org buffers
              ;; ("C-c e" . org-latex-subtree-to-pdf)
              ("C-c e" . org-latex-export-to-pdf)
              ("C-c 4" . org-toggle-latex-fragment))
-  (plist-put org-format-latex-options :scale 1.25)
+  (plist-put org-format-latex-options :scale 2.25)
   (setq org-latex-pdf-process (list "latexmk -bibtex -pdf %f"))
   (setq org-latex-to-mathml-convert-command nil)
+
+  (with-eval-after-load 'ox-latex
+    (add-to-list 'org-latex-classes 
+                 '("amsart" "\\documentclass[11pt]{amsart}"
+                   ("\\section{%s}" . "\\section*{%s}")
+                   ("\\subsection{%s}" . "\\subsection*{%s}")
+                   ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+                   ("\\paragraph{%s}" . "\\paragraph*{%s}")
+                   ("\\subparagraph{%s}" . "\\subparagraph*{%s}"))))
 #+end_src
 
 ** org download
@@ -1683,6 +1754,12 @@ Languages which can be evaluated in Org buffers
           ("h" . org-cycle)
           ))
 #+end_src
+** pdf view
+#+BEGIN_SRC emacs-lisp
+  (setq pdf-view-midnight-colors `(,(face-attribute 'default :foreground) .
+                                   ,(face-attribute 'default :background)))
+#+END_SRC
+ 
 ** appearance
 #+BEGIN_SRC emacs-lisp
   (add-hook 'org-mode-hook (lambda () (progn
@@ -1708,23 +1785,38 @@ Languages which can be evaluated in Org buffers
               (setq auctex-latexmk-inherit-TeX-PDF-mode t)
               (auctex-latexmk-setup)))
 
+  (setq latex-run-command "tectonic")
 
   (require 'tex-buf)
 
-  (defun run-latexmk ()
+  ;; (defun run-latexmk ()
+  ;;   (interactive)
+  ;;   (let ((TeX-save-query nil)
+  ;;         (TeX-process-asynchronous nil)
+  ;;         (master-file (TeX-master-file)))
+  ;;     (TeX-save-document "")
+  ;;     (TeX-run-command "Tectonic" "tectonic %t" master-file)
+  ;;     (if (plist-get TeX-error-report-switches (intern master-file))
+  ;;         (TeX-next-error t)
+  ;;       (minibuffer-message "tectonic done"))))
+
+  ;; (bind-key "C-c e" 'run-latexmk LaTeX-mode-map)
+
+  (add-to-list 'TeX-command-list
+               '("Tectonic" "tectonic %t"
+                 TeX-run-command nil
+                 (plain-tex-mode latex-mode doctex-mode)
+                 :help "Run tectonic"))
+
+  (defun run-tectonic ()
     (interactive)
-    (let ((TeX-save-query nil)
-          (TeX-process-asynchronous nil)
-          (master-file (TeX-master-file)))
-      (TeX-save-document "")
-      (TeX-run-TeX "latexmk" "latexmk -pdf" master-file)
-      (if (plist-get TeX-error-report-switches (intern master-file))
-          (TeX-next-error t)
-        (minibuffer-message "latexmk done"))))
+    (TeX-command "Tectonic" 'TeX-master-file nil))
 
-  (bind-key "C-c e" 'run-latexmk LaTeX-mode-map)
-
+  (bind-key "C-c e" 'run-tectonic LaTeX-mode-map)
 #+end_src
+
+#+RESULTS:
+: run-tectonic
 
 
 ** org-ref
@@ -1785,7 +1877,7 @@ Languages which can be evaluated in Org buffers
 #+begin_src emacs-lisp
   (use-package python
     :config
-    (setq python-shell-interpreter "~/.local/bin/ipython3"
+    (setq python-shell-interpreter "ipython3"
           python-shell-interpreter-args "--simple-prompt -i"
           python-shell-completion-native-enable nil))
 
@@ -1800,8 +1892,8 @@ Languages which can be evaluated in Org buffers
 
   (defun bind-ein-keys () 
     (bind-keys :map ein:notebook-mode-map
-               ("M-p" . ein:worksheet-goto-prev-input)
-               ("M-n" . ein:worksheet-goto-next-input)
+               ("M-P" . ein:worksheet-goto-prev-input)
+               ("M-N" . ein:worksheet-goto-next-input)
                ("M-g" . ein:worksheet-goto-next-input)
                ("C-c p" . ein:worksheet-goto-prev-input)
                ("C-c n" . ein:worksheet-goto-next-input)
@@ -1811,18 +1903,31 @@ Languages which can be evaluated in Org buffers
     )
 
   (use-package ein
-    :after (progn
-             (require 'ein-loaddefs)
-             (require 'ein-notebook)
-             (require 'ein-subpackages))
     :config 
-    (add-hook 'ein:notebook-mode-hook 'bind-ein-keys)
+    (progn
+      (require 'ein-notebook)
+      (require 'ein-subpackages)
+      (require 'ein-org)
+      (autoload-do-load 'ein:org-store-link)
+      (ein:org-store-link)
+      (add-hook 'ein:notebook-mode-hook 'bind-ein-keys))
     )
 
 
 
 
 #+end_src
+** ipython-notebook appearance
+#+BEGIN_SRC emacs-lisp
+  (add-hook 'ein:notebook-mode-hook
+            (lambda ()
+              (progn
+                (setq left-margin-width 4)
+                (setq right-margin-width 4)
+                (set-window-buffer nil (current-buffer))
+                (fringe-mode 0))))
+#+END_SRC
+
 ** python company
 #+begin_src emacs-lisp
   ;; (defun my/python-mode-hook ()
@@ -1830,6 +1935,15 @@ Languages which can be evaluated in Org buffers
 
   ;; (add-hook 'python-mode-hook 'my/python-mode-hook)
 #+end_src
+** flycheck
+#+BEGIN_SRC emacs-lisp
+  (add-hook 'python-mode-hook '(lambda () (flycheck-mode)))
+#+END_SRC
+** eglot config
+#+BEGIN_SRC emacs-lisp
+  (setq eglot-workspace-configuration '((pyls . ((configurationSources . ["flake8"])))))
+#+END_SRC
+
 * matlab
 #+begin_src emacs-lisp
   (add-to-list 'auto-mode-alist '("\\.m\\'" . matlab-mode))
@@ -1976,20 +2090,21 @@ From https://github.com/mbork/beeminder.el
     ("r" (find-file "~/Dropbox/org/research.org") "research")
     )
 
-  (bind-key "M-s-e" 'hydra-common-files/body)
+  (bind-key "s-a" 'hydra-common-files/body)
 #+END_SRC
 * keybindings
 #+BEGIN_SRC emacs-lisp
-  (bind-keys
+  (bind-keys*
 
    ;; manage windows
    ("s-SPC" . ivy-switch-buffer)
    ("s-k" . really-kill-this-buffer)
+   ("s-Q" . really-kill-this-buffer)
    ("s-o" . ace-window)
    ("s-O" . (lambda () (interactive) (ace-window 4)))
    ("s-w" . delete-window)
    ("s-W" . ace-delete-window)
-   ("<M-return>" . delete-other-windows)
+   ("C-1" . delete-other-windows)
    ("s-<left>" . switch-window-mvborder-left)
    ("s-<right>" . switch-window-mvborder-right)
    ("s-<up>" . switch-window-mvborder-up)
@@ -1999,16 +2114,19 @@ From https://github.com/mbork/beeminder.el
 
    ;; eshell
    ("M-S-s-<return>" . shell-switcher-switch-buffer)
+   ;; ("M-S-<return>" . shell-switcher-switch-buffer)
+
    ("s-m" . eshell-cwd)
    ("s-M" . shell-switcher-new-shell)
    ("s-_" . (lambda () (interactive) (split-window-horizontally) (other-window 1) (shell-switcher-switch-buffer)))
 
    ;; useful navigation
-   ("s-b" . beeminder-list-goals)
    ("s-f" . counsel-find-file)
+   ("M-s-b" . beeminder-list-goals)
    ("<XF86LaunchA>" . (lambda (&optional arg) (interactive "P") (org-agenda arg "a")))
    ("<XF86LaunchB>" . counsel-org-capture)
-   ("<XF86KbdBrightnessDown>" . (lambda () (interactive) (switch-to-buffer "*dashboard*")))
+   ("M-s-c" . counsel-org-capture)
+   ;; ("<XF86KbdBrightnessDown>" . (lambda () (interactive) (switch-to-buffer "*dashboard*")))
 
    )
 #+END_SRC
@@ -2069,7 +2187,7 @@ From https://github.com/mbork/beeminder.el
 #+end_src
 ** set up keybindings
 #+begin_src emacs-lisp :tangle no
-;;  (require 'my-exwm-keys)
+  ;;  (require 'my-exwm-keys)
 #+end_src
 ** randr
 #+BEGIN_SRC emacs-lisp :tangle no
@@ -2091,3 +2209,9 @@ From https://github.com/mbork/beeminder.el
 #+begin_src emacs-lisp :tangle no
   ;; (exwm-enable)
 #+end_src
+
+
+
+
+
+

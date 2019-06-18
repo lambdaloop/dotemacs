@@ -22,7 +22,7 @@
 
 (setq package-enable-at-startup nil)
 
-(unless package--initialized 
+(unless package--initialized
   (package-initialize))
 
 ;;; Bootstrap use-package

@@ -284,7 +284,9 @@ From [[https://github.com/danielmai/.emacs.d/blob/master/config.org][Daniel Mai]
 
   (use-package doom-themes
     :ensure t
-    :config (switch-theme 'doom-one))
+    :config 
+    (customize-set-variable 'doom-one-brighter-comments t)
+    (switch-theme 'doom-one))
 
   ;; (defun set-my-theme (&optional frame)
   ;;   "Setup the theme."
@@ -501,6 +503,19 @@ Here's a bunch of one-liners for package requires
   (use-package magit :bind ("C-x g" . magit-status)
     :config (setq magit-completing-read-function
                   'magit-ido-completing-read))
+
+
+;; full screen magit-status
+(defadvice magit-status (around magit-fullscreen activate)
+  (window-configuration-to-register :magit-fullscreen)
+  ad-do-it
+  (delete-other-windows))
+
+(defun magit-quit-session ()
+  "Restores the previous window configuration and kills the magit buffer"
+  (interactive)
+  (kill-buffer)
+  (jump-to-register :magit-fullscreen))
 
 #+end_src
 ** pdf-tools

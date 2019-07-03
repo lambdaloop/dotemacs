@@ -692,6 +692,13 @@ crux has a bunch of autoloads, so we use require instead of use-package
    ("M-;" . comment-or-uncomment-region)
    )
 #+END_SRC
+** treemacs
+#+BEGIN_SRC emacs-lisp
+  (use-package treemacs
+    :bind (("C-c t" . treemacs-select-window))
+  )
+#+END_SRC
+
 * system-packages
 #+begin_src emacs-lisp
   (require 'system-packages)
@@ -920,7 +927,7 @@ I want to have movement using Ctrl+something
             (select-window first-win)
             (if this-win-2nd (other-window 1))))))
 
-  (bind-key "C-c t" 'toggle-window-split)
+  ;; (bind-key "C-c t" 'toggle-window-split)
 
 #+end_src
 ** mark region

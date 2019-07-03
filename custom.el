@@ -16,6 +16,7 @@
  '(custom-safe-themes
    (quote
     ("3da031b25828b115c6b50bb92a117f5c0bbd3d9d0e9ba5af3cd2cb9db80db1c2" "bb08c73af94ee74453c90422485b29e5643b73b05e8de029a6909af6a3fb3f58" "c74e83f8aa4c78a121b52146eadb792c9facc5b1f02c917e3dbb454fca931223" "3c83b3676d796422704082049fc38b6966bcad960f896669dfc21a7a37a748fa" "628278136f88aa1a151bb2d6c8a86bf2b7631fbea5f0f76cba2a0079cd910f7d" "7b4d9b8a6ada8e24ac9eecd057093b0572d7008dbd912328231d0cada776065a" default)))
+ '(doom-one-brighter-comments t)
  '(electric-indent-mode nil)
  '(fci-rule-color "#515151")
  '(flycheck-color-mode-line-face-to-color (quote mode-line-buffer-id))
@@ -35,6 +36,7 @@
  '(hl-paren-background-colors (quote ("#e8fce8" "#c1e7f8" "#f8e8e8")))
  '(hl-paren-colors (quote ("#40883f" "#0287c8" "#b85c57")))
  '(magit-diff-use-overlays nil)
+ '(on-screen-highlight-method (quote shadow))
  '(org-agenda-custom-commands
    (quote
     (("d" "Agenda with only one deadline warning day" agenda ""
@@ -89,7 +91,7 @@
  '(org-refile-use-outline-path (quote file))
  '(package-selected-packages
    (quote
-    (doom-modeline love-minor-mode enh-ruby-mode nix-mode almost-mono-themes flymake flycheck-pycheckers flycheck-pyflakes flycheck-pyre eglot light-soap-theme isortify ido-completing-read+ pkgbuild-mode cmake-mode flycheck web-mode wc-mode image+ yaml-mode json-mode indent-tools synosaurus ace-window zen-and-art-theme hide-mode-line multishell shell-switcher better-shell base16-theme doom-themes centered-window danneskjold-theme abyss-theme afternoon-theme borland-blue-theme forest-blue-theme hamburg-theme metalheart-theme northcode-theme underwater-theme dumb-jump import-popwin counsel-notmuch nm notmuch notmuch-labeler xterm-color crux buffer-move artbollocks-mode ivy-posframe helm-org-rifle gruvbox-theme darkokai-theme monokai-alt-theme monokai-theme monotropic-theme dracula-theme ivy-rich counsel-dash counsel-pydoc golden-ratio counsel-org-capture-string counsel-tramp helm-system-packages fancy-battery org org-edna nord-theme ivy-hydra korean-holidays academic-phrases ivy-dired-history ivy-historian ivy-mpdel ivy-pass ivy-todo ivy-yasnippet atom-dark-theme flatland-black-theme color-theme-sanityinc-tomorrow color-theme-sanityinc-solarized badger-theme avy-zap ereader nov exwm-edit darkroom launch company-shell company-jedi google-maps google-this esup calfw-gcal calfw-org diminish calfw image-archive image-dired+ fish-completion bash-completion elfeed elfeed-goodies elfeed-org benchmark-init flatui-dark-theme flatland-theme molokai-theme moe-theme dired-du ido-hacks esh-autosuggest dashboard org-dashboard exwm counsel god-mode helm-swoop evil-dvorak ein lua-mode auctex-latexmk anaphora matlab-mode csv-mode git-timemachine org-download org-plus-contrib gitignore-mode haskell-mode ivy-bibtex arduino-mode ag flyspell-correct neotree nyan-mode multi-term org-bullets ess expand-region org-edit-latex auctex latex-extra bind-key undo-tree)))
+    (lsp-treemacs treemacs treemacs-magit treemacs-projectile waher-theme on-screen doom-modeline love-minor-mode enh-ruby-mode nix-mode almost-mono-themes flymake flycheck-pycheckers flycheck-pyflakes flycheck-pyre eglot light-soap-theme isortify ido-completing-read+ pkgbuild-mode cmake-mode flycheck web-mode wc-mode image+ yaml-mode json-mode indent-tools synosaurus ace-window zen-and-art-theme hide-mode-line multishell shell-switcher better-shell base16-theme doom-themes centered-window danneskjold-theme abyss-theme afternoon-theme borland-blue-theme forest-blue-theme hamburg-theme metalheart-theme northcode-theme underwater-theme dumb-jump import-popwin counsel-notmuch nm notmuch notmuch-labeler xterm-color crux buffer-move artbollocks-mode ivy-posframe helm-org-rifle gruvbox-theme darkokai-theme monokai-alt-theme monokai-theme monotropic-theme dracula-theme ivy-rich counsel-dash counsel-pydoc golden-ratio counsel-org-capture-string counsel-tramp helm-system-packages fancy-battery org org-edna nord-theme ivy-hydra korean-holidays academic-phrases ivy-dired-history ivy-historian ivy-mpdel ivy-pass ivy-todo ivy-yasnippet atom-dark-theme flatland-black-theme color-theme-sanityinc-tomorrow color-theme-sanityinc-solarized badger-theme avy-zap ereader nov exwm-edit darkroom launch company-shell company-jedi google-maps google-this esup calfw-gcal calfw-org diminish calfw image-archive image-dired+ fish-completion bash-completion elfeed elfeed-goodies elfeed-org benchmark-init flatui-dark-theme flatland-theme molokai-theme moe-theme dired-du ido-hacks esh-autosuggest dashboard org-dashboard exwm counsel god-mode helm-swoop evil-dvorak ein lua-mode auctex-latexmk anaphora matlab-mode csv-mode git-timemachine org-download org-plus-contrib gitignore-mode haskell-mode ivy-bibtex arduino-mode ag flyspell-correct neotree nyan-mode multi-term org-bullets ess expand-region org-edit-latex auctex latex-extra bind-key undo-tree)))
  '(paradox-github-token t)
  '(pdf-view-midnight-colors (quote ("#282828" . "#fbf1c7")))
  '(pos-tip-background-color "#A6E22E")
@@ -99,6 +101,7 @@
  '(sml/active-foreground-color "#424242")
  '(sml/inactive-background-color "#4fa8a8")
  '(sml/inactive-foreground-color "#424242")
+ '(smooth-scrolling-mode t)
  '(tramp-syntax (quote default) nil (tramp))
  '(vc-annotate-background nil)
  '(vc-annotate-color-map

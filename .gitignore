@@ -27,3 +27,4 @@ secrets.el.gpg
 async-bytecomp.log
 .historian
 /transient/
+/.cache

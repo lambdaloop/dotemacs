@@ -34,9 +34,8 @@ I almost never use the *scratch* buffer. Let's start using the dashboard!
     :ensure t
     :init
     (progn
-      (setq dashboard-items '((agenda  . 8)
-                              (recents . 8)))
-      (setq dashboard-page-separator "\n\n")
+      (setq dashboard-items '((recents . 8)))
+      (setq dashobard-page-separator "\n\n")
       (setq dashboard-startup-banner
             (get-random-file "~/Pictures/wallpapers/chosen/small-emacs")))
     :config
@@ -211,17 +210,17 @@ Page-Breaks in GNU Emacs" by Eric J. M. Ritz.]]
 ** basic appearance
 #+begin_src emacs-lisp
   (setq default-frame-alist '((font-backend . "xft")
-                              (font . "Dejavu Sans Mono-10")
+                              (font . "Dejavu Sans Mono-9.5")
                               (vertical-scroll-bars)
                               (menu-bar-lines . 0)
                               (tool-bar-lines . 0)
                               ))
 
-  (set-face-attribute 'default nil
-                      :family "Dejavu Sans Mono"
-                      :height 95
-                      :weight 'normal
-                      :width 'normal)
+  ;; (set-face-attribute 'default nil
+  ;;                     :family "Dejavu Sans Mono"
+  ;;                     :height 95
+  ;;                     :weight 'normal
+  ;;                     :width 'normal)
 
   ;; remove window bar
   (set-frame-position nil 0 -24)
@@ -279,22 +278,27 @@ From [[https://github.com/danielmai/.emacs.d/blob/master/config.org][Daniel Mai]
   ;; (use-package moe-theme
   ;;   :config (switch-theme 'moe-light))
 
-  (defun set-my-theme (&optional frame)
-    "Setup the theme."
-    (switch-theme 'sanityinc-tomorrow-eighties))
+  ;; (use-package color-theme-sanityinc-tomorrow
+  ;;   :ensure t
+  ;;   :config (switch-theme 'sanityinc-tomorrow-eighties))
 
-  (use-package color-theme-sanityinc-tomorrow)
+  (use-package doom-themes
+    :ensure t
+    :config (switch-theme 'doom-one))
 
-  (set-my-theme)
+  ;; (defun set-my-theme (&optional frame)
+  ;;   "Setup the theme."
+  ;;   (switch-theme 'doom-one))
 
-  (add-hook 'after-make-frame-functions 'set-my-theme)
-
+  ;; (set-my-theme)
+  ;; (add-hook 'emacs-startup-hook 'set-my-theme)
 #+end_src
 
 
-** smart-mode-line
+** modeline
 #+begin_src emacs-lisp
   (use-package smart-mode-line
+    :disabled t
     :config
     (progn
       (setq sml/no-confirm-load-theme t)
@@ -315,17 +319,21 @@ From [[https://github.com/danielmai/.emacs.d/blob/master/config.org][Daniel Mai]
               ))
       (sml/setup)))
 
-
-#+end_src
-** modeline
-#+begin_src emacs-lisp
   (use-package time
-    :init (setq display-time-format " %H:%M"
+    :disabled t
+    :init (setq display-time-format "%H:%M"
                 display-time-24hr-format t
                 display-time-default-load-average nil)
     :config
     (display-time-mode 1))
 
+  (use-package doom-modeline
+    :ensure t
+    :init (progn 
+            (setq doom-modeline-bar-width 3)
+            (setq doom-modeline-vcs-max-length 12)
+            )
+    :hook (after-init . doom-modeline-mode))
 #+end_src
 * ido
 ** enable ido + basic settings
@@ -444,6 +452,7 @@ From [[https://github.com/danielmai/.emacs.d/blob/master/config.org][Daniel Mai]
                     )
               (ivy-rich-mode +1)
               ))
+
 #+end_src
 ** historian
 #+BEGIN_SRC emacs-lisp :tangle no
@@ -1297,7 +1306,7 @@ I want to have movement using Ctrl+something
     :bind (("C-c f" . counsel-recentf))
     :config
     (setq recentf-max-saved-items nil
-          recentf-max-menu-items 40
+          recentf-max-menu-items 400
           ;; Cleanup recent files only when Emacs is idle, but not when the mode
           ;; is enabled, because that unnecessarily slows down Emacs. My Emacs
           ;; idles often enough to have the recent files list clean up regularly
@@ -1307,7 +1316,7 @@ I want to have movement using Ctrl+something
                                 "/itsalltext/" ; It's all text temp files
                                 )))
 
-  (run-with-timer 0 (* 30 60) (lambda () (interactive) (let ((inhibit-message t)) (recentf-save-list))))
+  (run-with-timer 0 (* 10 60) (lambda () (interactive) (let ((inhibit-message t)) (recentf-save-list))))
 #+end_src
 * dired
 #+begin_src emacs-lisp
@@ -2094,6 +2103,15 @@ From https://github.com/mbork/beeminder.el
 
   (bind-key "s-a" 'hydra-common-files/body)
 #+END_SRC
+* love
+#+BEGIN_SRC emacs-lisp
+  (use-package love-minor-mode
+    :bind (
+           :map love-minor-mode-map
+           ("M-p" . backward-paragraph)
+           ("M-r" . love/play)
+           ))
+#+END_SRC
 * keybindings
 #+BEGIN_SRC emacs-lisp
   (bind-keys*
@@ -2211,6 +2229,11 @@ From https://github.com/mbork/beeminder.el
 #+begin_src emacs-lisp :tangle no
   ;; (exwm-enable)
 #+end_src
+
+
+
+
+
 
 
 

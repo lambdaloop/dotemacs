@@ -1357,7 +1357,15 @@ I want to have movement using Ctrl+something
 
   (setq dired-listing-switches "-alh")
 
+  ;; Allow rsync from dired buffers
+  (use-package dired-rsync
+    :bind (:map dired-mode-map
+                ("C-c C-r" . dired-rsync)))
+
 #+end_src
+
+#+RESULTS:
+
 * picpocket
 #+BEGIN_SRC emacs-lisp
   (use-package picpocket
@@ -1975,6 +1983,12 @@ Languages which can be evaluated in Org buffers
 ** eglot config
 #+BEGIN_SRC emacs-lisp
   (setq eglot-workspace-configuration '((pyls . ((configurationSources . ["flake8"])))))
+#+END_SRC
+** yapf
+#+BEGIN_SRC emacs-lisp
+(use-package yapfify
+    :diminish yapf-mode
+:hook (python-mode . yapf-mode))
 #+END_SRC
 
 * matlab

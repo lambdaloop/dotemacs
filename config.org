@@ -1,0 +1,608 @@
+#+TITLE: Emacs Config
+#+PROPERTY: header-args :tangle yes
+
+* Personal info
+Some functionality uses this to identify you, e.g. GPG configuration, email
+clients, file templates and snippets.
+#+begin_src emacs-lisp
+(setq user-full-name "Pierre Karashchuk"
+      user-mail-address "krchtchk@gmail.com")
+#+end_src
+* some defaults
+#+begin_src emacs-lisp :tangle yes
+(setq next-line-add-newlines t)
+#+end_src
+
+* Fonts
+Doom exposes five (optional) variables for controlling fonts in Doom. Here
+are the three important ones:
+
++ `doom-font'
++ `doom-variable-pitch-font'
++ `doom-big-font' -- used for `doom-big-font-mode'; use this for
+  presentations or streaming.
+
+They all accept either a font-spec, font string ("Input Mono-12"), or xlfd
+font string. You generally only need these two:
+#+begin_src emacs-lisp
+;; (setq doom-font "Iosevka Regular-12")
+(setq doom-font (font-spec :family "Iosevka" :size 15))
+#+end_src
+
+* Theme
+** Appearance
+There are two ways to load a theme. Both assume the theme is installed and
+available. You can either set `doom-theme' or manually load a theme with the
+`load-theme' function. This is the default.
+
+#+begin_src emacs-lisp
+(setq doom-theme 'doom-palenight)
+
+;; If you use `org' and don't want your org files in the default location below,
+;; change `org-directory'. It must be set before org loads!
+(setq org-directory "~/org/")
+
+;; This determines the style of line numbers in effect. If set to `nil', line
+;; numbers are disabled. For relative line numbers, set this to `relative'.
+(setq display-line-numbers-type nil)
+#+end_src
+** Modeline stuff
+#+begin_src emacs-lisp
+(setq doom-modeline-major-mode-icon t)
+(after! doom-modeline
+  (remove-hook 'doom-modeline-mode-hook #'size-indication-mode) ; filesize in modeline
+  (remove-hook 'doom-modeline-mode-hook #'column-number-mode)   ; cursor column in modeline
+  (setq doom-modeline-buffer-encoding nil)
+  (setq doom-modeline-buffer-file-name-style 'truncate-upto-root)
+  )
+#+end_src
+
+#+RESULTS:
+** Dashboard
+#+begin_src emacs-lisp :tangle yes
+(defun get-random-file (dir)
+    (concat ;; (file-name-as-directory dir)
+            (string-trim-right
+             (shell-command-to-string
+              (format "ls %s | shuf | head -1" dir)))))
+
+(setq banner-dir "~/Pictures/wallpapers/chosen/small-emacs")
+
+(setq +doom-dashboard-banner-dir banner-dir)
+(setq +doom-dashboard-banner-file (get-random-file banner-dir))
+
+
+#+end_src
+
+* Keybindings
+TODO: change this to
+** navigation keys
+#+begin_src emacs-lisp
+
+  (bind-keys*
+
+   ;; manage windows
+   ("s-SPC" . ivy-switch-buffer)
+   ("s-k" . kill-this-buffer)
+   ("s-Q" . kill-this-buffer)
+   ("s-o" . ace-window)
+   ("s-O" . (lambda () (interactive) (ace-window 4)))
+   ("s-w" . delete-window)
+   ("s-W" . ace-delete-window)
+   ("C-1" . delete-other-windows)
+   ("s-<left>" . switch-window-mvborder-left)
+   ("s-<right>" . switch-window-mvborder-right)
+   ("s-<up>" . switch-window-mvborder-up)
+   ("s-<down>" . switch-window-mvborder-down)
+   ("s-," . (lambda () (interactive) (split-window-right) (other-window 1)))
+   ("s-." . (lambda () (interactive) (split-window-below) (other-window 1)))
+   ("s-z" . toggle-window-split)
+
+   ;; eshell
+   ("M-S-s-<return>" . shell-switcher-switch-buffer)
+   ;; ("M-S-<return>" . shell-switcher-switch-buffer)
+
+   ("s-m" . vterm-toggle)
+   ("s-M" . vterm)
+   ;; ("s-M" . shell-switcher-new-shell)
+   ;; ("s-_" . (lambda () (interactive) (split-window-horizontally) (other-window 1) (shell-switcher-switch-buffer)))
+
+   ;; useful navigation
+   ("s-f" . counsel-find-file)
+   ("C-x \\" . align-regexp)
+   ;; ("M-s-b" . beeminder-list-goals)
+   ;; ("<XF86LaunchA>" . (lambda (&optional arg) (interactive "P") (org-agenda arg "a")))
+   ;; ("<XF86LaunchB>" . counsel-org-capture)
+   ;; ("M-s-c" . counsel-org-capture)
+   ;; ("<XF86KbdBrightnessDown>" . (lambda () (interactive) (switch-to-buffer "*dashboard*")))
+
+   )
+#+end_src
+
+#+RESULTS:
+: align-regexp
+
+** ergonomic keys
+Based on ergoemacs key bindings, but adjusted for me
+I want to have movement using Ctrl+something
+
+#+begin_src emacs-lisp
+  (map!
+   "C-x C-x" 'pop-to-mark-command
+   "C-o" 'other-window
+   "C-t" 'previous-line
+   "C-p" 'transpose-chars
+   "M-i" 'universal-argument
+   "M-p" (lambda () (interactive) (execute-kbd-macro (kbd "M-{")))
+   "M-g" (lambda () (interactive) (execute-kbd-macro (kbd "M-}")))
+   "M-[" (lambda () (interactive) (execute-kbd-macro (kbd "M-{")))
+   "M-]" (lambda () (interactive) (execute-kbd-macro (kbd "M-}")))
+   "C-z" 'repeat
+   "C-c m" 'counsel-describe-face
+   "C-c q" 'switch-theme
+   )
+
+
+
+  (map! :map general-override-mode-map
+   "C-." 'set-mark-command
+   )
+
+  (define-key key-translation-map (kbd "C-u") (kbd "C-x"))
+  (define-key key-translation-map (kbd "M-h") (kbd "C-x C-s"))
+
+#+end_src
+
+#+RESULTS:
+: 
+* revert buffer
+#+begin_src emacs-lisp :tangle yes
+  (defun revert-buffer-no-confirm ()
+    "Revert buffer without confirmation."
+    (interactive) (revert-buffer t t))
+  (bind-key "C-x C-r" 'revert-buffer-no-confirm)
+#+end_src
+
+#+RESULTS:
+: revert-buffer-no-confirm
+
+* duplicate line
+#+begin_src emacs-lisp :tangle yes
+  ;; https://stackoverflow.com/questions/88399/how-do-i-duplicate-a-whole-line-in-emacs
+  (defun duplicate-line (arg)
+    "Duplicate current line, leaving point in lower line."
+    (interactive "*p")
+
+    ;; save the point for undo
+    (setq buffer-undo-list (cons (point) buffer-undo-list))
+
+    ;; local variables for start and end of line
+    (let ((bol (save-excursion (beginning-of-line) (point)))
+          eol)
+      (save-excursion
+
+        ;; don't use forward-line for this, because you would have
+        ;; to check whether you are at the end of the buffer
+        (end-of-line)
+        (setq eol (point))
+
+        ;; store the line and disable the recording of undo information
+        (let ((line (buffer-substring bol eol))
+              (buffer-undo-list t)
+              (count arg))
+          ;; insert the line arg times
+          (while (> count 0)
+            (newline)         ;; because there is no newline in 'line'
+            (insert line)
+            (setq count (1- count)))
+          )
+
+        ;; create the undo information
+        (setq buffer-undo-list (cons (cons eol (point)) buffer-undo-list)))
+      ) ; end-of-let
+
+    ;; put the point in the lowest line and return
+    (next-line arg))
+
+
+  (map! "C-c d" 'duplicate-line)
+#+end_src
+
+* ace-window
+#+begin_src emacs-lisp
+
+(after! ace-window
+  (progn
+    (setq aw-keys '(?h ?t ?n ?s ?a ?o ?e ?u ?i ?d))
+    (setq aw-scope 'frame)
+    ;; (custom-set-faces
+    ;;  '(aw-leading-char-face
+    ;;    ((t (:inherit ace-jump-face-foreground :height 1.0))))
+    ))
+
+#+end_src
+
+#+RESULTS:
+: ace-window
+* switch-window
+#+begin_src emacs-lisp :tangle yes
+(use-package switch-window
+  :commands
+  (
+   switch-window-mvborder-left
+   switch-window-mvborder-right
+   switch-window-mvborder-up
+   switch-window-mvborder-down
+   ))
+
+#+end_src
+
+#+RESULTS:
+
+* org
+** open pdf files in emacs
+#+begin_src emacs-lisp :tangle yes
+(use-package! org
+  :defer t
+  :config
+  (setcdr (assoc "\\.pdf\\'" org-file-apps) 'emacs))
+#+end_src
+** insert dates
+#+begin_src emacs-lisp :tangle yes
+(defun org-insert-current-date ()
+  (interactive)
+  (org-insert-time-stamp (current-time))
+  )
+
+(defun org-insert-current-date-inactive ()
+  (interactive)
+  (org-insert-time-stamp (current-time) nil t)
+  )
+
+(defun org-insert-current-datetime-inactive ()
+  (interactive)
+  (org-insert-time-stamp (current-time) t t)
+  )
+
+(map! :map org-mode-map
+      "C-c ," 'org-insert-current-date
+      "C-c C-," 'org-insert-current-datetime-inactive
+      "C-c C-." 'org-insert-current-date-inactive
+      )
+#+end_src
+
+#+RESULTS:
+** org-ref citations
+#+begin_src emacs-lisp :tangle yes
+(after! org-ref
+  (map! :map org-mode-map
+        "C-c C-i" 'org-ref-insert-link ))
+#+end_src
+** org-to-clipboard
+#+BEGIN_SRC emacs-lisp
+(defun org-to-clipboard ()
+  "Convert the contents of the current buffer or region from Org
+mode to HTML.  Store the result in the clipboard."
+  (interactive)
+  (if (use-region-p)
+      (shell-command-on-region (region-beginning)
+                               (region-end)
+                               "org2clip")
+      (shell-command-on-region (point-min)
+                               (point-max)
+                               "org2clip"))) 
+#+END_SRC
+** no smartparens in org-mode
+#+begin_src emacs-lisp :tangle yes
+(add-hook 'org-mode-hook #'turn-off-smartparens-mode)
+#+end_src
+
+* org-roam
+** roam
+#+begin_src emacs-lisp :tangle yes
+(use-package! org-roam
+  :defer t
+  ;; :commands (org-roam-insert org-roam-find-file org-roam)
+  :init
+  (setq org-roam-directory "~/Dropbox/org/roam")
+  (map! :leader
+        :prefix "n"
+        :desc "Org-Roam-Insert" "i" #'org-roam-insert
+        :desc "Org-Roam-Find"   "f" #'org-roam-find-file
+        :desc "Org-Roam-Buffer" "r" #'org-roam
+        :desc "Org-Roam-Today"  "t" #'org-roam-dailies-today
+        :desc "Org-Roam-Yesterday"  "y" #'org-roam-dailies-yesterday
+        :desc "Org-Roam-Tomorrow"  "m" #'org-roam-dailies-tomorrow
+        )
+  :config
+  (setq org-roam-capture-templates
+        '(("d" "default" plain (function org-roam--capture-get-point)
+           "%?"
+           :file-name "%<%Y-%m-%d>-${slug}"
+           :head "#+TITLE: ${title}\n"
+           :unnarrowed t))
+        )
+  (setq +org-roam-open-buffer-on-find-file nil)
+
+  (setq org-roam-graph-node-extra-config '(("shape"      . "\"underline\"")
+                                           ("style"      . "\"rounded,filled\"")
+                                           ("fillcolor"  . "\"#EEEEEE\"")
+                                           ("color"      . "\"#C9C9C9\"")
+                                           ("fontcolor"  . "\"#111111\"")
+                                           ("fontname"   . "\"Overpass\""))
+        org-roam-graph-edge-extra-config '(("color"      . "\"#333333\""))
+        org-roam-graph-extra-config
+        `(("stylesheet" . ,(concat "\"" doom-private-dir
+                                   "misc/roam-graphviz-style.css\""))))
+
+  )
+;;(org-roam-mode +1)
+#+end_src
+
+#+RESULTS:
+: t
+** bibtex
+#+begin_src emacs-lisp :tangle yes
+  (use-package! org-roam-bibtex
+    :defer t
+    :hook (org-roam-mode . org-roam-bibtex-mode)
+    :config
+    (setq org-roam-bibtex-preformat-keywords '("=key=" "title" "author" "date" "journaltitle"))
+    (setq org-roam-bibtex-templates
+          '(("r" "ref" plain (function org-roam-capture--get-point) ""
+             :file-name "${slug}"
+             :head "#+TITLE: ${title}
+  #+ROAM_KEY: ${ref}
+  #+ROAM_ALIAS: ${=key=}
+  :PROPERTIES:
+  :DATE: ${date}
+  :AUTHOR: ${author}
+  :JOURNAL: ${journaltitle}
+  :END:
+  ${ref}
+  "
+             :unnarrowed t))
+          )
+    )
+#+end_src
+** deft
+#+BEGIN_SRC emacs-lisp
+  (use-package! deft
+    :defer
+    :after org
+    :bind
+    ("C-c n d" . deft)
+    :custom
+    (deft-recursive t)
+    (deft-use-filter-string-for-filename t)
+    (deft-default-extension "org")
+    (deft-directory org-roam-directory))
+#+END_SRC
+
+#+RESULTS:
+: deft
+
+* ivy
+** standard
+#+begin_src emacs-lisp :tangle yes
+(use-package! ivy
+  :defer t
+  :config
+  (progn
+    (setq ivy-re-builders-alist
+          '((counsel-rg . ivy--regex-plus)
+            (swiper . ivy--regex-plus)
+            (ivy-bibtex . ivy--regex-plus)
+            (t      . ivy--regex-fuzzy))
+          ivy-initial-inputs-alist nil
+          ivy-use-virtual-buffers t
+          ivy-virtual-abbreviate 'full
+          ivy-count-format "%d/%d "
+          ivy-height 15
+          ivy-wrap t
+          )
+    ))
+
+(map!
+ ;; ("C-s" . counsel-grep)
+ "M-x" 'counsel-M-x
+ "C-x C-f" 'counsel-find-file
+ "C-h v" 'counsel-describe-variable
+ "M-y" 'counsel-yank-pop
+ "C-c j" 'counsel-semantic-or-imenu
+ "C-c u" 'counsel-semantic-or-imenu
+ :map ivy-minibuffer-map
+ "C-m" 'ivy-alt-done
+ "<C-return>" 'ivy-immediate-done
+ "C-s" 'ivy-next-line
+ "C-r" 'ivy-previous-line
+ "C-w" 'ivy-yank-word
+ :map ivy-switch-buffer-map
+ "C-k" 'ivy-switch-buffer-kill
+ :map org-mode-map
+ "C-c j" 'counsel-org-goto
+ "C-c u" 'counsel-org-goto
+ )
+#+end_src
+
+#+RESULTS:
+** prescient
+#+begin_src emacs-lisp :tangle yes
+(use-package! ivy-prescient
+
+  :config
+  (ivy-prescient-mode 1)
+  (setq prescient-filter-method '(literal regexp initialism fuzzy))
+  (setq ivy-prescient-sort-commands '(:not swiper ivy-switch-buffer counsel-yank-pop)))
+#+end_src
+** ivy-bibtex
+#+begin_src emacs-lisp :tangle yes
+(use-package! ivy-bibtex
+  :defer-incrementally t
+  :commands (ivy-bibtex)
+  :init (progn
+          (setq bibtex-completion-notes-path "~/Dropbox/org/references/article_notes.org")
+          (setq bibtex-completion-bibliography '("~/Dropbox/org/references/articles.bib"))
+          (setq reftex-default-bibliography bibtex-completion-bibliography)
+          (setq bibtex-completion-pdf-field "file")
+          (setq bibtex-completion-notes-template-one-file "\n* ${year} - ${title}\n  :PROPERTIES:\n  :Custom_ID: ${=key=}\n  :AUTHOR: ${author}\n  :URL: ${url}\n  :END:\ncite:${=key=}\n") ;
+          )
+  :bind ("C-c b" . ivy-bibtex)
+  )
+
+(use-package! org-ref
+  :defer t
+  :commands (org-ref-ivy-insert-cite-latex)
+  :init (progn
+          (setq org-ref-bibliography-notes bibtex-completion-notes-path
+                org-ref-default-bibliography bibtex-completion-bibliography
+                org-ref-pdf-directory "~/Dropbox/org/references/pdfs/")
+
+          (setq org-ref-completion-library 'org-ref-ivy-cite)
+          (setq org-ref-insert-cite-key "C-c i r")
+
+          (defun my/org-ref-get-pdf-filename (key)
+            "Open the pdf for bibtex key under point if it exists."
+            (interactive)
+            (let* ((bibtex-completion-bibliography (org-ref-find-bibliography))
+                   (pdf-file (car (bibtex-completion-find-pdf key))))
+              pdf-file))
+
+          (setq org-ref-get-pdf-filename-function 'my/org-ref-get-pdf-filename)
+          )
+  )
+
+#+end_src
+
+#+RESULTS:
+: my/org-ref-get-pdf-filename
+* deadgrep
+#+begin_src emacs-lisp :tangle yes
+(setq-default deadgrep--search-type 'words)
+#+end_src
+
+* visual-fill-column-mode
+#+begin_src emacs-lisp
+(setq-default visual-fill-column-center-text t)
+(map!
+ :leader
+ (:prefix-map ("t" . "toggle")
+   "v" 'visual-fill-column-mode))
+#+end_src
+
+#+RESULTS:
+
+* recentf
+#+begin_src emacs-lisp :tangle yes
+(use-package! recentf                    ; Save recently visited files
+  :init (recentf-mode)
+  :config
+  (setq recentf-max-saved-items nil
+        recentf-max-menu-items 400
+        ;; Cleanup recent files only when Emacs is idle, but not when the mode
+        ;; is enabled, because that unnecessarily slows down Emacs. My Emacs
+        ;; idles often enough to have the recent files list clean up regularly
+        recentf-auto-cleanup 'never ;; disable before we start recentf! If using Tramp a lot.
+        recentf-exclude (list "/\\.git/.*\\'" ; Git contents
+                              "/elpa/.*\\'" ; Package files
+                              "/itsalltext/" ; It's all text temp files
+                              )))
+
+(defun save-list-no-message ()
+  (interactive)
+  (let ((inhibit-message t)) (recentf-save-list))
+  )
+(run-at-time "2 min" 120 'save-list-no-message)
+#+end_src
+
+#+RESULTS:
+: [nil 24229 56965 927378 120 save-list-no-message nil nil 790000]
+
+* vterm
+#+begin_src emacs-lisp :tangle yes
+
+(use-package! vterm
+  :defer
+  :config
+  (setq vterm-shell "/usr/bin/zsh")
+  (setq vterm-kill-buffer-on-exit t)
+)
+
+(use-package! vterm-toggle
+  :defer
+  :config
+  (setq vterm-toggle-fullscreen-p nil)
+  (setq vterm-toggle-cd-auto-create-buffer nil))
+
+(map! :map vterm-mode-map
+      "C-m" 'vterm-toggle-forward
+      "C-z" 'vterm-toggle-backward
+      )
+
+#+end_src
+
+#+RESULTS:
+: vterm-toggle-backward
+* latex
+** org-ref
+#+begin_src emacs-lisp
+  (defun org-ref-to-latex-citation ()
+    (interactive)
+    (let ((end (point)))
+      (search-backward "cite")
+      (insert "\\")
+      (search-forward ":")
+      (replace-match "{")
+      (goto-char end)
+      (forward-char)
+      (insert "}")
+      ))
+
+  (defun org-ref-ivy-insert-cite-latex ()
+    (interactive)
+    (org-ref-ivy-insert-cite-link)
+    (org-ref-to-latex-citation))
+
+  (map! :map TeX-mode-map
+        "C-c C-i"  'org-ref-ivy-insert-cite-latex)
+#+end_src
+
+#+RESULTS:
+* python
+** ipython shell
+#+begin_src emacs-lisp :tangle yes
+(setq python-shell-interpreter "ipython3"
+      python-shell-interpreter-args "--simple-prompt -i")
+#+end_src
+** emacs ipython notebook (ein)
+#+begin_src emacs-lisp :tangle yes
+(after! ein-notebook
+  (setq ein:notebooklist-sort-field ::last_modified)
+  (setq ein:notebooklist-sort-order :descending)
+  (setq ein:output-area-inlined-images t)
+  (map! :map ein:notebook-mode-map
+        "M-P" 'ein:worksheet-goto-prev-input-km
+        "M-N" 'ein:worksheet-goto-next-input-km
+        "M-G" 'ein:worksheet-goto-next-input-km
+        "M-g" 'forward-paragraph
+        "M-p" 'backward-paragraph
+        ;; "C-c p" 'ein:worksheet-goto-prev-input-km
+        ;; "C-c n" 'ein:worksheet-goto-next-input-km
+        "<C-return>" 'ein:worksheet-execute-cell-and-goto-next-km
+        )
+  )
+
+#+end_src
+
+* company
+Idle company completion drives me crazy somehow. Instead of that, we use a keybinding to trigger it.
+#+begin_src emacs-lisp :tangle yes
+(after! company
+  (setq company-idle-delay nil)
+  (global-unset-key (kbd "C--"))
+  (map! :map company-mode-map
+        "C--" 'company-complete)
+)
+#+end_src
+
+#+RESULTS:

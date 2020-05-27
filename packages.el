@@ -65,3 +65,16 @@
 (package! deadgrep)
 
 (package! matlab-mode)
+
+(package! gdscript-mode)
+
+(package! graphviz-dot-mode)
+
+(package! emojify)
+
+
+(package! pipenv :disable t)
+
+(package! nyan-mode)
+
+(package! ob-async)

@@ -10,7 +10,11 @@ clients, file templates and snippets.
 #+end_src
 * some defaults
 #+begin_src emacs-lisp :tangle yes
+;; keep going down in a file without newlines
 (setq next-line-add-newlines t)
+
+;; don't ask me before opening big files, just open them
+(setq large-file-warning-threshold nil)
 #+end_src
 
 * Fonts
@@ -36,15 +40,18 @@ available. You can either set `doom-theme' or manually load a theme with the
 `load-theme' function. This is the default.
 
 #+begin_src emacs-lisp
-(setq doom-theme 'doom-palenight)
-
-;; If you use `org' and don't want your org files in the default location below,
-;; change `org-directory'. It must be set before org loads!
-(setq org-directory "~/org/")
+(setq doom-theme 'doom-dracula)
+;; (setq doom-theme 'doom-palenight)
+;; (setq doom-theme 'doom-one-light)
 
 ;; This determines the style of line numbers in effect. If set to `nil', line
 ;; numbers are disabled. For relative line numbers, set this to `relative'.
 (setq display-line-numbers-type nil)
+
+(custom-set-faces
+ '(mode-line-inactive ((t (:background "#171a26" :foreground "#676E95" :box nil))))
+ '(solaire-mode-line-inactive-face ((t (:background "#171a26" :foreground "#676E95" :box nil))))
+)
 #+end_src
 ** Modeline stuff
 #+begin_src emacs-lisp
@@ -75,10 +82,9 @@ available. You can either set `doom-theme' or manually load a theme with the
 #+end_src
 
 * Keybindings
-TODO: change this to
 ** navigation keys
 #+begin_src emacs-lisp
-
+;; TODO: change this to map!
   (bind-keys*
 
    ;; manage windows
@@ -140,6 +146,7 @@ I want to have movement using Ctrl+something
    "C-z" 'repeat
    "C-c m" 'counsel-describe-face
    "C-c q" 'switch-theme
+   "M-;" 'comment-line
    )
 
 
@@ -240,6 +247,12 @@ I want to have movement using Ctrl+something
 #+RESULTS:
 
 * org
+** basic setup
+#+begin_src emacs-lisp :tangle yes
+;; If you use `org' and don't want your org files in the default location below,
+;; change `org-directory'. It must be set before org loads!
+(setq org-directory "~/org/")
+#+end_src
 ** open pdf files in emacs
 #+begin_src emacs-lisp :tangle yes
 (use-package! org
@@ -296,6 +309,12 @@ mode to HTML.  Store the result in the clipboard."
 #+begin_src emacs-lisp :tangle yes
 (add-hook 'org-mode-hook #'turn-off-smartparens-mode)
 #+end_src
+** async execute
+#+begin_src emacs-lisp :tangle yes
+(after! org
+  (require 'ob-async)
+  )
+#+end_src
 
 * org-roam
 ** roam
@@ -313,6 +332,7 @@ mode to HTML.  Store the result in the clipboard."
         :desc "Org-Roam-Today"  "t" #'org-roam-dailies-today
         :desc "Org-Roam-Yesterday"  "y" #'org-roam-dailies-yesterday
         :desc "Org-Roam-Tomorrow"  "m" #'org-roam-dailies-tomorrow
+        :desc "Org-Roam-Date"  "g" #'org-roam-dailies-date
         )
   :config
   (setq org-roam-capture-templates
@@ -393,7 +413,7 @@ mode to HTML.  Store the result in the clipboard."
           '((counsel-rg . ivy--regex-plus)
             (swiper . ivy--regex-plus)
             (ivy-bibtex . ivy--regex-plus)
-            (t      . ivy--regex-fuzzy))
+            (t      . ivy--regex-plus))
           ivy-initial-inputs-alist nil
           ivy-use-virtual-buffers t
           ivy-virtual-abbreviate 'full
@@ -429,10 +449,9 @@ mode to HTML.  Store the result in the clipboard."
 ** prescient
 #+begin_src emacs-lisp :tangle yes
 (use-package! ivy-prescient
-
   :config
   (ivy-prescient-mode 1)
-  (setq prescient-filter-method '(literal regexp initialism fuzzy))
+  (setq prescient-filter-method '(literal regexp initialism))
   (setq ivy-prescient-sort-commands '(:not swiper ivy-switch-buffer counsel-yank-pop)))
 #+end_src
 ** ivy-bibtex
@@ -573,6 +592,10 @@ mode to HTML.  Store the result in the clipboard."
 #+begin_src emacs-lisp :tangle yes
 (setq python-shell-interpreter "ipython3"
       python-shell-interpreter-args "--simple-prompt -i")
+
+(map! :map python-mode-map
+      :localleader
+      :desc "run python" "C-p" 'run-python)
 #+end_src
 ** emacs ipython notebook (ein)
 #+begin_src emacs-lisp :tangle yes
@@ -602,7 +625,33 @@ Idle company completion drives me crazy somehow. Instead of that, we use a keybi
   (global-unset-key (kbd "C--"))
   (map! :map company-mode-map
         "C--" 'company-complete)
+  (company-prescient-mode -1)
 )
 #+end_src
 
 #+RESULTS:
+* emojify
+#+BEGIN_SRC emacs-lisp
+(defun emojify-insert-emoji-unicode ()
+  (interactive)
+  (insert (emojify-completing-read
+           "Select a unicode style emoji: "
+           (lambda (emoji)
+             (string-match-p (regexp-quote "unicode") emoji)))))
+
+(use-package emojify
+  :defer t
+  :init
+  (global-emojify-mode +1)
+  (map! :leader
+        :prefix "h"
+        :desc "Insert emoji" "i" 'emojify-insert-emoji
+        :desc "Insert emoji unicode" "u" 'emojify-insert-emoji-unicode
+        )
+  )
+#+END_SRC
+* nyan-mode
+#+begin_src emacs-lisp :tangle yes
+(after! nyan-mode
+  (setq nyan-bar-length 16))
+#+end_src

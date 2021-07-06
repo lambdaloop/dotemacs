@@ -8,6 +8,18 @@ clients, file templates and snippets.
 (setq user-full-name "Pierre Karashchuk"
       user-mail-address "krchtchk@gmail.com")
 #+end_src
+
+* secrets
+Load the secrets. We ignore errors here so that if GPG config is missing, rest of config still loads.
+#+BEGIN_SRC emacs-lisp
+(load "~/.emacs-secrets.el" t)
+;; (ignore-errors (load "~/.doom.d/secrets.el.gpg"))
+#+END_SRC
+
+#+RESULTS:
+: t
+
+
 * some defaults
 #+begin_src emacs-lisp :tangle yes
 ;; keep going down in a file without newlines
@@ -15,6 +27,9 @@ clients, file templates and snippets.
 
 ;; don't ask me before opening big files, just open them
 (setq large-file-warning-threshold nil)
+
+;; celndar start
+(setq calendar-week-start-day 1)
 #+end_src
 
 * Fonts
@@ -29,9 +44,61 @@ are the three important ones:
 They all accept either a font-spec, font string ("Input Mono-12"), or xlfd
 font string. You generally only need these two:
 #+begin_src emacs-lisp
-;; (setq doom-font "Iosevka Regular-12")
-(setq doom-font (font-spec :family "Iosevka" :size 15))
+(cond
+ ((string-equal system-name "callisto") ; desktop
+  (setq doom-font "Iosevka-11"))
+ (t
+  (setq doom-font "Iosevka-10")))
 #+end_src
+
+** Fallbacks
+Fallback fonts for different kinds of scripts.
+https://idiocy.org/emacs-fonts-and-fontsets.html
+
+#+BEGIN_SRC emacs-lisp
+;; Latin
+(set-fontset-font t 'latin "Noto Sans")
+
+;; East Asia: 你好, 早晨, こんにちは, 안녕하세요
+;;
+;; Make sure you use the right font. See
+;; https://www.google.com/get/noto/help/cjk/.
+;;
+;; This font requires "Regular". Other Noto fonts dont.
+;; ¯\_(ツ)_/¯
+(set-fontset-font t 'han "Noto Sans CJK SC Regular")
+(set-fontset-font t 'kana "Noto Sans CJK JP Regular")
+(set-fontset-font t 'hangul "Noto Sans CJK KR Regular")
+(set-fontset-font t 'cjk-misc "Noto Sans CJK KR Regular")
+
+;; South East Asia: ជំរាបសួរ, ສະບາຍດີ, မင်္ဂလာပါ, สวัสดีครับ
+(set-fontset-font t 'khmer "Noto Sans Khmer")
+(set-fontset-font t 'lao "Noto Sans Lao")
+(set-fontset-font t 'burmese "Noto Sans Myanmar")
+(set-fontset-font t 'thai "Noto Sans Thai")
+
+;; Africa: ሠላም
+(set-fontset-font t 'ethiopic "Noto Sans Ethiopic")
+
+;; Middle/Near East: שלום, السّلام عليكم
+(set-fontset-font t 'hebrew "Noto Sans Hebrew")
+(set-fontset-font t 'arabic "Noto Sans Arabic")
+
+;;  South Asia: નમસ્તે, नमस्ते, ನಮಸ್ಕಾರ, നമസ്കാരം, ଶୁଣିବେ,
+;;              ආයුබෝවන්, வணக்கம், నమస్కారం, བཀྲ་ཤིས་བདེ་ལེགས༎
+(set-fontset-font t 'gujarati "Noto Sans Gujarati")
+(set-fontset-font t 'devanagari "Noto Sans Devanagari")
+(set-fontset-font t 'kannada "Noto Sans Kannada")
+(set-fontset-font t 'malayalam "Noto Sans Malayalam")
+(set-fontset-font t 'oriya "Noto Sans Oriya")
+(set-fontset-font t 'sinhala "Noto Sans Sinhala")
+(set-fontset-font t 'tamil "Noto Sans Tamil")
+(set-fontset-font t 'telugu "Noto Sans Telugu")
+(set-fontset-font t 'tibetan "Noto Sans Tibetan")
+
+#+END_SRC
+
+#+RESULTS:
 
 * Theme
 ** Appearance
@@ -48,11 +115,21 @@ available. You can either set `doom-theme' or manually load a theme with the
 ;; numbers are disabled. For relative line numbers, set this to `relative'.
 (setq display-line-numbers-type nil)
 
-(custom-set-faces
- '(mode-line-inactive ((t (:background "#171a26" :foreground "#676E95" :box nil))))
- '(solaire-mode-line-inactive-face ((t (:background "#171a26" :foreground "#676E95" :box nil))))
-)
+;; (custom-set-faces
+;;  '(mode-line-inactive ((t (:background "#171a26" :foreground "#676E95" :box nil))))
+;;  '(solaire-mode-line-inactive-face ((t (:background "#171a26" :foreground "#676E95" :box nil))))
+;; )
 #+end_src
+
+** Custom faces
+#+BEGIN_SRC emacs-lisp
+(custom-set-faces
+ '(vterm-color-black ((t (:background "darkgray" :foreground "black")))))
+
+#+END_SRC
+
+#+RESULTS:
+
 ** Modeline stuff
 #+begin_src emacs-lisp
 (setq doom-modeline-major-mode-icon t)
@@ -61,10 +138,13 @@ available. You can either set `doom-theme' or manually load a theme with the
   (remove-hook 'doom-modeline-mode-hook #'column-number-mode)   ; cursor column in modeline
   (setq doom-modeline-buffer-encoding nil)
   (setq doom-modeline-buffer-file-name-style 'truncate-upto-root)
+  (setq doom-modeline-enable-word-count t)
+  (setq doom-modeline-continuous-word-count-modes '(markdown-mode gfm-mode org-mode latex-mode tex-mode text-mode))
   )
 #+end_src
 
 #+RESULTS:
+| markdown-mode | gfm-mode | org-mode | latex-mode | tex-mode | text-mode |
 ** Dashboard
 #+begin_src emacs-lisp :tangle yes
 (defun get-random-file (dir)
@@ -85,89 +165,109 @@ available. You can either set `doom-theme' or manually load a theme with the
 ** navigation keys
 #+begin_src emacs-lisp
 ;; TODO: change this to map!
-  (bind-keys*
+(bind-keys*
 
-   ;; manage windows
-   ("s-SPC" . ivy-switch-buffer)
-   ("s-k" . kill-this-buffer)
-   ("s-Q" . kill-this-buffer)
-   ("s-o" . ace-window)
-   ("s-O" . (lambda () (interactive) (ace-window 4)))
-   ("s-w" . delete-window)
-   ("s-W" . ace-delete-window)
-   ("C-1" . delete-other-windows)
-   ("s-<left>" . switch-window-mvborder-left)
-   ("s-<right>" . switch-window-mvborder-right)
-   ("s-<up>" . switch-window-mvborder-up)
-   ("s-<down>" . switch-window-mvborder-down)
-   ("s-," . (lambda () (interactive) (split-window-right) (other-window 1)))
-   ("s-." . (lambda () (interactive) (split-window-below) (other-window 1)))
-   ("s-z" . toggle-window-split)
+ ;; manage windows
+ ("s-SPC" . ivy-switch-buffer)
+ ("s-k" . kill-this-buffer)
+ ("s-Q" . kill-this-buffer)
+ ("s-o" . other-window)
+ ("s-O" . (lambda () (interactive) (ace-window 4)))
+ ("s-w" . delete-window)
+ ("s-W" . ace-delete-window)
+ ("C-1" . delete-other-windows)
+ ("s-<left>" . switch-window-mvborder-left)
+ ("s-<right>" . switch-window-mvborder-right)
+ ("s-<up>" . switch-window-mvborder-up)
+ ("s-<down>" . switch-window-mvborder-down)
+ ("s-," . (lambda () (interactive) (split-window-right) (other-window 1)))
+ ("s-." . (lambda () (interactive) (split-window-below) (other-window 1)))
+ ("s-z" . previous-buffer)
+ ("s-Z" . next-buffer)
+ ("s-d" . avy-goto-char-timer)
+ ("C-&" . delete-other-windows)
 
-   ;; eshell
-   ("M-S-s-<return>" . shell-switcher-switch-buffer)
-   ;; ("M-S-<return>" . shell-switcher-switch-buffer)
+ ;; eshell
+ ;; ("M-S-s-<return>" . shell-switcher-switch-buffer)
+ ;; ("M-S-<return>" . shell-switcher-switch-buffer)
 
-   ("s-m" . vterm-toggle)
-   ("s-M" . vterm)
-   ;; ("s-M" . shell-switcher-new-shell)
-   ;; ("s-_" . (lambda () (interactive) (split-window-horizontally) (other-window 1) (shell-switcher-switch-buffer)))
+ ("s-m" . vterm-toggle)
+ ("s-M" . vterm)
+ ;; ("s-M" . shell-switcher-new-shell)
+ ;; ("s-_" . (lambda () (interactive) (split-window-horizontally) (other-window 1) (shell-switcher-switch-buffer)))
 
-   ;; useful navigation
-   ("s-f" . counsel-find-file)
-   ("C-x \\" . align-regexp)
-   ;; ("M-s-b" . beeminder-list-goals)
-   ;; ("<XF86LaunchA>" . (lambda (&optional arg) (interactive "P") (org-agenda arg "a")))
-   ;; ("<XF86LaunchB>" . counsel-org-capture)
-   ;; ("M-s-c" . counsel-org-capture)
-   ;; ("<XF86KbdBrightnessDown>" . (lambda () (interactive) (switch-to-buffer "*dashboard*")))
+ ;; useful navigation
+ ("s-f" . counsel-find-file)
+ ("C-x \\" . align-regexp)
+ ;; ("M-s-b" . beeminder-list-goals)
+ ;; ("<XF86LaunchA>" . (lambda (&optional arg) (interactive "P") (org-agenda arg "a")))
+ ;; ("<XF86LaunchB>" . counsel-org-capture)
+ ;; ("M-s-c" . counsel-org-capture)
+ ;; ("<XF86KbdBrightnessDown>" . (lambda () (interactive) (switch-to-buffer "*dashboard*")))
 
-   )
-#+end_src
+ )
+
+  #+end_src
 
 #+RESULTS:
-: align-regexp
 
 ** ergonomic keys
 Based on ergoemacs key bindings, but adjusted for me
 I want to have movement using Ctrl+something
 
 #+begin_src emacs-lisp
-  (map!
-   "C-x C-x" 'pop-to-mark-command
-   "C-o" 'other-window
-   "C-t" 'previous-line
-   "C-p" 'transpose-chars
-   "M-i" 'universal-argument
-   "M-p" (lambda () (interactive) (execute-kbd-macro (kbd "M-{")))
-   "M-g" (lambda () (interactive) (execute-kbd-macro (kbd "M-}")))
-   "M-[" (lambda () (interactive) (execute-kbd-macro (kbd "M-{")))
-   "M-]" (lambda () (interactive) (execute-kbd-macro (kbd "M-}")))
-   "C-z" 'repeat
-   "C-c m" 'counsel-describe-face
-   "C-c q" 'switch-theme
-   "M-;" 'comment-line
-   )
+(map!
+ "C-x C-x" 'pop-to-mark-command
+ "C-o" 'other-window
+ "C-t" 'previous-line
+ "C-p" 'transpose-chars
+ "M-i" 'universal-argument
+ "M-p" (lambda () (interactive) (execute-kbd-macro (kbd "M-{")))
+ "M-g" (lambda () (interactive) (execute-kbd-macro (kbd "M-}")))
+ "M-[" (lambda () (interactive) (execute-kbd-macro (kbd "M-{")))
+ "M-]" (lambda () (interactive) (execute-kbd-macro (kbd "M-}")))
+ "C-z" 'repeat
+ "C-c m" 'counsel-describe-face
+ "C-c q" 'switch-theme
+ "M-;" 'comment-line
+ )
 
 
 
-  (map! :map general-override-mode-map
-   "C-." 'set-mark-command
-   )
+(map! :map general-override-mode-map
+      "C-." 'set-mark-command
+      )
 
-  (define-key key-translation-map (kbd "C-u") (kbd "C-x"))
-  (define-key key-translation-map (kbd "M-h") (kbd "C-x C-s"))
+(define-key key-translation-map (kbd "C-u") (kbd "C-x"))
+(define-key key-translation-map (kbd "M-h") (kbd "C-x C-s"))
 
 #+end_src
 
 #+RESULTS:
 : 
+
+** org agenda keys
+
+#+BEGIN_SRC emacs-lisp
+(map!
+ (:prefix-map ("s-a" . "agenda")
+  "a" 'org-agenda-list
+  "b" 'beeminder-list-goals
+  "t" 'org-todo-list
+  "n" 'org-agenda
+  "v" 'org-ql-view
+  "g" 'counsel-org-agenda-headlines
+))
+#+END_SRC
+
+#+RESULTS:
+
 * revert buffer
 #+begin_src emacs-lisp :tangle yes
-  (defun revert-buffer-no-confirm ()
-    "Revert buffer without confirmation."
-    (interactive) (revert-buffer t t))
-  (bind-key "C-x C-r" 'revert-buffer-no-confirm)
+(defun revert-buffer-no-confirm ()
+  "Revert buffer without confirmation."
+  (interactive) (revert-buffer t t))
+(bind-key "C-x C-r" 'revert-buffer-no-confirm)
 #+end_src
 
 #+RESULTS:
@@ -175,44 +275,44 @@ I want to have movement using Ctrl+something
 
 * duplicate line
 #+begin_src emacs-lisp :tangle yes
-  ;; https://stackoverflow.com/questions/88399/how-do-i-duplicate-a-whole-line-in-emacs
-  (defun duplicate-line (arg)
-    "Duplicate current line, leaving point in lower line."
-    (interactive "*p")
+;; https://stackoverflow.com/questions/88399/how-do-i-duplicate-a-whole-line-in-emacs
+(defun duplicate-line (arg)
+  "Duplicate current line, leaving point in lower line."
+  (interactive "*p")
 
-    ;; save the point for undo
-    (setq buffer-undo-list (cons (point) buffer-undo-list))
+  ;; save the point for undo
+  (setq buffer-undo-list (cons (point) buffer-undo-list))
 
-    ;; local variables for start and end of line
-    (let ((bol (save-excursion (beginning-of-line) (point)))
-          eol)
-      (save-excursion
+  ;; local variables for start and end of line
+  (let ((bol (save-excursion (beginning-of-line) (point)))
+        eol)
+    (save-excursion
 
-        ;; don't use forward-line for this, because you would have
-        ;; to check whether you are at the end of the buffer
-        (end-of-line)
-        (setq eol (point))
+      ;; don't use forward-line for this, because you would have
+      ;; to check whether you are at the end of the buffer
+      (end-of-line)
+      (setq eol (point))
 
-        ;; store the line and disable the recording of undo information
-        (let ((line (buffer-substring bol eol))
-              (buffer-undo-list t)
-              (count arg))
-          ;; insert the line arg times
-          (while (> count 0)
-            (newline)         ;; because there is no newline in 'line'
-            (insert line)
-            (setq count (1- count)))
-          )
+      ;; store the line and disable the recording of undo information
+      (let ((line (buffer-substring bol eol))
+            (buffer-undo-list t)
+            (count arg))
+        ;; insert the line arg times
+        (while (> count 0)
+          (newline)         ;; because there is no newline in 'line'
+          (insert line)
+          (setq count (1- count)))
+        )
 
-        ;; create the undo information
-        (setq buffer-undo-list (cons (cons eol (point)) buffer-undo-list)))
-      ) ; end-of-let
+      ;; create the undo information
+      (setq buffer-undo-list (cons (cons eol (point)) buffer-undo-list)))
+    ) ; end-of-let
 
-    ;; put the point in the lowest line and return
-    (next-line arg))
+  ;; put the point in the lowest line and return
+  (next-line arg))
 
 
-  (map! "C-c d" 'duplicate-line)
+(map! "C-c d" 'duplicate-line)
 #+end_src
 
 * ace-window
@@ -251,8 +351,167 @@ I want to have movement using Ctrl+something
 #+begin_src emacs-lisp :tangle yes
 ;; If you use `org' and don't want your org files in the default location below,
 ;; change `org-directory'. It must be set before org loads!
-(setq org-directory "~/org/")
+(setq org-directory "~/notes/org/")
 #+end_src
+** org appearance
+#+begin_src emacs-lisp :tangle yes
+(after! org
+  (setq org-startup-indented nil
+        org-hide-leading-stars nil)
+  )
+#+end_src
+
+#+RESULTS:
+
+** org capture
+#+BEGIN_SRC emacs-lisp :tangle yes
+(after! org
+  (setq +org-capture-todo-file "~/notes/org/todo/inbox.org")
+
+  (setq org-capture-templates
+        '(("t" "Personal todo" entry
+           (file+headline +org-capture-todo-file "Inbox")
+           "* TODO %?\n%i\n%a" :prepend t))
+        )
+  )
+#+END_SRC
+
+#+RESULTS:
+| t | Personal todo | entry | (file+headline +org-capture-todo-file Inbox) | * TODO %? |
+
+** org agenda
+#+BEGIN_SRC emacs-lisp
+;; set priorities
+
+(after! org
+  (setq org-agenda-sticky t)
+  (setq org-agenda-use-time-grid nil)
+  (setq org-agenda-span 14)
+     (setq org-log-done 'time)
+  (setq org-priority-highest 0)
+  (setq org-priority-lowest 9)
+  (setq org-priority-default 3)
+
+  (setq org-agenda-skip-deadline-prewarning-if-scheduled t)
+
+  (setq org-todo-keywords
+        '((sequence "TODO(t)" "PROJ(p)" "STRT(s)" "WAIT(w)" "FUTR(f)"
+                    "|"
+                    "DONE(d)" "KILL(k)")))
+
+  (setq org-agenda-breadcrumbs-separator "->")
+
+  (with-no-warnings
+    (custom-declare-face '+org-todo-future
+                         '((t (:inherit (bold font-lock-keyword-face org-todo)))) ""))
+
+  (setq org-todo-keyword-faces
+        '(("STRT" . +org-todo-active)
+          ("WAIT" . +org-todo-onhold)
+          ("FUTR" . +org-todo-future)
+          ("PROJ" . +org-todo-project)))
+
+  (setq org-agenda-prefix-format " %i %-12c%?-12t% s")
+  (setq org-agenda-overriding-header "⚡ SCHEDULE:\n")
+
+  )
+
+(setq org-agenda-custom-commands
+      '(("o" "My Agenda"
+         ((todo "TODO" (
+                      (org-agenda-overriding-header "\n⚡ Do Today:\n⎺⎺⎺⎺⎺⎺⎺⎺⎺")
+                      (org-agenda-remove-tags t)
+                      (org-agenda-prefix-format " %-2i %-15b")
+                      (org-agenda-todo-keyword-format "")
+                       ))
+          (agenda "" (
+                      (org-agenda-start-day "+0d")
+                      (org-agenda-span 5)
+                      (org-agenda-overriding-header "⚡ Schedule:\n⎺⎺⎺⎺⎺⎺⎺⎺⎺")
+                      (org-agenda-repeating-timestamp-show-all nil)
+                      (org-agenda-remove-tags t)
+                      (org-agenda-prefix-format   "  %-3i  %-15b %t%s")
+                      (org-agenda-todo-keyword-format " ☐ ")
+                      (org-agenda-current-time-string "⮜┈┈┈┈┈┈┈ now")
+                      (org-agenda-scheduled-leaders '("" ""))
+                      (org-agenda-time-grid (quote ((daily today remove-match)
+                                                    (0900 1200 1500 1800 2100)
+                                                    "      " "┈┈┈┈┈┈┈┈┈┈┈┈┈")))
+                       ))
+          ))))
+
+#+END_SRC
+
+#+RESULTS:
+: ((STRT . +org-todo-active) (WAIT . +org-todo-onhold) (FUTR . +org-todo-onhold) (PROJ . +org-todo-project))
+** org-super-agenda
+
+#+BEGIN_SRC emacs-lisp
+(use-package org-super-agenda
+  :after org-agenda
+  :config
+  (setq org-super-agenda-groups '((:name "Today"
+                                   :time-grid table
+                                   :scheduled today)
+                                  (:name "Due today"
+                                   :deadline today)
+                                  (:name "Important"
+                                   :priority "A")
+                                  (:name "Overdue"
+                                   :deadline past)
+                                  (:name "Due soon"
+                                   :deadline future)))
+  (org-super-agenda-mode -1))
+#+END_SRC
+
+#+RESULTS:
+: t
+
+** org-ql
+#+BEGIN_SRC emacs-lisp
+(after! org-ql
+  (setq org-ql-views
+        '(
+          ("Scheduling: category" :buffers-files org-agenda-files
+           :query
+           (and (todo) (not (todo "WAIT" "HOLD"))
+                (not (scheduled :from today))
+                (not (children (todo))))
+           :sort (priority) :narrow nil :super-groups
+           ((:auto-category))
+           :title "Scheduling: category")
+
+          ("Scheduling: priority" :buffers-files org-agenda-files
+           :query
+           (and (todo) (not (todo "WAIT" "HOLD"))
+                (not (scheduled :from today))
+                (not (children (todo))))
+           :sort nil :narrow nil :super-groups
+           ((:auto-priority))
+           :title "Scheduling: priority")
+
+
+          ))
+  )
+
+#+END_SRC
+
+#+RESULTS:
+| Scheduling: category | :buffers-files | org-agenda-files | :query | (and (todo) (not (todo WAIT HOLD)) (not (scheduled :from today)) (not (children (todo)))) | :sort | (priority) | :narrow | nil | :super-groups | ((:auto-category)) | :title | Scheduling: category |
+| Scheduling: priority | :buffers-files | org-agenda-files | :query | (and (todo) (not (todo WAIT HOLD)) (not (scheduled :from today)) (not (children (todo)))) | :sort | nil        | :narrow | nil | :super-groups | ((:auto-priority)) | :title | Scheduling: priority |
+
+** keybindings
+#+begin_src emacs-lisp :tangle yes
+(after! org
+  (map! :map org-mode-map
+        "C-c C-n" 'org-next-block
+        "C-c C-p" 'org-previous-block
+        "C-c a" 'org-latex-export-to-pdf
+        ))
+#+end_src
+
+#+RESULTS:
+
 ** open pdf files in emacs
 #+begin_src emacs-lisp :tangle yes
 (use-package! org
@@ -313,8 +572,68 @@ mode to HTML.  Store the result in the clipboard."
 #+begin_src emacs-lisp :tangle yes
 (after! org
   (require 'ob-async)
+  (setq ob-async-no-async-languages-alist '(
+                                            "jupyter-python" "jupyter-julia"
+                                            "ipython"
+                                            ))
   )
 #+end_src
+
+#+RESULTS:
+| jupyter-python | jupyter-julia | ipython |
+** inline images
+#+begin_src emacs-lisp :tangle yes
+(setq org-image-actual-width 320)
+#+end_src
+** exporting to html
+#+begin_src emacs-lisp :tangle yes
+
+(after! ox-html
+  (setq org-html-htmlize-output-type 'css)
+  (setq org-html-htmlize-font-prefix "org-")
+  (setq org-html-postamble nil)
+
+  (setcdr (assq 'path org-html-mathjax-options)
+          '("https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js")
+          )
+
+  (setq org-html-mathjax-template
+        "<script>
+window.MathJax = {
+  chtml: {
+    displayAlign: \"%ALIGN\",
+    displayIndent: \"%INDENT\",
+    scale: %SCALE / 100
+  },
+  svg: {
+    scale: %SCALE / 100
+  },
+  tex: {
+    tags: \"ams\",
+    multlineWidth: \"%MULTLINEWIDTH\",
+    tagSide: \"%TAGSIDE\",
+    tagIndent: \"%TAGINDENT\",
+    autoload: {
+      color: [],
+      colorV2: ['color']
+    },
+    packages: {'[+]': ['noerrors']}
+  },
+  options: {
+    ignoreHtmlClass: 'tex2jax_ignore',
+    processHtmlClass: 'tex2jax_process'
+  },
+  loader: {
+    load: ['[tex]/noerrors']
+  }
+};
+</script>
+<script src=\"%PATH\" id=\"MathJax-script\"></script>"
+        )
+  )
+#+end_src
+
+#+RESULTS:
 
 * org-roam
 ** roam
@@ -323,16 +642,16 @@ mode to HTML.  Store the result in the clipboard."
   :defer t
   ;; :commands (org-roam-insert org-roam-find-file org-roam)
   :init
-  (setq org-roam-directory "~/Dropbox/org/roam")
+  (setq org-roam-directory "~/notes/org/roam")
   (map! :leader
         :prefix "n"
         :desc "Org-Roam-Insert" "i" #'org-roam-insert
         :desc "Org-Roam-Find"   "f" #'org-roam-find-file
         :desc "Org-Roam-Buffer" "r" #'org-roam
-        :desc "Org-Roam-Today"  "t" #'org-roam-dailies-today
-        :desc "Org-Roam-Yesterday"  "y" #'org-roam-dailies-yesterday
-        :desc "Org-Roam-Tomorrow"  "m" #'org-roam-dailies-tomorrow
-        :desc "Org-Roam-Date"  "g" #'org-roam-dailies-date
+        :desc "Org-Roam-Today"  "t" #'org-roam-dailies-find-today
+        :desc "Org-Roam-Yesterday"  "y" #'org-roam-dailies-find-yesterday
+        :desc "Org-Roam-Tomorrow"  "m" #'org-roam-dailies-find-tomorrow
+        :desc "Org-Roam-Date"  "g" #'org-roam-dailies-find-date
         )
   :config
   (setq org-roam-capture-templates
@@ -344,23 +663,23 @@ mode to HTML.  Store the result in the clipboard."
         )
   (setq +org-roam-open-buffer-on-find-file nil)
 
-  (setq org-roam-graph-node-extra-config '(("shape"      . "\"underline\"")
-                                           ("style"      . "\"rounded,filled\"")
-                                           ("fillcolor"  . "\"#EEEEEE\"")
-                                           ("color"      . "\"#C9C9C9\"")
-                                           ("fontcolor"  . "\"#111111\"")
-                                           ("fontname"   . "\"Overpass\""))
-        org-roam-graph-edge-extra-config '(("color"      . "\"#333333\""))
-        org-roam-graph-extra-config
-        `(("stylesheet" . ,(concat "\"" doom-private-dir
-                                   "misc/roam-graphviz-style.css\""))))
+  ;; (setq org-roam-graph-node-extra-config '(("shape"      . "\"underline\"")
+  ;;                                          ("style"      . "\"rounded,filled\"")
+  ;;                                          ("fillcolor"  . "\"#EEEEEE\"")
+  ;;                                          ("color"      . "\"#C9C9C9\"")
+  ;;                                          ("fontcolor"  . "\"#111111\"")
+  ;;                                          ("fontname"   . "\"Overpass\""))
+  ;;       org-roam-graph-edge-extra-config '(("color"      . "\"#333333\""))
+  ;;       org-roam-graph-extra-config
+  ;;       `(("stylesheet" . ,(concat "\"" doom-private-dir
+  ;;                                  "misc/roam-graphviz-style.css\""))))
 
   )
 ;;(org-roam-mode +1)
+
 #+end_src
 
 #+RESULTS:
-: t
 ** bibtex
 #+begin_src emacs-lisp :tangle yes
   (use-package! org-roam-bibtex
@@ -460,8 +779,8 @@ mode to HTML.  Store the result in the clipboard."
   :defer-incrementally t
   :commands (ivy-bibtex)
   :init (progn
-          (setq bibtex-completion-notes-path "~/Dropbox/org/references/article_notes.org")
-          (setq bibtex-completion-bibliography '("~/Dropbox/org/references/articles.bib"))
+          (setq bibtex-completion-notes-path "~/notes/org/references/article_notes.org")
+          (setq bibtex-completion-bibliography (list "~/notes/org/references/articles.bib"))
           (setq reftex-default-bibliography bibtex-completion-bibliography)
           (setq bibtex-completion-pdf-field "file")
           (setq bibtex-completion-notes-template-one-file "\n* ${year} - ${title}\n  :PROPERTIES:\n  :Custom_ID: ${=key=}\n  :AUTHOR: ${author}\n  :URL: ${url}\n  :END:\ncite:${=key=}\n") ;
@@ -475,7 +794,7 @@ mode to HTML.  Store the result in the clipboard."
   :init (progn
           (setq org-ref-bibliography-notes bibtex-completion-notes-path
                 org-ref-default-bibliography bibtex-completion-bibliography
-                org-ref-pdf-directory "~/Dropbox/org/references/pdfs/")
+                org-ref-pdf-directory "~/notes/org/references/pdfs/")
 
           (setq org-ref-completion-library 'org-ref-ivy-cite)
           (setq org-ref-insert-cite-key "C-c i r")
@@ -496,12 +815,14 @@ mode to HTML.  Store the result in the clipboard."
 #+RESULTS:
 : my/org-ref-get-pdf-filename
 * deadgrep
+
 #+begin_src emacs-lisp :tangle yes
 (setq-default deadgrep--search-type 'words)
 #+end_src
-
-* visual-fill-column-mode
-#+begin_src emacs-lisp
+* writing mode
+** visual-fill-column-mode
+Replaced with olivetti
+#+begin_src emacs-lisp :tangle no
 (setq-default visual-fill-column-center-text t)
 (map!
  :leader
@@ -510,6 +831,21 @@ mode to HTML.  Store the result in the clipboard."
 #+end_src
 
 #+RESULTS:
+
+** olivetti
+#+begin_src emacs-lisp
+(after! olivetti
+  (setq-default olivetti-body-width 100)
+)
+
+(map!
+ :leader
+ (:prefix-map ("t" . "toggle")
+   "v" 'olivetti-mode))
+#+end_src
+
+#+RESULTS:
+: olivetti-mode
 
 * recentf
 #+begin_src emacs-lisp :tangle yes
@@ -595,8 +931,33 @@ mode to HTML.  Store the result in the clipboard."
 
 (map! :map python-mode-map
       :localleader
-      :desc "run python" "C-p" 'run-python)
+      :desc "run python" "p" 'run-python)
+
+
+  (defun clear-shell ()
+    (interactive)
+    (let ((comint-buffer-maximum-size 0))
+      (comint-truncate-buffer)))
+
+  (defun run-python-conda ()
+    (interactive)
+    (let* ((conda-env
+            (read-string "conda env: "))
+           (python-shell-interpreter
+            (format "/home/pierre/miniconda3/envs/%s/bin/ipython" conda-env))
+           )
+      (run-python)
+      ;; (run-python (format "~/scripts/ipython-conda.sh") t t)
+      ))
+
+(map! :map python-mode-map
+      :localleader
+      :desc "run python conda" "n" 'run-python-conda)
+
 #+end_src
+
+#+RESULTS:
+
 ** emacs ipython notebook (ein)
 #+begin_src emacs-lisp :tangle yes
 (after! ein-notebook
@@ -616,6 +977,59 @@ mode to HTML.  Store the result in the clipboard."
   )
 
 #+end_src
+** ob-ipython
+#+begin_src emacs-lisp :tangle no
+(after! org
+  (require 'ob-ipython)
+  (map! :map ob-ipython-mode-map
+        "M-." 'ob-ipython-inspect
+        "C--" 'company-ob-ipython
+        "<S-Return>" 'org-ctrl-c-ctrl-c
+        )
+  )
+(after! company
+  (add-to-list 'company-backends 'company-ob-ipython)
+  )
+
+(after! org
+  (org-babel-do-load-languages
+   'org-babel-load-languages
+   '((ipython . t)
+     ))
+  )
+
+(after! python
+(add-to-list 'python-shell-completion-native-disabled-interpreters "jupyter")
+)
+
+
+
+#+end_src
+
+#+RESULTS:
+| jupyter | pypy | Python |
+** emacs-jupyter
+#+begin_src emacs-lisp :tangle yes
+(after! org
+  (require 'ob-jupyter)
+  (require 'ob-python)
+  (require 'ox-ipynb)
+  (org-babel-do-load-languages
+   'org-babel-load-languages
+   '((emacs-lisp . t)
+     (julia . t)
+     (python . t)
+     (jupyter . t)))
+  (map! :map org-mode-map
+        "M-." 'jupyter-inspect-at-point)
+
+  (setq org-babel-default-header-args:jupyter-python '((:async . "yes")
+                                                      (:session . "/jpy:localhost#8888:py")
+                                                      (:kernel . "python3")))
+  )
+#+end_src
+
+#+RESULTS:
 
 * company
 Idle company completion drives me crazy somehow. Instead of that, we use a keybinding to trigger it.
@@ -625,8 +1039,10 @@ Idle company completion drives me crazy somehow. Instead of that, we use a keybi
   (global-unset-key (kbd "C--"))
   (map! :map company-mode-map
         "C--" 'company-complete)
-  (company-prescient-mode -1)
+  ;(company-prescient-mode -1)
 )
+(after! org
+  (set-company-backend! 'org-mode 'company-capf))
 #+end_src
 
 #+RESULTS:
@@ -648,6 +1064,7 @@ Idle company completion drives me crazy somehow. Instead of that, we use a keybi
         :desc "Insert emoji" "i" 'emojify-insert-emoji
         :desc "Insert emoji unicode" "u" 'emojify-insert-emoji-unicode
         )
+  (setq emojify-emoji-styles '(unicode github))
   )
 #+END_SRC
 * nyan-mode
@@ -655,3 +1072,81 @@ Idle company completion drives me crazy somehow. Instead of that, we use a keybi
 (after! nyan-mode
   (setq nyan-bar-length 16))
 #+end_src
+* picpocket
+#+BEGIN_SRC emacs-lisp
+  (use-package picpocket
+    :bind (:map picpocket-mode-map
+                ("<left>" . picpocket-previous)
+                ("<right>" . picpocket-next)
+                :map dired-mode-map
+                ("P" . picpocket)
+                )
+    )
+#+END_SRC
+
+#+RESULTS:
+: picpocket
+
+* flyspell
+#+BEGIN_SRC emacs-lisp
+(defun my-save-word ()
+  (interactive)
+  (let ((current-location (point))
+         (word (flyspell-get-word)))
+    (when (consp word)
+      (flyspell-do-correct 'save nil (car word)
+                           current-location (cadr word) (caddr word) current-location)
+      (message "\"%s\" added to dictionary!" (car word))
+        )
+        ))
+
+(defun my-add-word () (interactive) (my-save-word))
+
+
+(after! flyspell
+  (map! :map flyspell-mode-map
+        "C-c x" 'my-save-word)
+        )
+#+END_SRC
+
+#+RESULTS:
+
+* native-compilation
+#+BEGIN_SRC emacs-lisp
+(setq comp-deferred-compilation t)
+#+END_SRC
+* json-mode
+this fixes an issue with json-mode, which expects this function for some reason
+#+begin_src emacs-lisp :tangle yes
+(defun jsons-remove-buffer () nil)
+#+end_src
+* beeminder
+From https://github.com/mbork/beeminder.el
+I adjust all the faces to work with the theme, as the default colors don't work well on a dark background.
+
+#+begin_src emacs-lisp :tangle yes
+(use-package beeminder
+  :config
+  (setq beeminder-when-the-day-ends (* 3600 3) ; 3am
+        beeminder-username secret-beeminder-username
+        beeminder-auth-token secret-beeminder-auth-token
+        )
+
+
+  (custom-set-faces
+   '(beeminder-red ((t (:inherit font-lock-keyword-face))))
+   '(beeminder-green ((t (:inherit font-lock-function-name-face))))
+   '(beeminder-blue ((t (:inherit font-lock-constant-face))))
+   '(beeminder-yellow ((t (:inherit font-lock-builtin-face))))
+   '(beeminder-error ((t (:inherit error))))
+   '(beeminder-warning ((t (:inherit warning))))
+   '(subtle-highlight ((t (:inherit bold))))
+   '(beeminder-dirty ((t (:inherit font-lock-comment-face))))
+   )
+
+  )
+
+#+end_src
+
+#+RESULTS:
+: t

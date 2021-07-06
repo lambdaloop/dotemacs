@@ -53,11 +53,13 @@
   :recipe (:host github :repo "zaeph/org-roam-bibtex"))
 
 (package! ivy-prescient)
+(package! company-prescient)
 
 (package! ivy-bibtex)
 (package! org-ref)
 
-(package! vterm)
+
+(package! vterm :pin "f41849c")
 (package! vterm-toggle)
 
 (package! switch-window)
@@ -78,3 +80,42 @@
 (package! nyan-mode)
 
 (package! ob-async)
+
+(package! atomic-chrome)
+
+(package! picpocket)
+
+;; (package! ob-ipython
+;;   :recipe (:host github :repo "moritzschaefer/ob-ipython"))
+
+(package! jupyter)
+(package! ox-ipynb
+  :recipe (:host github :repo "jkitchin/ox-ipynb"))
+
+(package! olivetti)
+
+(package! sdcv-mode
+  :recipe (:host github :repo "gucong/emacs-sdcv"))
+
+(package! org-ql)
+
+(package! crux)
+
+;; (package! avk-emacs-themes)
+;; (package! dracula-theme)
+;; (package! material-theme)
+;; (package! moe-theme)
+(package! gruvbox-theme)
+
+
+(package! org-roam-server)
+(package! org-super-agenda)
+
+(package! beeminder
+  :recipe (:host github :repo "mbork/beeminder.el"))
+
+
+(package! toc-mode
+  :recipe (:host github :repo "dalanicolai/toc-mode"))
+
+(package! calibredb)

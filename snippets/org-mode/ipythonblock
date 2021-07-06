@@ -1,0 +1,7 @@
+# -*- mode: snippet -*-
+# name: ipython block
+# key: py
+# --
+#+BEGIN_SRC jupyter-python
+  $0
+#+END_SRC

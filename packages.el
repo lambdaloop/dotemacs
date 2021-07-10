@@ -119,3 +119,5 @@
   :recipe (:host github :repo "dalanicolai/toc-mode"))
 
 (package! calibredb)
+
+(package! auto-yasnippet)

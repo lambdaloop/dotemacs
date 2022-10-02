@@ -49,8 +49,23 @@
 ;; (package! org-roam
 ;;   :recipe (:host github :repo "jethrokuan/org-roam" :branch "develop"))
 
+;; (package! org-roam
+;;   :recipe (:host github :repo "org-roam/org-roam" :branch "master"))
+
+;; (unpin! org-roam)
+;; (package! org-roam-ui)
+
+(package! org-roam
+  :recipe (:host github :repo "org-roam/org-roam"
+           :files (:defaults "extensions/*")))
+
+(package! org-roam-ui
+  :recipe (:host github :repo "org-roam/org-roam-ui"))
+
 (package! org-roam-bibtex
-  :recipe (:host github :repo "zaeph/org-roam-bibtex"))
+  :recipe (:host github :repo "org-roam/org-roam-bibtex"))
+
+(unpin! bibtex-completion helm-bibtex ivy-bibtex)
 
 (package! ivy-prescient)
 (package! company-prescient)
@@ -104,8 +119,10 @@
 ;; (package! avk-emacs-themes)
 ;; (package! dracula-theme)
 ;; (package! material-theme)
-;; (package! moe-theme)
+(package! moe-theme)
 (package! gruvbox-theme)
+(package! poet-theme)
+(package! color-theme-sanityinc-tomorrow)
 
 
 (package! org-roam-server)
@@ -121,3 +138,13 @@
 (package! calibredb)
 
 (package! auto-yasnippet)
+
+(package! gitconfig-mode
+	  :recipe (:host github :repo "magit/git-modes"
+			 :files ("gitconfig-mode.el")))
+(package! gitignore-mode
+	  :recipe (:host github :repo "magit/git-modes"
+			 :files ("gitignore-mode.el")))
+
+(package! ef-themes
+  :recipe (:host nil :repo "https://git.sr.ht/~protesilaos/ef-themes"))

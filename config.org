@@ -5,7 +5,7 @@
 Some functionality uses this to identify you, e.g. GPG configuration, email
 clients, file templates and snippets.
 #+begin_src emacs-lisp
-(setq user-full-name "Pierre Karashchuk"
+(setq user-full-name "Lili Karashchuk"
       user-mail-address "krchtchk@gmail.com")
 #+end_src
 
@@ -46,9 +46,9 @@ font string. You generally only need these two:
 #+begin_src emacs-lisp
 (cond
  ((string-equal system-name "callisto") ; desktop
-  (setq doom-font "Iosevka-11"))
+  (setq doom-font "Iosevka-10"))
  (t
-  (setq doom-font "Iosevka-10")))
+  (setq doom-font "Iosevka-11")))
 #+end_src
 
 ** Fallbacks
@@ -107,7 +107,7 @@ available. You can either set `doom-theme' or manually load a theme with the
 `load-theme' function. This is the default.
 
 #+begin_src emacs-lisp
-(setq doom-theme 'doom-dracula)
+(setq doom-theme 'doom-oceanic-next)
 ;; (setq doom-theme 'doom-palenight)
 ;; (setq doom-theme 'doom-one-light)
 
@@ -121,11 +121,17 @@ available. You can either set `doom-theme' or manually load a theme with the
 ;; )
 #+end_src
 
+#+RESULTS:
+
 ** Custom faces
 #+BEGIN_SRC emacs-lisp
 (custom-set-faces
- '(vterm-color-black ((t (:background "darkgray" :foreground "black")))))
-
+ '(vterm-color-black ((t (:background "darkgray" :foreground "black"))))
+ '(org-scheduled-today ((t (:foreground "#eee"))))
+ '(org-scheduled ((t (:foreground "#eee"))))
+ '(org-agenda-dimmed-todo-face ((t (:foreground "#ccc"))))
+ ;; '(org-done ((t (:strike-through nil))))
+ )
 #+END_SRC
 
 #+RESULTS:
@@ -226,7 +232,7 @@ I want to have movement using Ctrl+something
  "M-g" (lambda () (interactive) (execute-kbd-macro (kbd "M-}")))
  "M-[" (lambda () (interactive) (execute-kbd-macro (kbd "M-{")))
  "M-]" (lambda () (interactive) (execute-kbd-macro (kbd "M-}")))
- "C-z" 'repeat
+ "s-z" 'repeat
  "C-c m" 'counsel-describe-face
  "C-c q" 'switch-theme
  "M-;" 'comment-line
@@ -249,15 +255,22 @@ I want to have movement using Ctrl+something
 ** org agenda keys
 
 #+BEGIN_SRC emacs-lisp
+(defun switch-to-agenda ()
+  (interactive)
+  (ivy-read "Agenda file: " org-agenda-files
+            :action 'find-file)
+  )
+
 (map!
  (:prefix-map ("s-a" . "agenda")
   "a" 'org-agenda-list
   "b" 'beeminder-list-goals
+  "c" 'org-capture
   "t" 'org-todo-list
   "n" 'org-agenda
   "v" 'org-ql-view
-  "g" 'counsel-org-agenda-headlines
-))
+  "g" 'switch-to-agenda
+  ))
 #+END_SRC
 
 #+RESULTS:
@@ -356,11 +369,13 @@ I want to have movement using Ctrl+something
 ** org appearance
 #+begin_src emacs-lisp :tangle yes
 (after! org
-  (setq org-startup-indented nil
-        org-hide-leading-stars nil
+  (setq org-startup-indented t
+        org-hide-leading-stars t
         org-adapt-indentation nil)
   )
 #+end_src
+
+#+RESULTS:
 
 
 ** org capture
@@ -392,10 +407,12 @@ I want to have movement using Ctrl+something
   (setq org-priority-lowest 9)
   (setq org-priority-default 3)
 
+  (setq org-deadline-warning-days 7)
+
   (setq org-agenda-skip-deadline-prewarning-if-scheduled t)
 
   (setq org-todo-keywords
-        '((sequence "TODO(t)" "PROJ(p)" "STRT(s)" "WAIT(w)" "FUTR(f)"
+        '((sequence "TODO(t)" "STRT(s)" "PROJ(p)" "SCHD(c)" "WAIT(w)" "FUTR(f)"
                     "|"
                     "DONE(d)" "KILL(k)")))
 
@@ -407,11 +424,12 @@ I want to have movement using Ctrl+something
 
   (setq org-todo-keyword-faces
         '(("STRT" . +org-todo-active)
+          ("SCHD" . +org-todo-active)
           ("WAIT" . +org-todo-onhold)
           ("FUTR" . +org-todo-future)
           ("PROJ" . +org-todo-project)))
 
-  (setq org-agenda-prefix-format " %i %-12c%?-12t% s")
+  (setq org-agenda-prefix-format " %i %?-12t% s")
   (setq org-agenda-overriding-header "⚡ SCHEDULE:\n")
 
   )
@@ -419,7 +437,7 @@ I want to have movement using Ctrl+something
 (setq org-agenda-custom-commands
       '(("o" "My Agenda"
          ((todo "TODO" (
-                      (org-agenda-overriding-header "\n⚡ Do Today:\n⎺⎺⎺⎺⎺⎺⎺⎺⎺")
+                      (org-agenda-overriding-header "\nDo Today:\n⎺⎺⎺⎺⎺⎺⎺⎺⎺")
                       (org-agenda-remove-tags t)
                       (org-agenda-prefix-format " %-2i %-15b")
                       (org-agenda-todo-keyword-format "")
@@ -427,7 +445,7 @@ I want to have movement using Ctrl+something
           (agenda "" (
                       (org-agenda-start-day "+0d")
                       (org-agenda-span 5)
-                      (org-agenda-overriding-header "⚡ Schedule:\n⎺⎺⎺⎺⎺⎺⎺⎺⎺")
+                      (org-agenda-overriding-header "Schedule:⎺⎺⎺⎺⎺⎺⎺⎺⎺")
                       (org-agenda-repeating-timestamp-show-all nil)
                       (org-agenda-remove-tags t)
                       (org-agenda-prefix-format   "  %-3i  %-15b %t%s")
@@ -443,7 +461,7 @@ I want to have movement using Ctrl+something
 #+END_SRC
 
 #+RESULTS:
-: ((STRT . +org-todo-active) (WAIT . +org-todo-onhold) (FUTR . +org-todo-onhold) (PROJ . +org-todo-project))
+| o | My Agenda | ((todo TODO ((org-agenda-overriding-header |
 ** org-super-agenda
 
 #+BEGIN_SRC emacs-lisp
@@ -472,33 +490,39 @@ I want to have movement using Ctrl+something
 (after! org-ql
   (setq org-ql-views
         '(
-          ("Scheduling: category" :buffers-files org-agenda-files
+          ("deadline" :buffers-files org-agenda-files
+           :query
+           (and (todo) (deadline))
+           :sort deadline
+           :super-groups ((:auto-category))
+           :title "deadline")
+
+          ("category" :buffers-files org-agenda-files
            :query
            (and (todo) (not (todo "WAIT" "HOLD"))
                 (not (scheduled :from today))
                 (not (children (todo))))
-           :sort (priority) :narrow nil :super-groups
-           ((:auto-category))
-           :title "Scheduling: category")
+           :sort (priority) :narrow nil
+           :super-groups ((:auto-category))
+           :title "category")
 
-          ("Scheduling: priority" :buffers-files org-agenda-files
+          ("priority" :buffers-files org-agenda-files
            :query
            (and (todo) (not (todo "WAIT" "HOLD"))
                 (not (scheduled :from today))
                 (not (children (todo))))
            :sort nil :narrow nil :super-groups
            ((:auto-priority))
-           :title "Scheduling: priority")
-
-
+           :title "priority")
           ))
   )
 
 #+END_SRC
 
 #+RESULTS:
-| Scheduling: category | :buffers-files | org-agenda-files | :query | (and (todo) (not (todo WAIT HOLD)) (not (scheduled :from today)) (not (children (todo)))) | :sort | (priority) | :narrow | nil | :super-groups | ((:auto-category)) | :title | Scheduling: category |
-| Scheduling: priority | :buffers-files | org-agenda-files | :query | (and (todo) (not (todo WAIT HOLD)) (not (scheduled :from today)) (not (children (todo)))) | :sort | nil        | :narrow | nil | :super-groups | ((:auto-priority)) | :title | Scheduling: priority |
+| deadline | :buffers-files | org-agenda-files | :query | (and (todo) (deadline))                                                                   | :sort | deadline   | :super-groups | ((:auto-category)) | :title        | deadline           |        |          |
+| category | :buffers-files | org-agenda-files | :query | (and (todo) (not (todo WAIT HOLD)) (not (scheduled :from today)) (not (children (todo)))) | :sort | (priority) | :narrow       | nil                | :super-groups | ((:auto-category)) | :title | category |
+| priority | :buffers-files | org-agenda-files | :query | (and (todo) (not (todo WAIT HOLD)) (not (scheduled :from today)) (not (children (todo)))) | :sort | nil        | :narrow       | nil                | :super-groups | ((:auto-priority)) | :title | priority |
 
 ** keybindings
 #+begin_src emacs-lisp :tangle yes
@@ -634,88 +658,123 @@ window.MathJax = {
 #+end_src
 
 #+RESULTS:
+** archiving
+
+Useful function to archive all the DONE tasks in a file
+https://stackoverflow.com/questions/6997387/how-to-archive-all-the-done-tasks-using-a-single-command
+#+begin_src emacs-lisp :tangle yes
+(defun org-archive-done-tasks ()
+  (interactive)
+  (org-map-entries
+   (lambda ()
+     (org-archive-subtree)
+     (setq org-map-continue-from (org-element-property :begin (org-element-at-point))))
+   "/DONE" 'file)
+  (org-map-entries
+   (lambda ()
+     (org-archive-subtree)
+     (setq org-map-continue-from (org-element-property :begin (org-element-at-point))))
+   "/KILL" 'file))
+#+end_src
+
+#+RESULTS:
+: org-archive-done-tasks
 
 * org-roam
 ** roam
 #+begin_src emacs-lisp :tangle yes
 (use-package! org-roam
-  :defer t
-  ;; :commands (org-roam-insert org-roam-find-file org-roam)
   :init
-  (setq org-roam-directory "~/notes/org/roam")
+  (setq org-roam-v2-ack t)
+  (setq org-roam-directory (file-truename "~/notes/org/roam"))
   (map! :leader
         :prefix "n"
-        :desc "Org-Roam-Insert" "i" #'org-roam-insert
-        :desc "Org-Roam-Find"   "f" #'org-roam-find-file
-        :desc "Org-Roam-Buffer" "r" #'org-roam
-        :desc "Org-Roam-Today"  "t" #'org-roam-dailies-find-today
-        :desc "Org-Roam-Yesterday"  "y" #'org-roam-dailies-find-yesterday
-        :desc "Org-Roam-Tomorrow"  "m" #'org-roam-dailies-find-tomorrow
-        :desc "Org-Roam-Date"  "g" #'org-roam-dailies-find-date
+        :desc "Org-Roam-Insert" "i" #'org-roam-node-insert
+        :desc "Org-Roam-Find"   "f" #'org-roam-node-find
+        :desc "Org-Roam-Buffer" "r" 'my/org-roam-buffer
+        :desc "Org-Roam-Today"  "t" #'org-roam-dailies-goto-today
+        :desc "Org-Roam-Yesterday"  "y" #'org-roam-dailies-goto-yesterday
+        :desc "Org-Roam-Tomorrow"  "m" #'org-roam-dailies-goto-tomorrow
+        :desc "Org-Roam-Date"  "g" #'org-roam-dailies-goto-date
+        )
+  (map! :map org-mode-map
+        "C-c C-r" 'my/org-roam-buffer
+        "C-s-<left>" #'org-roam-dailies-goto-previous-note
+        "C-s-<right>" #'org-roam-dailies-goto-next-note
         )
   :config
-  (setq org-roam-capture-templates
-        '(("d" "default" plain (function org-roam--capture-get-point)
-           "%?"
-           :file-name "%<%Y-%m-%d>-${slug}"
-           :head "#+TITLE: ${title}\n"
-           :unnarrowed t))
-        )
-  (setq +org-roam-open-buffer-on-find-file nil)
+  (defun my/org-roam-buffer ()
+    (interactive)
+    (org-roam-buffer-display-dedicated (org-roam-node-at-point)))
+  ;; (setq org-roam-capture-templates
+  ;;       '(("d" "default" plain (function org-roam--capture-get-point)
+  ;;          "%?"
+  ;;          :file-name "%<%Y-%m-%d>-${slug}"
+  ;;          :head "#+TITLE: ${title}\n"
+  ;;          :unnarrowed t))
+  ;;       )
 
-  ;; (setq org-roam-graph-node-extra-config '(("shape"      . "\"underline\"")
-  ;;                                          ("style"      . "\"rounded,filled\"")
-  ;;                                          ("fillcolor"  . "\"#EEEEEE\"")
-  ;;                                          ("color"      . "\"#C9C9C9\"")
-  ;;                                          ("fontcolor"  . "\"#111111\"")
-  ;;                                          ("fontname"   . "\"Overpass\""))
-  ;;       org-roam-graph-edge-extra-config '(("color"      . "\"#333333\""))
-  ;;       org-roam-graph-extra-config
-  ;;       `(("stylesheet" . ,(concat "\"" doom-private-dir
-  ;;                                  "misc/roam-graphviz-style.css\""))))
+  (org-roam-db-autosync-mode +1)
+
+  (setq org-roam-capture-templates
+        '(("d" "default" plain "%?" :target
+           (file+head "%<%Y-%m-%d>-${slug}.org" "#+title: ${title}\n")
+           :unnarrowed t)
+          ("r" "bibliography reference" plain
+           ":PROPERTIES:
+:DATE: %^{date}
+:AUTHOR: %^{author}
+:JOURNAL: %^{journaltitle}
+:END:
+${ref}"
+           :if-new
+           (file+head "${citekey}.org" "#+title: ${title}\n")
+           :unnarrowed t)))
+
+  (define-key org-roam-mode-map [mouse-1] #'org-roam-visit-thing)
+  (add-to-list 'display-buffer-alist
+               '("\\*org-roam\\*"
+                 (display-buffer-in-direction)
+                 (direction . right)
+                 (window-width . 0.33)
+                 (window-height . fit-window-to-buffer)))
+  (advice-add 'org-roam-db-update-file :around
+              (defun +org-roam-db-update-file (fn &rest args)
+                (emacsql-with-transaction (org-roam-db)
+                  (apply fn args))))
 
   )
-;;(org-roam-mode +1)
 
 #+end_src
 
 #+RESULTS:
+: t
 ** bibtex
 #+begin_src emacs-lisp :tangle yes
   (use-package! org-roam-bibtex
-    :defer t
-    :hook (org-roam-mode . org-roam-bibtex-mode)
+    :after org-roam
     :config
-    (setq org-roam-bibtex-preformat-keywords '("=key=" "title" "author" "date" "journaltitle"))
-    (setq org-roam-bibtex-templates
-          '(("r" "ref" plain (function org-roam-capture--get-point) ""
-             :file-name "${slug}"
-             :head "#+TITLE: ${title}
-  #+ROAM_KEY: ${ref}
-  #+ROAM_ALIAS: ${=key=}
-  :PROPERTIES:
-  :DATE: ${date}
-  :AUTHOR: ${author}
-  :JOURNAL: ${journaltitle}
-  :END:
-  ${ref}
-  "
-             :unnarrowed t))
-          )
+    (require 'org-ref)
+    (setq orb-preformat-keywords '("citekey" "title" "author" "date" "journaltitle"))
+    (org-roam-bibtex-mode +1)
     )
 #+end_src
+
+#+RESULTS:
+: t
+
 ** deft
-#+BEGIN_SRC emacs-lisp
-  (use-package! deft
-    :defer
-    :after org
-    :bind
-    ("C-c n d" . deft)
-    :custom
-    (deft-recursive t)
-    (deft-use-filter-string-for-filename t)
-    (deft-default-extension "org")
-    (deft-directory org-roam-directory))
+#+BEGIN_SRC emacs-lisp :tangle no
+  ;; (use-package! deft
+  ;;   :defer
+  ;;   :after org
+  ;;   :bind
+  ;;   ("C-c n d" . deft)
+  ;;   :custom
+  ;;   (deft-recursive t)
+  ;;   (deft-use-filter-string-for-filename t)
+  ;;   (deft-default-extension "org")
+  ;;   (deft-directory org-roam-directory))
 #+END_SRC
 
 #+RESULTS:
@@ -947,7 +1006,7 @@ Replaced with olivetti
 * python
 ** ipython shell
 #+begin_src emacs-lisp :tangle yes
-(setq python-shell-interpreter "ipython3"
+(setq python-shell-interpreter "/home/lili/mambaforge/bin/ipython"
       python-shell-interpreter-args "--simple-prompt -i")
 
 (map! :map python-mode-map
@@ -965,7 +1024,7 @@ Replaced with olivetti
     (let* ((conda-env
             (read-string "conda env: "))
            (python-shell-interpreter
-            (format "/home/pierre/miniconda3/envs/%s/bin/ipython" conda-env))
+            (format "/home/lili/miniconda3/envs/%s/bin/ipython" conda-env))
            )
       (run-python)
       ;; (run-python (format "~/scripts/ipython-conda.sh") t t)
@@ -1031,6 +1090,12 @@ Replaced with olivetti
 | jupyter | pypy | Python |
 ** emacs-jupyter
 #+begin_src emacs-lisp :tangle yes
+(defun my-org-execute-and-next-block ()
+  (interactive)
+  (org-babel-execute-src-block)
+  (org-next-block 1)
+  )
+
 (after! org
   (require 'ob-jupyter)
   (require 'ob-python)
@@ -1042,7 +1107,10 @@ Replaced with olivetti
      (python . t)
      (jupyter . t)))
   (map! :map org-mode-map
-        "M-." 'jupyter-inspect-at-point)
+        "M-." 'jupyter-inspect-at-point
+        "C-z" 'jupyter-org-interrupt-kernel
+        "C-'" 'my-org-execute-and-next-block
+        )
 
   (setq org-babel-default-header-args:jupyter-python '((:async . "yes")
                                                       (:session . "/jpy:localhost#8888:py")
@@ -1051,6 +1119,7 @@ Replaced with olivetti
 #+end_src
 
 #+RESULTS:
+: ((:async . yes) (:session . /jpy:localhost#8888:py) (:kernel . python3))
 
 * company
 Idle company completion drives me crazy somehow. Instead of that, we use a keybinding to trigger it.
@@ -1182,3 +1251,13 @@ I adjust all the faces to work with the theme, as the default colors don't work 
 
 #+RESULTS:
 : aya-expand
+* lsp
+#+begin_src emacs-lisp :tangle yes
+(after! lsp-ui
+  (setq lsp-ui-doc-enable nil
+        lsp-ui-sideline-enable nil
+        lsp-signature-render-documentation nil
+        lsp-signature-auto-activate nil))
+#+end_src
+
+#+RESULTS:

@@ -3,15 +3,30 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(ansi-color-faces-vector
+   [default default default italic underline success warning error])
  '(auth-source-save-behavior nil)
  '(org-agenda-files
-   '("/jellyfish/notes/org/todo/ideas.org" "~/notes/org/todo/anipose.org" "~/notes/org/todo/writing.org" "~/notes/org/todo/clubs.org" "~/notes/org/todo/learning.org" "~/notes/org/todo/setup.org" "~/notes/org/todo/fly_kinematics.org" "~/notes/org/todo/scheduling.org" "~/notes/org/todo/personal.org" "~/notes/org/todo/evodev.org" "~/notes/org/todo/inbox.org"))
+   '("/jellyfish/notes/org/todo/projects.org" "/home/pierre/notes/org/todo/personal.org" "/jellyfish/notes/org/todo/ideas.org" "/home/pierre/notes/org/todo/inbox.org"))
+ '(org-roam-db-autosync-mode t)
  '(safe-local-variable-values '((org-image-actual-width . 300))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(beeminder-blue ((t (:inherit font-lock-constant-face))))
+ '(beeminder-dirty ((t (:inherit font-lock-comment-face))))
+ '(beeminder-error ((t (:inherit error))))
+ '(beeminder-green ((t (:inherit font-lock-function-name-face))))
+ '(beeminder-red ((t (:inherit font-lock-keyword-face))))
+ '(beeminder-warning ((t (:inherit warning))))
+ '(beeminder-yellow ((t (:inherit font-lock-builtin-face))))
+ '(org-agenda-dimmed-todo-face ((t (:foreground "#ccc"))))
+ '(org-scheduled ((t (:foreground "#eee"))))
+ '(org-scheduled-today ((t (:foreground "#eee"))))
+ '(subtle-highlight ((t (:inherit bold))))
  '(vterm-color-black ((t (:background "darkgray" :foreground "black")))))
 (put 'narrow-to-region 'disabled nil)
 (put 'narrow-to-page 'disabled nil)
+(put 'projectile-ripgrep 'disabled nil)

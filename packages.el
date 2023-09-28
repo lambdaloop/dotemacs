@@ -103,7 +103,12 @@
 ;; (package! ob-ipython
 ;;   :recipe (:host github :repo "moritzschaefer/ob-ipython"))
 
-(package! jupyter)
+(package! quarto-mode)
+
+(package! jupyter
+  :recipe (:host github :repo "emacs-jupyter/jupyter"
+           :branch "next"))
+
 (package! ox-ipynb
   :recipe (:host github :repo "jkitchin/ox-ipynb"))
 
@@ -148,3 +153,9 @@
 
 (package! ef-themes
   :recipe (:host nil :repo "https://git.sr.ht/~protesilaos/ef-themes"))
+
+(package! chat
+  :recipe (:host github :repo "iwahbe/chat.el"))
+
+(package! spacious-padding
+  :recipe (:host nil :repo "https://git.sr.ht/~protesilaos/spacious-padding"))

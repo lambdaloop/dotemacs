@@ -48,7 +48,7 @@ font string. You generally only need these two:
  ((string-equal system-name "callisto") ; desktop
   (setq doom-font "Iosevka-10"))
  (t
-  (setq doom-font "Iosevka-11")))
+  (setq doom-font "Iosevka-12")))
 #+end_src
 
 ** Fallbacks
@@ -100,6 +100,12 @@ https://idiocy.org/emacs-fonts-and-fontsets.html
 
 #+RESULTS:
 
+** coding system
+
+#+BEGIN_SRC emacs-lisp
+(prefer-coding-system 'utf-8)
+#+END_SRC
+
 * Theme
 ** Appearance
 There are two ways to load a theme. Both assume the theme is installed and
@@ -107,9 +113,10 @@ available. You can either set `doom-theme' or manually load a theme with the
 `load-theme' function. This is the default.
 
 #+begin_src emacs-lisp
-(setq doom-theme 'doom-oceanic-next)
+;; (setq doom-theme 'doom-oceanic-next)
 ;; (setq doom-theme 'doom-palenight)
 ;; (setq doom-theme 'doom-one-light)
+(setq doom-theme 'ef-autumn)
 
 ;; This determines the style of line numbers in effect. If set to `nil', line
 ;; numbers are disabled. For relative line numbers, set this to `relative'.
@@ -131,7 +138,14 @@ available. You can either set `doom-theme' or manually load a theme with the
  '(org-scheduled ((t (:foreground "#eee"))))
  '(org-agenda-dimmed-todo-face ((t (:foreground "#ccc"))))
  ;; '(org-done ((t (:strike-through nil))))
+
+ '(term-color-green ((t (:foreground "#36a036" :background "#FFFFFF"))))
+
+ '(term-default-fg-color ((t (:inherit term-color-white))))
+ '(term-default-bg-color ((t (:inherit term-color-black))))
+
  )
+
 #+END_SRC
 
 #+RESULTS:
@@ -165,6 +179,14 @@ available. You can either set `doom-theme' or manually load a theme with the
 (setq +doom-dashboard-banner-file (get-random-file banner-dir))
 
 
+#+end_src
+** spacious-padding
+#+begin_src emacs-lisp :tangle yes
+(use-package! spacious-padding
+  :config
+  :defer
+  (spacious-padding-mode +1)
+)
 #+end_src
 
 * Keybindings
@@ -263,6 +285,7 @@ I want to have movement using Ctrl+something
 
 (map!
  (:prefix-map ("s-a" . "agenda")
+  "s-a" 'org-agenda-list
   "a" 'org-agenda-list
   "b" 'beeminder-list-goals
   "c" 'org-capture
@@ -410,6 +433,7 @@ I want to have movement using Ctrl+something
   (setq org-deadline-warning-days 7)
 
   (setq org-agenda-skip-deadline-prewarning-if-scheduled t)
+  (setq org-scheduled-past-days 14)
 
   (setq org-todo-keywords
         '((sequence "TODO(t)" "STRT(s)" "PROJ(p)" "SCHD(c)" "WAIT(w)" "FUTR(f)"
@@ -531,6 +555,7 @@ I want to have movement using Ctrl+something
         "C-c C-n" 'org-next-block
         "C-c C-p" 'org-previous-block
         "C-c a" 'org-latex-export-to-pdf
+        "C-c z" 'org-archive-subtree
         ))
 #+end_src
 
@@ -698,7 +723,7 @@ https://stackoverflow.com/questions/6997387/how-to-archive-all-the-done-tasks-us
         :desc "Org-Roam-Date"  "g" #'org-roam-dailies-goto-date
         )
   (map! :map org-mode-map
-        "C-c C-r" 'my/org-roam-buffer
+        "C-c C-r" 'org-roam-buffer-toggle
         "C-s-<left>" #'org-roam-dailies-goto-previous-note
         "C-s-<right>" #'org-roam-dailies-goto-next-note
         )
@@ -714,6 +739,7 @@ https://stackoverflow.com/questions/6997387/how-to-archive-all-the-done-tasks-us
   ;;          :unnarrowed t))
   ;;       )
 
+  (add-hook 'org-roam-mode-hook 'visual-line-mode)
   (org-roam-db-autosync-mode +1)
 
   (setq org-roam-capture-templates
@@ -728,7 +754,7 @@ https://stackoverflow.com/questions/6997387/how-to-archive-all-the-done-tasks-us
 :END:
 ${ref}"
            :if-new
-           (file+head "${citekey}.org" "#+title: ${title}\n")
+           (file+head "${citekey}.org" "#+title: ${title} - ${citekey}\n")
            :unnarrowed t)))
 
   (define-key org-roam-mode-map [mouse-1] #'org-roam-visit-thing)
@@ -1092,7 +1118,9 @@ Replaced with olivetti
 #+begin_src emacs-lisp :tangle yes
 (defun my-org-execute-and-next-block ()
   (interactive)
-  (org-babel-execute-src-block)
+  (condition-case nil
+      (org-babel-execute-src-block)
+    (error nil))
   (org-next-block 1)
   )
 
@@ -1154,7 +1182,7 @@ Idle company completion drives me crazy somehow. Instead of that, we use a keybi
         :desc "Insert emoji" "i" 'emojify-insert-emoji
         :desc "Insert emoji unicode" "u" 'emojify-insert-emoji-unicode
         )
-  (setq emojify-emoji-styles '(unicode github))
+  (setq emojify-emoji-styles '(unicode))
   )
 #+END_SRC
 * nyan-mode
@@ -1240,6 +1268,19 @@ I adjust all the faces to work with the theme, as the default colors don't work 
 
 #+RESULTS:
 : t
+* artificial intelligence
+** chat.el
+#+BEGIN_SRC emacs-lisp
+(use-package chat
+  :config
+  (setq chat-api-key secret-chat-api-key)
+  (setq chat-model "gpt-3.5-turbo")
+  ;; (setq chat-model "gpt-4")
+  (setq chat-max-tokens 700)
+  (add-hook 'chat-mode-hook #'olivetti-mode)
+        )
+
+#+END_SRC
 * yasnippet
 ** auto-yasnippet
 #+begin_src emacs-lisp :tangle yes
@@ -1261,3 +1302,10 @@ I adjust all the faces to work with the theme, as the default colors don't work 
 #+end_src
 
 #+RESULTS:
+* quarto-mode
+#+BEGIN_SRC emacs-lisp :tangle yes
+(require 'quarto-mode)
+#+END_SRC
+
+#+RESULTS:
+: quarto-mode

@@ -712,6 +712,8 @@ https://stackoverflow.com/questions/6997387/how-to-archive-all-the-done-tasks-us
   :init
   (setq org-roam-v2-ack t)
   (setq org-roam-directory (file-truename "~/notes/org/roam"))
+  (setq org-roam-file-exclude-regexp
+        (concat (expand-file-name org-roam-directory) "/.stversions/"))
   (map! :leader
         :prefix "n"
         :desc "Org-Roam-Insert" "i" #'org-roam-node-insert

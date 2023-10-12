@@ -48,7 +48,7 @@ font string. You generally only need these two:
  ((string-equal system-name "callisto") ; desktop
   (setq doom-font "Iosevka-10"))
  (t
-  (setq doom-font "Iosevka-12")))
+  (setq doom-font "Iosevka SS04 Medium-13")))
 #+end_src
 
 ** Fallbacks
@@ -712,6 +712,8 @@ https://stackoverflow.com/questions/6997387/how-to-archive-all-the-done-tasks-us
   :init
   (setq org-roam-v2-ack t)
   (setq org-roam-directory (file-truename "~/notes/org/roam"))
+  (setq org-roam-file-exclude-regexp
+        (concat (expand-file-name org-roam-directory) "/.stversions/"))
   (map! :leader
         :prefix "n"
         :desc "Org-Roam-Insert" "i" #'org-roam-node-insert
@@ -1242,7 +1244,7 @@ this fixes an issue with json-mode, which expects this function for some reason
 From https://github.com/mbork/beeminder.el
 I adjust all the faces to work with the theme, as the default colors don't work well on a dark background.
 
-#+begin_src emacs-lisp :tangle yes
+#+begin_src emacs-lisp :tangle no
 (use-package beeminder
   :config
   (setq beeminder-when-the-day-ends (* 3600 3) ; 3am

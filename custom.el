@@ -7,7 +7,7 @@
    [default default default italic underline success warning error])
  '(auth-source-save-behavior nil)
  '(org-agenda-files
-   '("/jellyfish/notes/org/todo/projects.org" "/home/pierre/notes/org/todo/personal.org" "/jellyfish/notes/org/todo/ideas.org" "/home/pierre/notes/org/todo/inbox.org"))
+   '("/home/lili/notes/org/todo/projects.org" "/home/lili/notes/org/todo/personal.org" "/home/lili/notes/org/todo/ideas.org" "/home/lili/notes/org/todo/inbox.org"))
  '(org-roam-db-autosync-mode t)
  '(safe-local-variable-values '((org-image-actual-width . 300))))
 (custom-set-faces

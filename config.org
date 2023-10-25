@@ -30,6 +30,7 @@ Load the secrets. We ignore errors here so that if GPG config is missing, rest o
 
 ;; celndar start
 (setq calendar-week-start-day 1)
+
 #+end_src
 
 * Fonts
@@ -349,6 +350,15 @@ I want to have movement using Ctrl+something
 
 
 (map! "C-c d" 'duplicate-line)
+#+end_src
+* ws-butler
+I don't like ws-butler moving my point when i save
+#+begin_src emacs-lisp
+(after! ws-butler
+  (progn
+    (ws-butler-global-mode -1)
+    (setq ws-butler-keep-whitespace-before-point t)
+    ))
 #+end_src
 
 * ace-window
@@ -1052,7 +1062,7 @@ Replaced with olivetti
     (let* ((conda-env
             (read-string "conda env: "))
            (python-shell-interpreter
-            (format "/home/lili/miniconda3/envs/%s/bin/ipython" conda-env))
+            (format "/home/lili/mambaforge/envs/%s/bin/ipython" conda-env))
            )
       (run-python)
       ;; (run-python (format "~/scripts/ipython-conda.sh") t t)

@@ -159,3 +159,6 @@
 
 (package! spacious-padding
   :recipe (:host nil :repo "https://git.sr.ht/~protesilaos/spacious-padding"))
+
+(package! gptel
+  :recipe (:host github :repo "karthink/gptel"))

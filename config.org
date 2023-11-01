@@ -213,7 +213,7 @@ available. You can either set `doom-theme' or manually load a theme with the
  ("s-." . (lambda () (interactive) (split-window-below) (other-window 1)))
  ;; ("s-z" . previous-buffer)
  ;; ("s-Z" . next-buffer)
- ("s-d" . avy-goto-char-timer)
+ ("s-d" . dumb-jump-go)
  ("C-&" . delete-other-windows)
 
  ;; eshell

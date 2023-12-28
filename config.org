@@ -49,7 +49,7 @@ font string. You generally only need these two:
  ((string-equal system-name "callisto") ; desktop
   (setq doom-font "Iosevka-10"))
  (t
-  (setq doom-font "Iosevka SS04 Medium-13")))
+  (setq doom-font "Iosevka-12")))
 #+end_src
 
 ** Fallbacks
@@ -783,10 +783,10 @@ ${ref}"
 
   )
 
+(setq warning-suppress-types (append warning-suppress-types '((org-element-cache))))
 #+end_src
 
-#+RESULTS:
-: t
+
 ** bibtex
 #+begin_src emacs-lisp :tangle yes
   (use-package! org-roam-bibtex

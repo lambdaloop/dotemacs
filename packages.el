@@ -68,7 +68,7 @@
 (unpin! bibtex-completion helm-bibtex ivy-bibtex)
 
 (package! ivy-prescient)
-(package! company-prescient)
+;; (package! company-prescient)
 
 (package! ivy-bibtex)
 (package! org-ref)
@@ -76,10 +76,6 @@
 
 (package! vterm :pin "f41849c")
 (package! vterm-toggle)
-
-(package! switch-window)
-
-(package! deadgrep)
 
 (package! matlab-mode)
 
@@ -89,14 +85,11 @@
 
 (package! emojify)
 
-
 (package! pipenv :disable t)
 
 (package! nyan-mode)
 
 (package! ob-async)
-
-(package! atomic-chrome)
 
 (package! picpocket)
 
@@ -129,12 +122,13 @@
 (package! poet-theme)
 (package! color-theme-sanityinc-tomorrow)
 
+(package! switch-window)
 
 (package! org-roam-server)
 (package! org-super-agenda)
 
-(package! beeminder
-  :recipe (:host github :repo "mbork/beeminder.el"))
+;; (package! beeminder
+;;   :recipe (:host github :repo "mbork/beeminder.el"))
 
 
 (package! toc-mode
@@ -160,5 +154,21 @@
 (package! spacious-padding
   :recipe (:host nil :repo "https://git.sr.ht/~protesilaos/spacious-padding"))
 
-(package! gptel
-  :recipe (:host github :repo "karthink/gptel"))
+;; (package! gptel
+;;   :recipe (:host github :repo "karthink/gptel"))
+
+;; (package! llm :recipe (:host github :repo "ahyatt/llm"))
+
+(package! claude-shell :recipe (:host github :repo "arminfriedl/claude-shell"))
+
+(package! yuck-mode)
+
+(package! org
+  :recipe (:host github :repo "emacs-straight/org-mode")
+  )
+
+(unpin! org)
+
+
+
+(package! dockerfile-mode)

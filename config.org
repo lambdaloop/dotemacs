@@ -31,6 +31,8 @@ Load the secrets. We ignore errors here so that if GPG config is missing, rest o
 ;; celndar start
 (setq calendar-week-start-day 1)
 
+;; don't pop up that annoying window
+(setq byte-compile-warnings '(not obsolete))
 #+end_src
 
 * Fonts
@@ -45,11 +47,7 @@ are the three important ones:
 They all accept either a font-spec, font string ("Input Mono-12"), or xlfd
 font string. You generally only need these two:
 #+begin_src emacs-lisp
-(cond
- ((string-equal system-name "callisto") ; desktop
-  (setq doom-font "Iosevka-10"))
- (t
-  (setq doom-font "Iosevka-12")))
+(setq doom-font "Iosevka-12")
 #+end_src
 
 ** Fallbacks
@@ -114,10 +112,12 @@ available. You can either set `doom-theme' or manually load a theme with the
 `load-theme' function. This is the default.
 
 #+begin_src emacs-lisp
-;; (setq doom-theme 'doom-oceanic-next)
+(setq doom-theme 'doom-oceanic-next)
 ;; (setq doom-theme 'doom-palenight)
 ;; (setq doom-theme 'doom-one-light)
-(setq doom-theme 'ef-autumn)
+;; (setq doom-theme 'ef-autumn)
+;; (setq doom-theme 'ef-spring)
+;; (setq doom-theme 'ef-duo-dark)
 
 ;; This determines the style of line numbers in effect. If set to `nil', line
 ;; numbers are disabled. For relative line numbers, set this to `relative'.
@@ -166,6 +166,7 @@ available. You can either set `doom-theme' or manually load a theme with the
 
 #+RESULTS:
 | markdown-mode | gfm-mode | org-mode | latex-mode | tex-mode | text-mode |
+
 ** Dashboard
 #+begin_src emacs-lisp :tangle yes
 (defun get-random-file (dir)
@@ -180,14 +181,6 @@ available. You can either set `doom-theme' or manually load a theme with the
 (setq +doom-dashboard-banner-file (get-random-file banner-dir))
 
 
-#+end_src
-** spacious-padding
-#+begin_src emacs-lisp :tangle yes
-(use-package! spacious-padding
-  :config
-  :defer
-  (spacious-padding-mode +1)
-)
 #+end_src
 
 * Keybindings
@@ -226,7 +219,7 @@ available. You can either set `doom-theme' or manually load a theme with the
  ;; ("s-_" . (lambda () (interactive) (split-window-horizontally) (other-window 1) (shell-switcher-switch-buffer)))
 
  ;; useful navigation
- ("s-f" . counsel-find-file)
+ ("s-f" . find-file)
  ("C-x \\" . align-regexp)
  ;; ("M-s-b" . beeminder-list-goals)
  ;; ("<XF86LaunchA>" . (lambda (&optional arg) (interactive "P") (org-agenda arg "a")))
@@ -256,7 +249,7 @@ I want to have movement using Ctrl+something
  "M-[" (lambda () (interactive) (execute-kbd-macro (kbd "M-{")))
  "M-]" (lambda () (interactive) (execute-kbd-macro (kbd "M-}")))
  "s-z" 'repeat
- "C-c m" 'counsel-describe-face
+ "C-c m" 'describe-face
  "C-c q" 'switch-theme
  "M-;" 'comment-line
  )
@@ -345,6 +338,7 @@ I want to have movement using Ctrl+something
       (setq buffer-undo-list (cons (cons eol (point)) buffer-undo-list)))
     ) ; end-of-let
 
+
   ;; put the point in the lowest line and return
   (next-line arg))
 
@@ -410,6 +404,15 @@ I don't like ws-butler moving my point when i save
 
 #+RESULTS:
 
+** tab width
+
+#+begin_src emacs-lisp :tangle yes
+(add-hook 'org-mode-hook
+          (lambda () (setq-local tab-width 8)))
+#+end_src
+
+#+RESULTS:
+| (lambda nil (setq-local tab-width 8)) | er/add-org-mode-expansions | #[0 \301\211\207 [imenu-create-index-function org-imenu-get-tree] 2] | jupyter-org-interaction-mode | org-ref-org-menu | #[0 \300\301\302\303\304$\207 [add-hook change-major-mode-hook org-fold-show-all append local] 5] | #[0 \300\301\302\303\304$\207 [add-hook change-major-mode-hook org-babel-show-result-all append local] 5] | org-babel-result-hide-spec | org-babel-hide-all-hashes | turn-off-smartparens-mode | writegood-mode | flyspell-mode | +literate-enable-recompile-h |
 
 ** org capture
 #+BEGIN_SRC emacs-lisp :tangle yes
@@ -628,7 +631,7 @@ mode to HTML.  Store the result in the clipboard."
 (add-hook 'org-mode-hook #'turn-off-smartparens-mode)
 #+end_src
 ** async execute
-#+begin_src emacs-lisp :tangle yes
+#+begin_src emacs-lisp :tangle no
 (after! org
   (require 'ob-async)
   (setq ob-async-no-async-languages-alist '(
@@ -783,7 +786,7 @@ ${ref}"
 
   )
 
-(setq warning-suppress-types (append warning-suppress-types '((org-element-cache))))
+(setq warning-suppress-types (append warning-suppress-types '((org-element))))
 #+end_src
 
 
@@ -801,22 +804,6 @@ ${ref}"
 #+RESULTS:
 : t
 
-** deft
-#+BEGIN_SRC emacs-lisp :tangle no
-  ;; (use-package! deft
-  ;;   :defer
-  ;;   :after org
-  ;;   :bind
-  ;;   ("C-c n d" . deft)
-  ;;   :custom
-  ;;   (deft-recursive t)
-  ;;   (deft-use-filter-string-for-filename t)
-  ;;   (deft-default-extension "org")
-  ;;   (deft-directory org-roam-directory))
-#+END_SRC
-
-#+RESULTS:
-: deft
 
 * ivy
 ** standard
@@ -843,7 +830,7 @@ ${ref}"
  ;; ("C-s" . counsel-grep)
  "M-x" 'counsel-M-x
  "C-x C-f" 'counsel-find-file
- "C-h v" 'counsel-describe-variable
+ "C-h v" 'describe-variable
  "M-y" 'counsel-yank-pop
  "C-c j" 'counsel-semantic-or-imenu
  "C-c u" 'counsel-semantic-or-imenu
@@ -932,24 +919,7 @@ ${ref}"
 #+RESULTS:
 | tec/set-text-mode-abbrev-table |
 
-* deadgrep
-
-#+begin_src emacs-lisp :tangle yes
-(setq-default deadgrep--search-type 'words)
-#+end_src
 * writing mode
-** visual-fill-column-mode
-Replaced with olivetti
-#+begin_src emacs-lisp :tangle no
-(setq-default visual-fill-column-center-text t)
-(map!
- :leader
- (:prefix-map ("t" . "toggle")
-   "v" 'visual-fill-column-mode))
-#+end_src
-
-#+RESULTS:
-
 ** olivetti
 #+begin_src emacs-lisp
 (after! olivetti
@@ -1041,6 +1011,22 @@ Replaced with olivetti
 #+end_src
 
 #+RESULTS:
+** tectonic
+#+begin_src emacs-lisp :tangle yes
+    (eval-after-load 'tex
+        '(add-to-list 'TeX-command-list
+                      '("Tectonic" "tectonic %t" TeX-run-TeX nil t :help "Run Tectonic") t))
+
+  (defun my-run-tectonic ()
+    (interactive)
+    (TeX-command "Tectonic" #'TeX-master-file nil))
+
+  (map! :map TeX-mode-map
+        "C-c C-a"  'my-run-tectonic)
+  #+end_src
+
+#+RESULTS:
+
 * python
 ** ipython shell
 #+begin_src emacs-lisp :tangle yes
@@ -1128,54 +1114,41 @@ Replaced with olivetti
 | jupyter | pypy | Python |
 ** emacs-jupyter
 #+begin_src emacs-lisp :tangle yes
-(defun my-org-execute-and-next-block ()
-  (interactive)
-  (condition-case nil
-      (org-babel-execute-src-block)
-    (error nil))
-  (org-next-block 1)
-  )
+  (defun my-org-execute-and-next-block ()
+    (interactive)
+    (condition-case nil
+        (org-babel-execute-src-block)
+      (error nil))
+    (org-next-block 1)
+    )
 
-(after! org
-  (require 'ob-jupyter)
-  (require 'ob-python)
-  (require 'ox-ipynb)
-  (org-babel-do-load-languages
-   'org-babel-load-languages
-   '((emacs-lisp . t)
-     (julia . t)
-     (python . t)
-     (jupyter . t)))
-  (map! :map org-mode-map
-        "M-." 'jupyter-inspect-at-point
-        "C-z" 'jupyter-org-interrupt-kernel
-        "C-'" 'my-org-execute-and-next-block
-        )
+  (after! org
+    (require 'ob-jupyter)
+    (require 'ob-python)
+    (require 'ox-ipynb)
+    (org-babel-do-load-languages
+     'org-babel-load-languages
+     '((emacs-lisp . t)
+       (julia . t)
+       (python . t)
+       (jupyter . t)))
+    (map! :map org-mode-map
+          "M-." 'jupyter-inspect-at-point
+          "C-z" 'jupyter-org-interrupt-kernel
+          "C-'" 'my-org-execute-and-next-block
+          )
 
-  (setq org-babel-default-header-args:jupyter-python '((:async . "yes")
-                                                      (:session . "/jpy:localhost#8888:py")
-                                                      (:kernel . "python3")))
-  )
+    (setq org-babel-default-header-args:jupyter-python '((:async . "yes")
+                                                         (:session . "/jpy:localhost#8888:py")
+                                                         (:kernel . "python3")))
+
+
+    (setq org-confirm-babel-evaluate nil)
+    )
 #+end_src
 
 #+RESULTS:
-: ((:async . yes) (:session . /jpy:localhost#8888:py) (:kernel . python3))
 
-* company
-Idle company completion drives me crazy somehow. Instead of that, we use a keybinding to trigger it.
-#+begin_src emacs-lisp :tangle yes
-(after! company
-  (setq company-idle-delay nil)
-  (global-unset-key (kbd "C--"))
-  (map! :map company-mode-map
-        "C--" 'company-complete)
-  ;(company-prescient-mode -1)
-)
-(after! org
-  (set-company-backend! 'org-mode 'company-capf))
-#+end_src
-
-#+RESULTS:
 * emojify
 #+BEGIN_SRC emacs-lisp
 (defun emojify-insert-emoji-unicode ()
@@ -1241,58 +1214,36 @@ Idle company completion drives me crazy somehow. Instead of that, we use a keybi
 
 #+RESULTS:
 
-* native-compilation
-#+BEGIN_SRC emacs-lisp
-(setq comp-deferred-compilation t)
-#+END_SRC
-* json-mode
-this fixes an issue with json-mode, which expects this function for some reason
-#+begin_src emacs-lisp :tangle yes
-(defun jsons-remove-buffer () nil)
-#+end_src
-* beeminder
-From https://github.com/mbork/beeminder.el
-I adjust all the faces to work with the theme, as the default colors don't work well on a dark background.
-
-#+begin_src emacs-lisp :tangle no
-(use-package beeminder
-  :config
-  (setq beeminder-when-the-day-ends (* 3600 3) ; 3am
-        beeminder-username secret-beeminder-username
-        beeminder-auth-token secret-beeminder-auth-token
-        )
-
-
-  (custom-set-faces
-   '(beeminder-red ((t (:inherit font-lock-keyword-face))))
-   '(beeminder-green ((t (:inherit font-lock-function-name-face))))
-   '(beeminder-blue ((t (:inherit font-lock-constant-face))))
-   '(beeminder-yellow ((t (:inherit font-lock-builtin-face))))
-   '(beeminder-error ((t (:inherit error))))
-   '(beeminder-warning ((t (:inherit warning))))
-   '(subtle-highlight ((t (:inherit bold))))
-   '(beeminder-dirty ((t (:inherit font-lock-comment-face))))
-   )
-
-  )
-
-#+end_src
-
-#+RESULTS:
-: t
 * artificial intelligence
 ** chat.el
 #+BEGIN_SRC emacs-lisp
-(use-package chat
-  :config
-  (setq chat-api-key secret-chat-api-key)
-  (setq chat-model "gpt-3.5-turbo")
-  ;; (setq chat-model "gpt-4")
-  (setq chat-max-tokens 700)
-  (add-hook 'chat-mode-hook #'olivetti-mode)
-        )
+  (use-package chat
+    :config
+    (setq chat-api-key secret-chat-api-key)
+    ;; (setq chat-model "gpt-3.5-turbo")
+    (setq chat-model "gpt-3.5-turbo-1106")
+    ;; (setq chat-model "gpt-4-1106-preview")
+    (setq chat-max-tokens 700)
+    (add-hook 'chat-mode-hook #'olivetti-mode)
+          )
 
 #+END_SRC
+
+#+RESULTS:
+: t
+** claude-shell
+#+begin_src emacs-lisp :tangle yes
+  (use-package claude-shell
+     :config
+     (setq claude-shell-api-token secret-anthropic-key)
+     ;; (setq claude-shell-model "claude-3-haiku-20240307")
+     (setq claude-shell-model "claude-3-sonnet-20240229")
+     (setq claude-shell-streaming nil) ;; seems broken right now
+     (customize-set-value 'claude-shell-system-prompt "General")
+     ;; (add-hook 'claude-shell-mode-hook #'claude-shell--update-prompt)
+     )
+#+end_src
+
 * yasnippet
 ** auto-yasnippet
 #+begin_src emacs-lisp :tangle yes
@@ -1304,16 +1255,6 @@ I adjust all the faces to work with the theme, as the default colors don't work 
 
 #+RESULTS:
 : aya-expand
-* lsp
-#+begin_src emacs-lisp :tangle yes
-(after! lsp-ui
-  (setq lsp-ui-doc-enable nil
-        lsp-ui-sideline-enable nil
-        lsp-signature-render-documentation nil
-        lsp-signature-auto-activate nil))
-#+end_src
-
-#+RESULTS:
 * quarto-mode
 #+BEGIN_SRC emacs-lisp :tangle yes
 (require 'quarto-mode)

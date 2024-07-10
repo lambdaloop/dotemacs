@@ -6,6 +6,7 @@
  '(ansi-color-faces-vector
    [default default default italic underline success warning error])
  '(auth-source-save-behavior nil)
+ '(magit-todos-insert-after '(bottom) nil nil "Changed by setter of obsolete option `magit-todos-insert-at'")
  '(org-agenda-files
    '("/home/lili/notes/org/todo/projects.org" "/home/lili/notes/org/todo/personal.org" "/home/lili/notes/org/todo/ideas.org" "/home/lili/notes/org/todo/inbox.org"))
  '(org-roam-db-autosync-mode t)
@@ -25,8 +26,7 @@
  '(org-agenda-dimmed-todo-face ((t (:foreground "#ccc"))))
  '(org-scheduled ((t (:foreground "#eee"))))
  '(org-scheduled-today ((t (:foreground "#eee"))))
- '(subtle-highlight ((t (:inherit bold))))
- '(vterm-color-black ((t (:background "darkgray" :foreground "black")))))
+ '(subtle-highlight ((t (:inherit bold)))))
 (put 'narrow-to-region 'disabled nil)
 (put 'narrow-to-page 'disabled nil)
 (put 'projectile-ripgrep 'disabled nil)

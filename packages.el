@@ -74,7 +74,8 @@
 (package! org-ref)
 
 
-(package! vterm :pin "f41849c")
+;; (package! vterm :pin "f41849c")
+(package! vterm :pin "d9ea29f")
 (package! vterm-toggle)
 
 (package! matlab-mode)

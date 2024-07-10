@@ -133,17 +133,18 @@ available. You can either set `doom-theme' or manually load a theme with the
 
 ** Custom faces
 #+BEGIN_SRC emacs-lisp
+
 (custom-set-faces
- '(vterm-color-black ((t (:background "darkgray" :foreground "black"))))
+ '(term-color-bright-black ((t (:background "#9099AB" :foreground "#808080"))))
  '(org-scheduled-today ((t (:foreground "#eee"))))
  '(org-scheduled ((t (:foreground "#eee"))))
  '(org-agenda-dimmed-todo-face ((t (:foreground "#ccc"))))
  ;; '(org-done ((t (:strike-through nil))))
 
- '(term-color-green ((t (:foreground "#36a036" :background "#FFFFFF"))))
+ ;; '(term-color-green ((t (:foreground "#36a036" :background "#FFFFFF"))))
 
- '(term-default-fg-color ((t (:inherit term-color-white))))
- '(term-default-bg-color ((t (:inherit term-color-black))))
+ ;; '(term-default-fg-color ((t (:inherit term-color-white))))
+ ;; '(term-default-bg-color ((t (:inherit term-color-black))))
 
  )
 
@@ -191,6 +192,7 @@ available. You can either set `doom-theme' or manually load a theme with the
 
  ;; manage windows
  ("s-SPC" . ivy-switch-buffer)
+ ("s-b" . ivy-switch-buffer)
  ("s-k" . kill-this-buffer)
  ("s-Q" . kill-this-buffer)
  ("s-o" . other-window)
@@ -214,7 +216,7 @@ available. You can either set `doom-theme' or manually load a theme with the
  ;; ("M-S-<return>" . shell-switcher-switch-buffer)
 
  ("s-m" . vterm-toggle)
- ("s-M" . vterm)
+ ("s-M" . (lambda () (interactive) (vterm t)))
  ;; ("s-M" . shell-switcher-new-shell)
  ;; ("s-_" . (lambda () (interactive) (split-window-horizontally) (other-window 1) (shell-switcher-switch-buffer)))
 
@@ -232,6 +234,7 @@ available. You can either set `doom-theme' or manually load a theme with the
   #+end_src
 
 #+RESULTS:
+: align-regexp
 
 ** ergonomic keys
 Based on ergoemacs key bindings, but adjusted for me
@@ -446,7 +449,7 @@ I don't like ws-butler moving my point when i save
   (setq org-deadline-warning-days 7)
 
   (setq org-agenda-skip-deadline-prewarning-if-scheduled t)
-  (setq org-scheduled-past-days 14)
+  (setq org-scheduled-past-days 365)
 
   (setq org-todo-keywords
         '((sequence "TODO(t)" "STRT(s)" "PROJ(p)" "SCHD(c)" "WAIT(w)" "FUTR(f)"
@@ -1030,7 +1033,7 @@ ${ref}"
 * python
 ** ipython shell
 #+begin_src emacs-lisp :tangle yes
-(setq python-shell-interpreter "/home/lili/mambaforge/bin/ipython"
+(setq python-shell-interpreter "/home/lili/micromamba/bin/ipython"
       python-shell-interpreter-args "--simple-prompt -i")
 
 (map! :map python-mode-map
@@ -1048,7 +1051,7 @@ ${ref}"
     (let* ((conda-env
             (read-string "conda env: "))
            (python-shell-interpreter
-            (format "/home/lili/mambaforge/envs/%s/bin/ipython" conda-env))
+            (format "/home/lili/micromamba/envs/%s/bin/ipython" conda-env))
            )
       (run-python)
       ;; (run-python (format "~/scripts/ipython-conda.sh") t t)
@@ -1262,3 +1265,13 @@ ${ref}"
 
 #+RESULTS:
 : quarto-mode
+* ledger
+#+begin_src emacs-lisp :tangle yes
+(use-package ledger-mode
+  :config
+  (setq ledger-binary-path "hledger")
+  )
+#+end_src
+
+#+RESULTS:
+: t
